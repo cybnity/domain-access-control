@@ -14,11 +14,11 @@
   <packaging>pom</packaging>
   <name>Access control application (bounded context)</name>
   <modules>
-    <module>domain-model</module>
-    <module>translator</module>
-    <module>adapter</module>
-    <module>service</module>
-    <module>ui</module>
-    <module>system</module>
+    <module>ac-domain-model</module>
+    <module>ac-translator</module>
+    <module>ac-adapter</module>
+    <module>ac-service</module>
+    <module>ac-ui</module>
+    <module>ac-system</module>
   </modules>
 </project>
