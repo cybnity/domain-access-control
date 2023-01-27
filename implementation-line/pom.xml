@@ -2,8 +2,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.cybnity</groupId>
-		<artifactId>techstack</artifactId>
-		<version>0.6.0</version>
+		<artifactId>applications</artifactId>
+		<version>${revision}</version>
+		<relativePath>..</relativePath>
 	</parent>
 	<groupId>org.cybnity</groupId>
 	<artifactId>applications-impl</artifactId>
@@ -19,47 +20,5 @@
 		<!-- Project line -->
 		<module>access-control</module>
 	</modules>
-
-	<distributionManagement>
-		<!-- GitHub Packages development artifacts distribution
-	    	<snapshotRepository>
-	      		<id>github</id>
-	      		<name>CYBNITY Snapshot Packages</name>
-      			<uniqueVersion>true</uniqueVersion>
-	      		<url>https://maven.pkg.github.com/cybnity/foundation</url>
-	      	</snapshotRepository> -->
-		<!-- CYBNITY Open Source releases distribution -->
-		<repository>
-        		<id>space-cybnity-open-source</id>
-			<name>CYBNITY OS Releases</name>
-			<uniqueVersion>false</uniqueVersion>
-        		<url>https://maven.pkg.jetbrains.space/cybnity/p/cybnity-os/cybnity-open-source</url>
-			<layout>default</layout>
-    		</repository>
-	</distributionManagement>
-
-	<repositories>
-    		<repository>
-        		<id>space-cybnity-open-source</id>
-        		<url>https://maven.pkg.jetbrains.space/cybnity/p/cybnity-os/cybnity-open-source</url>
-			<snapshots>
-			    <enabled>false</enabled>
-			</snapshots>
-			<releases>
-			    <enabled>true</enabled>
-			</releases>
-    		</repository>
-		<repository>
-	      		<id>github</id>
-	      		<name>GitHub Packages</name>
-	      		<url>https://maven.pkg.github.com/cybnity/foundation</url>
-			<snapshots>
-			    <enabled>true</enabled>
-			</snapshots>
-			<releases>
-			    <enabled>true</enabled>
-			</releases>
-	      	</repository>
-	</repositories>
 
 </project>
