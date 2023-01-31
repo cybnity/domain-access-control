@@ -10,6 +10,6 @@
 	<artifactId>frontend-server</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
-	<name>--- AC UI frontend impl  module</name>
+	<name>--- AC UI frontend impl module</name>
 
 </project>
