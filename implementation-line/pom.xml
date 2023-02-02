@@ -23,6 +23,7 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- Foundation project dependencies -->
 			<dependency>
 				<groupId>org.cybnity.framework</groupId>
 				<artifactId>support</artifactId>
