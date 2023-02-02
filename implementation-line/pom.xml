@@ -27,7 +27,7 @@
 				<groupId>org.cybnity.framework</groupId>
 				<artifactId>support</artifactId>
 				<scope>compile</scope>
-				<version>${revision}</version>
+				<version>feature-153-alpha-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
