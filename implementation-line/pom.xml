@@ -28,11 +28,11 @@
 				<groupId>org.cybnity.framework</groupId>
 				<artifactId>support</artifactId>
 				<scope>compile</scope>
-				<version>feature-153-alpha-SNAPSHOT</version>
+				<version>feature-153-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.cybnity.framework</groupId>
