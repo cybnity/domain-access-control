@@ -12,7 +12,7 @@ on:
     # becarefull, path filters are not evaluated on tags
     paths:
       - 'pom.xml'
-      - 'implementations-line/**'
+      - 'implementation-line/**'
       - 'systems-line/**'
       - '.github/workflows/java-project-ci.yml'
       - '.github/workflows/check-project-technical-quality.yml'
