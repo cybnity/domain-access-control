@@ -14,4 +14,6 @@ buildNumber.properties
 #.project
 #.classpath
 #.settings/
-**/.flattened-pom.xml
+/**/.flattened-pom.xml
+.flattened-pom.xml
+#implementation-line/.flattened-pom.xml
