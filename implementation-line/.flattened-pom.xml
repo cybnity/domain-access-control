@@ -17,6 +17,7 @@
     <module>access-control</module>
   </modules>
   <properties>
+    <foundation.compatibility.version>staging-latest-SNAPSHOT</foundation.compatibility.version>
     <revision>0.1.0</revision>
   </properties>
   <dependencyManagement>
@@ -24,7 +25,7 @@
       <dependency>
         <groupId>org.cybnity.framework</groupId>
         <artifactId>support</artifactId>
-        <version>feature-153-alpha-SNAPSHOT</version>
+        <version>${foundation.compatibility.version}</version>
         <scope>compile</scope>
       </dependency>
     </dependencies>

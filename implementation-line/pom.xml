@@ -14,6 +14,8 @@
 	<properties>
 		<!-- CYBNITY project default revision -->
 		<revision>0.1.0</revision>
+		<!-- CYBNITY Foundation dependencies link-->
+		<foundation.compatibility.version>staging-latest-SNAPSHOT</foundation.compatibility.version>
 	</properties>
 
 	<modules>
@@ -28,7 +30,7 @@
 				<groupId>org.cybnity.framework</groupId>
 				<artifactId>support</artifactId>
 				<scope>compile</scope>
-				<version>feature-133-SNAPSHOT</version>
+				<version>${foundation.compatibility.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
