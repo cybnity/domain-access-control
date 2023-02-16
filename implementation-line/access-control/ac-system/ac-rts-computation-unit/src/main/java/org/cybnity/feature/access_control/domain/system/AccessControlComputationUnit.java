@@ -22,6 +22,8 @@ public class AccessControlComputationUnit extends AbstractVerticle {
 
 	@Override
 	public void start(Promise<Void> startPromise) throws Exception {
+
+		System.out.println("Access Control computation unit is started");
 		startPromise.complete();
 		/*vertx.deployVerticle(
 				Set each feature unit regarding this domain api

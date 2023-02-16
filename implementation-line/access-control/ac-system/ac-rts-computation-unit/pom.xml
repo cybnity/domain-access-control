@@ -10,70 +10,25 @@
 	<artifactId>rts-computation-unit</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
-	<name>-- AC RTS Computation Unit impl module</name>
+	<name>-- AC RTS Computation Unit impl</name>
 
 	<properties>
 		<main.verticle>org.cybnity.feature.access_control.domain.system.AccessControlComputationUnit</main.verticle>
-		<launcher.class>io.vertx.core.Launcher</launcher.class>
+		<module.system.image.name>access-control-process-module</module.system.image.name>
 	</properties>
-
-	<dependencies>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-junit5</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<manifestEntries>
-										<Main-Class>${launcher.class}</Main-Class>
-										<Main-Verticle>${main.verticle}</Main-Verticle>
-									</manifestEntries>
-								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-							</transformers>
-							<outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</outputFile>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<configuration>
-					<mainClass>${launcher.class}</mainClass>
-					<arguments>
-						<argument>run</argument>
-						<argument>${main.verticle}</argument>
-					</arguments>
-				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

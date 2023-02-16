@@ -16,6 +16,11 @@
 		<revision>0.1.0</revision>
 		<!-- CYBNITY Foundation dependencies link-->
 		<foundation.compatibility.version>staging-latest-SNAPSHOT</foundation.compatibility.version>
+		<!-- Standard Trusted Execution Environment (TEE) of java runtime container template -->
+		<docker.java.tee.image.name>cybnity/jre-tee</docker.java.tee.image.name>
+		<!-- NodeJS container template (Bullseye or buster based on Debian)-->
+		<!-- See https://snyk.io/blog/choosing-the-best-node-js-docker-image/ for choice of containerized NodeJS versions -->
+		<docker.nodejs.image.name>node:16.17.0-bullseye</docker.nodejs.image.name>
 	</properties>
 
 	<modules>
@@ -57,6 +62,8 @@
 				<docker.verbose>true</docker.verbose>
 				<docker.imagePullPolicy>IfNotPresent</docker.imagePullPolicy>
 				<docker.useColor>true</docker.useColor>
+				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
+				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
 			</properties>
 		</profile>
 
@@ -78,6 +85,8 @@
 				<docker.verbose>true</docker.verbose>
 				<docker.imagePullPolicy>IfNotPresent</docker.imagePullPolicy>
 				<docker.useColor>true</docker.useColor>
+				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
+				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
 			</properties>
 		</profile>
 
@@ -92,13 +101,29 @@
 				</property>
 			</activation>
 			<properties>
+				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
+			</properties>
+		</profile>
+
+		<profile>
+			<!-- Build phase regarding a software version development -->
+			<id>commit-stage</id>
+			<activation>
+				<property>
+					<!-- Activation based on -D system property (e.g command line with -Dstage=commit) -->
+					<name>stage</name>
+					<value>commit</value>
+				</property>
+			</activation>
+			<properties>
 				<!-- Default activate or deactivate the build of docker image -->
-				<docker.skip.build>true</docker.skip.build>
-				<docker.skip.tag>true</docker.skip.tag>
+				<docker.skip.build>false</docker.skip.build>
+				<docker.skip.tag>false</docker.skip.tag>
 				<docker.skip.push>true</docker.skip.push>
-				<docker.verbose>false</docker.verbose>
+				<docker.verbose>true</docker.verbose>
 				<docker.imagePullPolicy>IfNotPresent</docker.imagePullPolicy>
 				<docker.useColor>true</docker.useColor>
+				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
 			</properties>
 		</profile>
 
@@ -116,10 +141,12 @@
 				<!-- Default activate or deactivate the build of docker image -->
 				<docker.skip.build>false</docker.skip.build>
 				<docker.skip.tag>false</docker.skip.tag>
+				<!-- Push alpha release into Docker registry -->
 				<docker.skip.push>false</docker.skip.push>
 				<docker.verbose>true</docker.verbose>
 				<docker.imagePullPolicy>IfNotPresent</docker.imagePullPolicy>
 				<docker.useColor>true</docker.useColor>
+				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
 			</properties>
 			<build>
 				<plugins>
@@ -169,7 +196,7 @@
 		</profile>
 
 		<profile>
-			<!-- Build regarding a qualification version on AAT environment -->
+			<!-- Phase of integration quality validation of a software version (e.g on an test environment) -->
 			<id>integration-quality-stage</id>
 			<activation>
 				<property>
@@ -182,11 +209,25 @@
 				<!-- Default activate or deactivate the build of docker image -->
 				<docker.skip.build>false</docker.skip.build>
 				<docker.skip.tag>false</docker.skip.tag>
-				<docker.skip.push>true</docker.skip.push>
+				<!-- Push beta release into Docker registry -->
+				<docker.skip.push>false</docker.skip.push>
 				<docker.verbose>false</docker.verbose>
 				<docker.imagePullPolicy>IfNotPresent</docker.imagePullPolicy>
 				<docker.useColor>true</docker.useColor>
+				<docker.images.tag.suffix>-beta</docker.images.tag.suffix>
 			</properties>
+		</profile>
+
+		<profile>
+			<!-- Step of software behavior validation by testers community (e.g regarding a software beta release) -->
+			<id>user-acceptance-test-stage</id>
+			<activation>
+				<property>
+					<!-- Activation based on -D system property (e.g command line with -Dstage=user-acceptance-test) -->
+					<name>stage</name>
+					<value>user-acceptance-test</value>
+				</property>
+			</activation>
 		</profile>
 
 	</profiles>

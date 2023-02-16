@@ -25,8 +25,9 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
 						startPromise.fail(event.cause());
 					}
 				});
-			*/
-			// temp code before first implementation
+				*/
+
+			System.out.println("Access Control domain IO Gateway module is started");
 			startPromise.complete();
 	}
 }
