@@ -52,22 +52,6 @@ public class Tenant extends Entity implements IAggregate {
     private ActivityState activityStatus;
 
     /**
-     * Default constructor of a named tenant. By default, the tenant state is not
-     * active.
-     * 
-     * @param id   Mandatory identifier of this tenant.
-     * @param name Optional logical name (e.g organization name, owner or company
-     *             specific official identifying information) of this tenant.
-     * @throws IllegalArgumentException When any mandatory parameter is missing.
-     *                                  When id parameter's name is not equals to
-     *                                  BaseConstants.IDENTIFIER_ID.
-     */
-    public Tenant(Identifier id, MutableProperty name) throws IllegalArgumentException {
-	this(id);
-	this.name = name;
-    }
-
-    /**
      * Default constructor.
      * 
      * @param id   Mandatory identifier of this tenant.
@@ -166,9 +150,18 @@ public class Tenant extends Entity implements IAggregate {
      */
     public void setName(MutableProperty tenantName) {
 	if (this.name != null) {
-	    // Update the name with a new version
-
-	    // TODO : créer un change avec historique alimentée
+	    // Check if history shall be maintained
+	    if (!tenantName.changesHistory().contains(this.name)) {
+		// Save the previous name into the new name's versions history
+		MutableProperty enhanced = this.name.enhanceHistoryOf(tenantName,
+			/* Don't manage the already defined history state */ null);
+		// Update the current name of this tenant with the new version enhanced
+		this.name = enhanced;
+	    } else {
+		// new version is already instantiated with prior versions defined
+		// No need to enhance, but only to replace this current name
+		this.name = tenantName;
+	    }
 	} else {
 	    // Initialize the first defined name of this tenant
 	    this.name = tenantName;

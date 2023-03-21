@@ -47,6 +47,15 @@ public class OrganizationDescriptor extends MutableProperty {
 	this.versionedAt = OffsetDateTime.now();
     }
 
+    /**
+     * Get the name of the organization.
+     * 
+     * @return A label or null.
+     */
+    public String getOrganizationName() {
+	return (String) this.currentValue().getOrDefault(PropertyAttributeKey.Name.name(), null);
+    }
+
     @Override
     public OffsetDateTime occurredAt() {
 	return this.versionedAt;
@@ -54,7 +63,13 @@ public class OrganizationDescriptor extends MutableProperty {
 
     @Override
     public Serializable immutable() throws ImmutabilityException {
-	return null;
+	OrganizationDescriptor copy = new OrganizationDescriptor(this.owner(), this.currentValue(),
+		this.historyStatus());
+	// Complete with additional attributes of this complex property
+	copy.versionedAt = this.versionedAt;
+	copy.changedAt = this.occurredAt();
+	copy.updateChangesHistory(this.changesHistory());
+	return copy;
     }
 
     /**

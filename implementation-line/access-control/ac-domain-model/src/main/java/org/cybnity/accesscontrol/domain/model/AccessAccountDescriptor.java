@@ -44,7 +44,8 @@ public class AccessAccountDescriptor extends Entity implements IAggregate {
     /**
      * Version of this class
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = new VersionConcreteStrategy()
+	    .composeCanonicalVersionHash(AccessAccountDescriptor.class).hashCode();
 
     /**
      * Default constructor.
