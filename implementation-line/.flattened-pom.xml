@@ -18,7 +18,7 @@
   </modules>
   <properties>
     <docker.nodejs.image.name>node:16.17.0-bullseye</docker.nodejs.image.name>
-    <foundation.compatibility.version>staging-latest-SNAPSHOT</foundation.compatibility.version>
+    <foundation.compatibility.version>feature-159-alpha-SNAPSHOT</foundation.compatibility.version>
     <docker.java.tee.image.name>cybnity/jre-tee</docker.java.tee.image.name>
     <revision>0.1.0</revision>
   </properties>
