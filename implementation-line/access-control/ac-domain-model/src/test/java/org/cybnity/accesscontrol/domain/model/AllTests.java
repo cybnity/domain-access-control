@@ -11,6 +11,6 @@ import org.junit.platform.suite.api.Suite;
  *
  */
 @Suite
-@SelectClasses({ ActivityStateUseCaseTest.class, TenantUseCaseTest.class, AccountUseCaseTest.class })
+@SelectClasses({ ActivityStateUseCaseTest.class, AccountUseCaseTest.class })
 public class AllTests {
 }

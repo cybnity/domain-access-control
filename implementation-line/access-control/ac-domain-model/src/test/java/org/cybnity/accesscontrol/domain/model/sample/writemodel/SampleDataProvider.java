@@ -3,10 +3,10 @@ package org.cybnity.accesscontrol.domain.model.sample.writemodel;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.cybnity.accesscontrol.domain.model.Tenant;
-import org.cybnity.accesscontrol.domain.model.sample.writemodel.OrganizationDescriptor.PropertyAttributeKey;
+import org.cybnity.accesscontrol.domain.model.sample.writemodel.OrganizationProperty.PropertyAttributeKey;
 import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.model.DomainEntityImpl;
+import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.HistoryState;
 import org.cybnity.framework.immutable.Identifier;
@@ -30,7 +30,7 @@ public class SampleDataProvider {
 	// Define attributes of tenant owner
 	HashMap<String, Object> organisationAttr = new HashMap<String, Object>();
 	organisationAttr.put(PropertyAttributeKey.Name.name(), "CYBNITY France");
-	OrganizationDescriptor organization = new OrganizationDescriptor(tenant.parent(), organisationAttr,
+	OrganizationProperty organization = new OrganizationProperty(tenant.parent(), organisationAttr,
 		HistoryState.COMMITTED);
 	tenant.setOrganization(organization);
 	return tenant;

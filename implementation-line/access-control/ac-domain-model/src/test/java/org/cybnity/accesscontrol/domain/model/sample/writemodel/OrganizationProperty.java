@@ -21,7 +21,7 @@ import org.cybnity.framework.immutable.utility.VersionConcreteStrategy;
  * @author olivier
  *
  */
-public class OrganizationDescriptor extends MutableProperty {
+public class OrganizationProperty extends MutableProperty {
 
     private static final long serialVersionUID = 1L;
     private OffsetDateTime versionedAt;
@@ -35,14 +35,14 @@ public class OrganizationDescriptor extends MutableProperty {
 	Name, LocationCity, LocationCountry;
     }
 
-    public OrganizationDescriptor(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue,
+    public OrganizationProperty(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue,
 	    HistoryState status) throws IllegalArgumentException {
 	super(propertyOwner, propertyCurrentValue, status);
 	this.versionedAt = OffsetDateTime.now();
     }
 
-    public OrganizationDescriptor(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue,
-	    HistoryState status, OrganizationDescriptor... prior) throws IllegalArgumentException {
+    public OrganizationProperty(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue,
+	    HistoryState status, OrganizationProperty... prior) throws IllegalArgumentException {
 	super(propertyOwner, propertyCurrentValue, status, prior);
 	this.versionedAt = OffsetDateTime.now();
     }
@@ -63,7 +63,7 @@ public class OrganizationDescriptor extends MutableProperty {
 
     @Override
     public Serializable immutable() throws ImmutabilityException {
-	OrganizationDescriptor copy = new OrganizationDescriptor(this.owner(), this.currentValue(),
+	OrganizationProperty copy = new OrganizationProperty(this.owner(), this.currentValue(),
 		this.historyStatus());
 	// Complete with additional attributes of this complex property
 	copy.versionedAt = this.versionedAt;

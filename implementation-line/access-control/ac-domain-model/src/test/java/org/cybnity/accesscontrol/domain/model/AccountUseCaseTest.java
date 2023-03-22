@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.cybnity.accesscontrol.domain.model.sample.writemodel.SampleDataProvider;
 import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.model.DomainEntityImpl;
+import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.EntityReference;
