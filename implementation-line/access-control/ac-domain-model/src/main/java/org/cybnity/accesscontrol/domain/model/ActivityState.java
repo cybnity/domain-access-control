@@ -37,36 +37,36 @@ public class ActivityState extends MutableProperty {
     /**
      * Default constructor.
      * 
-     * @param propertyOwner Mandatory owner of this state (e.g account entity),
-     *                      including the entity information.
-     * @param status        Mandatory value of state property (e.g true when
-     *                      active).
+     * @param propertyOwner  Mandatory owner of this state (e.g account entity),
+     *                       including the entity information.
+     * @param isActiveStatus Mandatory value of state property (e.g true when
+     *                       active).
      * @throws IllegalArgumentException When mandatory parameter is missing.
      * @throws ImmutabilityException    When impossible creation of immutable
      *                                  version regarding the owner instance.
      */
-    public ActivityState(EntityReference propertyOwner, Boolean status)
+    public ActivityState(EntityReference propertyOwner, Boolean isActiveStatus)
 	    throws IllegalArgumentException, ImmutabilityException {
-	this(propertyOwner, status, (ActivityState) null);
+	this(propertyOwner, isActiveStatus, (ActivityState) null);
     }
 
     /**
      * Constructor with predecessors state automatically to save as history.
      * 
-     * @param propertyOwner Mandatory owner of this state (e.g account entity),
-     *                      including the entity information.
-     * @param status        Mandatory value of state property (e.g true when
-     *                      active).
-     * @param predecessors  Optional prior states.
+     * @param propertyOwner  Mandatory owner of this state (e.g account entity),
+     *                       including the entity information.
+     * @param isActiveStatus Mandatory value of state property (e.g true when
+     *                       active).
+     * @param predecessors   Optional prior states.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      * @throws ImmutabilityException    When impossible creation of immutable
      *                                  version regarding the owner instance.
      */
-    public ActivityState(EntityReference propertyOwner, Boolean status, ActivityState... predecessors)
+    public ActivityState(EntityReference propertyOwner, Boolean isActiveStatus, ActivityState... predecessors)
 	    throws IllegalArgumentException, ImmutabilityException {
 	this( /* Reference identifier equals to the owner of this state */
 		(propertyOwner != null) ? propertyOwner.getEntity() : null,
-		(status != null) ? buildPropertyValue(PropertyAttributeKey.StateValue, status) : null,
+		(isActiveStatus != null) ? buildPropertyValue(PropertyAttributeKey.StateValue, isActiveStatus) : null,
 		HistoryState.COMMITTED, predecessors);
     }
 

@@ -1,6 +1,5 @@
 package org.cybnity.accesscontrol.domain.model;
 
-import org.cybnity.accesscontrol.domain.model.sample.writemodel.TenantUseCaseTest;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 
@@ -12,6 +11,6 @@ import org.junit.platform.suite.api.Suite;
  *
  */
 @Suite
-@SelectClasses({ ActivityStateUseCaseTest.class, TenantUseCaseTest.class })
+@SelectClasses({ ActivityStateUseCaseTest.class, TenantUseCaseTest.class, AccountUseCaseTest.class })
 public class AllTests {
 }

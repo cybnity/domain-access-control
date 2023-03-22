@@ -1,10 +1,13 @@
 package org.cybnity.accesscontrol.domain.model;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import org.cybnity.framework.domain.IdentifierStringBased;
+import org.cybnity.framework.domain.model.Predecessors;
 import org.cybnity.framework.immutable.BaseConstants;
+import org.cybnity.framework.immutable.ChildFact;
 import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.EntityReference;
 import org.cybnity.framework.immutable.Identifier;
@@ -20,13 +23,13 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
  * regarding systems and/or capabilities) in the frame of a context (e.g
  * specific Tenant scope).
  * 
- * Domain aggregate object relative to a subject's usable account.
+ * Domain root aggregate object relative to a subject's usable account.
  * 
  * @author olivier
  *
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_3")
-public class AccountDescriptor extends Entity {
+public class Account extends ChildFact {
 
     /**
      * Owner entity (identifier) of this account.
@@ -42,30 +45,36 @@ public class AccountDescriptor extends Entity {
      * Version of this class
      */
     private static final long serialVersionUID = new VersionConcreteStrategy()
-	    .composeCanonicalVersionHash(AccountDescriptor.class).hashCode();
+	    .composeCanonicalVersionHash(Account.class).hashCode();
 
     /**
      * Default constructor.
      * 
-     * @param id             Mandatory identifier of this user account.
-     * @param userIdentity   Mandatory user identity who is owner of this account.
-     * @param tenantIdentity Optional identity of the tenant (e.g organization
-     *                       subscription that this account is registered into)
-     *                       where this account is usable.
+     * @param predecessor          Mandatory parent of this tenant root aggregate
+     *                             instance.
+     * @param id                   Optional identifier of this user account.
+     * @param accountOwnerIdentity Mandatory identity of owner (e.g user identity)
+     *                             of this account.
+     * @param tenantIdentity       Optional identity of the tenant (e.g organization
+     *                             subscription that this account is registered
+     *                             into) and usable.
      * @throws IllegalArgumentException When id parameter is null and does not
-     *                                  include name and value.
+     *                                  include name and value. When id parameter is
+     *                                  not based on BaseConstants.IDENTIFIER_ID
+     *                                  name.
      */
-    protected AccountDescriptor(Identifier id, EntityReference userIdentity, EntityReference tenantIdentity)
-	    throws IllegalArgumentException {
-	super(id);
-	if (!BaseConstants.IDENTIFIER_ID.name().equals(id.name()))
+    public Account(Entity predecessor, Identifier id, EntityReference accountOwnerIdentity,
+	    EntityReference tenantIdentity) throws IllegalArgumentException {
+	super(predecessor, id);
+	if (id != null && !BaseConstants.IDENTIFIER_ID.name().equals(id.name()))
 	    throw new IllegalArgumentException(
 		    "id parameter is not valid because identifier name shall be equals to only supported value ("
 			    + BaseConstants.IDENTIFIER_ID.name() + ")!");
-	if (userIdentity == null)
-	    throw new IllegalArgumentException("userIdentity parameter is required!");
+	if (accountOwnerIdentity == null)
+	    throw new IllegalArgumentException("accountOwnerIdentity parameter is required!");
 	// Save unmodifiable user identity which is owner of this account
-	this.owner = userIdentity;
+	this.owner = accountOwnerIdentity;
+
 	// Save the tenant identity which is a scope of usage regarding this account
 	// (e.g attached to the subcription of the tenant)
 	this.tenant = tenantIdentity;
@@ -74,19 +83,22 @@ public class AccountDescriptor extends Entity {
     /**
      * Specific partial constructor of an identifiable account.
      * 
-     * @param identifiers Set of mandatory identifiers of this entity, that contains
+     * @param predecessor Mandatory parent of this tenant root aggregate instance.
+     * @param identifiers Optional set of identifiers of this entity, that contains
      *                    non-duplicable elements.
      * @throws IllegalArgumentException When identifiers parameter is null or each
      *                                  item does not include name and value.
      */
-    private AccountDescriptor(LinkedHashSet<Identifier> identifiers) throws IllegalArgumentException {
-	super(identifiers);
+    private Account(Entity predecessor, LinkedHashSet<Identifier> identifiers) throws IllegalArgumentException {
+	super(predecessor, identifiers);
     }
 
+    /**
+     * Redefine the copied elements in immutable version of this account instance.
+     */
     @Override
     public Serializable immutable() throws ImmutabilityException {
-	LinkedHashSet<Identifier> ids = new LinkedHashSet<>(this.identifiers());
-	AccountDescriptor account = new AccountDescriptor(ids);
+	Account account = new Account(parent(), new LinkedHashSet<>(this.identifiers()));
 	account.createdAt = this.occurredAt();
 	account.owner = this.owner();
 	account.tenant = this.tenant();
@@ -104,12 +116,7 @@ public class AccountDescriptor extends Entity {
 
     @Override
     public Identifier identified() throws ImmutabilityException {
-	StringBuffer combinedId = new StringBuffer();
-	for (Identifier id : this.identifiers()) {
-	    combinedId.append(id.value());
-	}
-	// Return combined identifier
-	return new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), combinedId.toString());
+	return IdentifierStringBased.build(this.identifiers());
     }
 
     /**
@@ -141,6 +148,26 @@ public class AccountDescriptor extends Entity {
 	    }
 	}
 	return null;
+    }
+
+    /**
+     * Define the generation rule of identifier based on original child id name or
+     * BaseConstants.IDENTIFIER_ID.name().
+     */
+    @Override
+    protected Identifier generateIdentifierPredecessorBased(Entity predecessor, Identifier childOriginalId)
+	    throws IllegalArgumentException {
+	return Predecessors.generateIdentifierPredecessorBased(predecessor, childOriginalId);
+    }
+
+    /**
+     * Define the generation rule of identifier based on original child identifiers
+     * name or BaseConstants.IDENTIFIER_ID.name().
+     */
+    @Override
+    protected Identifier generateIdentifierPredecessorBased(Entity predecessor, Collection<Identifier> childOriginalIds)
+	    throws IllegalArgumentException {
+	return Predecessors.generateIdentifierPredecessorBased(predecessor, childOriginalIds);
     }
 
 }

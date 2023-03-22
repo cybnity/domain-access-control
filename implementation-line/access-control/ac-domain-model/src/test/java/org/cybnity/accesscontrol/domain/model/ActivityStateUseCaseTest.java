@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.cybnity.accesscontrol.domain.model.ActivityState.PropertyAttributeKey;
 import org.cybnity.framework.domain.IdentifierStringBased;
+import org.cybnity.framework.domain.model.DomainEntityImpl;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.EntityReference;
 import org.cybnity.framework.immutable.HistoryState;
@@ -32,11 +33,13 @@ public class ActivityStateUseCaseTest {
     public void initOwner() throws Exception {
 	// Create tenant
 	Tenant owner = new Tenant(
+		new DomainEntityImpl(new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID()
+			.toString())),
 		new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
 		Boolean.TRUE);
 	// Deactivate by default
 	owner.deactivate();
-	propertyOwner = owner.reference();
+	propertyOwner = owner.parent().reference();
     }
 
     @AfterEach

@@ -1,10 +1,13 @@
 package org.cybnity.accesscontrol.domain.model;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import org.cybnity.framework.domain.IdentifierStringBased;
+import org.cybnity.framework.domain.model.Predecessors;
 import org.cybnity.framework.immutable.BaseConstants;
+import org.cybnity.framework.immutable.ChildFact;
 import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
@@ -25,11 +28,13 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
  * per sharded database relative to the pool proportion user-base and resource
  * usage).
  * 
+ * Domain root aggregate object.
+ * 
  * @author olivier
  *
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_3")
-public class Tenant extends Entity {
+public class Tenant extends ChildFact {
 
     /**
      * Version of this class
@@ -51,23 +56,26 @@ public class Tenant extends Entity {
     /**
      * Default constructor.
      * 
-     * @param id            Mandatory identifier of this tenant.
+     * @param predecessor   Mandatory parent of this tenant root aggregate instance.
+     * @param id            Optional identifier of this tenant.
      * @param currentStatus Optional current status of this tenant subscription (e.g
      *                      True when active).
      * @throws IllegalArgumentException When any mandatory parameter is missing.
      *                                  When id parameter's name is not equals to
      *                                  BaseConstants.IDENTIFIER_ID. When a problem
-     *                                  of immutability is occurred.
+     *                                  of immutability is occurred. When
+     *                                  predecessor mandatory parameter is not
+     *                                  defined or without defined identifier.
      */
-    public Tenant(Identifier id, Boolean currentStatus) throws IllegalArgumentException {
-	super(id);
-	if (!BaseConstants.IDENTIFIER_ID.name().equals(id.name()))
+    public Tenant(Entity predecessor, Identifier id, Boolean currentStatus) throws IllegalArgumentException {
+	super(predecessor, id);
+	if (id != null && !BaseConstants.IDENTIFIER_ID.name().equals(id.name()))
 	    throw new IllegalArgumentException(
 		    "id parameter is not valid because identifier name shall be equals to only supported value ("
 			    + BaseConstants.IDENTIFIER_ID.name() + ")!");
 	if (currentStatus != null) {
 	    try {
-		this.activityStatus = new ActivityState(this.reference(), currentStatus);
+		this.activityStatus = new ActivityState(parent().reference(), currentStatus);
 	    } catch (ImmutabilityException ie) {
 		// Normally shall never arrive
 		// TODO : add technical log
@@ -78,13 +86,16 @@ public class Tenant extends Entity {
     /**
      * Specific partial constructor of an identifiable tenant.
      * 
-     * @param identifiers Set of mandatory identifiers of this entity, that contains
+     * @param predecessor Mandatory parent of this child tenant.
+     * @param identifiers Optional set of identifiers of this entity, that contains
      *                    non-duplicable elements.
      * @throws IllegalArgumentException When identifiers parameter is null or each
-     *                                  item does not include name and value.
+     *                                  item does not include name and value. When
+     *                                  predecessor mandatory parameter is not
+     *                                  defined or without defined identifier.
      */
-    private Tenant(LinkedHashSet<Identifier> identifiers) throws IllegalArgumentException {
-	super(identifiers);
+    private Tenant(Entity predecessor, LinkedHashSet<Identifier> identifiers) throws IllegalArgumentException {
+	super(predecessor, identifiers);
     }
 
     /**
@@ -138,7 +149,7 @@ public class Tenant extends Entity {
      */
     public MutableProperty activate() throws ImmutabilityException {
 	// Create initial status as active
-	setStatus(new ActivityState(this.reference(), Boolean.TRUE, this.activityStatus));
+	setStatus(new ActivityState(parent().reference(), Boolean.TRUE, this.activityStatus));
 	return status();
     }
 
@@ -153,7 +164,7 @@ public class Tenant extends Entity {
      */
     public MutableProperty deactivate() throws ImmutabilityException {
 	// Create initial status as inactive
-	setStatus(new ActivityState(this.reference(), Boolean.FALSE, this.activityStatus));
+	setStatus(new ActivityState(parent.reference(), Boolean.FALSE, this.activityStatus));
 	return status();
     }
 
@@ -202,7 +213,7 @@ public class Tenant extends Entity {
     @Override
     public Serializable immutable() throws ImmutabilityException {
 	LinkedHashSet<Identifier> ids = new LinkedHashSet<>(this.identifiers());
-	Tenant tenant = new Tenant(ids);
+	Tenant tenant = new Tenant(parent(), ids);
 	tenant.createdAt = this.occurredAt();
 	tenant.organization = this.organization();
 	tenant.activityStatus = this.status();
@@ -220,12 +231,27 @@ public class Tenant extends Entity {
 
     @Override
     public Identifier identified() throws ImmutabilityException {
-	StringBuffer combinedId = new StringBuffer();
-	for (Identifier id : this.identifiers()) {
-	    combinedId.append(id.value());
-	}
-	// Return combined identifier
-	return new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), combinedId.toString());
+	return IdentifierStringBased.build(this.identifiers());
+    }
+
+    /**
+     * Define the generation rule of identifier based on original child id name or
+     * BaseConstants.IDENTIFIER_ID.name().
+     */
+    @Override
+    protected Identifier generateIdentifierPredecessorBased(Entity predecessor, Identifier childOriginalId)
+	    throws IllegalArgumentException {
+	return Predecessors.generateIdentifierPredecessorBased(predecessor, childOriginalId);
+    }
+
+    /**
+     * Define the generation rule of identifier based on original child identifiers
+     * name or BaseConstants.IDENTIFIER_ID.name().
+     */
+    @Override
+    protected Identifier generateIdentifierPredecessorBased(Entity predecessor, Collection<Identifier> childOriginalIds)
+	    throws IllegalArgumentException {
+	return Predecessors.generateIdentifierPredecessorBased(predecessor, childOriginalIds);
     }
 
 }

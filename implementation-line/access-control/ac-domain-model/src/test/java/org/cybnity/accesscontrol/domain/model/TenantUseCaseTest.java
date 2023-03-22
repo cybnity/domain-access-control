@@ -1,4 +1,4 @@
-package org.cybnity.accesscontrol.domain.model.sample.writemodel;
+package org.cybnity.accesscontrol.domain.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.cybnity.accesscontrol.domain.model.ActivityState;
-import org.cybnity.accesscontrol.domain.model.Tenant;
+import org.cybnity.accesscontrol.domain.model.sample.writemodel.OrganizationDescriptor;
 import org.cybnity.accesscontrol.domain.model.sample.writemodel.OrganizationDescriptor.PropertyAttributeKey;
 import org.cybnity.framework.domain.IdentifierStringBased;
+import org.cybnity.framework.domain.model.DomainEntityImpl;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.HistoryState;
 import org.cybnity.framework.immutable.Identifier;
@@ -36,15 +36,19 @@ public class TenantUseCaseTest {
     private Identifier id;
 
     @BeforeEach
-    public void initTenantSample() {
+    public void initTenantSample() throws Exception {
 	id = new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString());
 	// Create named tenant
-	tenant = new Tenant(id, /* Simulate unknown original activity state */ null);
+	tenant = new Tenant(new DomainEntityImpl(id),
+		/*
+		 * Simulate auto-assigned parent identifier without extension of the child id
+		 * generation based on identifiers and minimum quantity of lenght
+		 */ null, /* Simulate unknown original activity state */ null);
 
 	// Define attributes of tenant owner
 	HashMap<String, Object> organisationAttr = new HashMap<String, Object>();
 	organisationAttr.put(PropertyAttributeKey.Name.name(), namedOrganization);
-	organization = new OrganizationDescriptor(tenant, organisationAttr, HistoryState.COMMITTED);
+	organization = new OrganizationDescriptor(tenant.parent(), organisationAttr, HistoryState.COMMITTED);
 	tenant.setOrganization(organization);
     }
 
@@ -73,7 +77,7 @@ public class TenantUseCaseTest {
 	HashMap<String, Object> attr = new HashMap<String, Object>();
 	attr.put(PropertyAttributeKey.Name.name(), renamedAs);
 
-	OrganizationDescriptor renamed1 = new OrganizationDescriptor(tenant, attr, HistoryState.COMMITTED,
+	OrganizationDescriptor renamed1 = new OrganizationDescriptor(tenant.parent(), attr, HistoryState.COMMITTED,
 		/*
 		 * prior link about old organizations automatically included into the versions
 		 * history of this renaming
@@ -99,8 +103,11 @@ public class TenantUseCaseTest {
     public void givenDefaultTenant_whenCreate_thenCompleted() throws Exception {
 	// Check valid identifier
 	assertNotNull(tenant.identified());
-	assertEquals(id, tenant.identified(), "Invalid sample identifier!");
 	assertNotNull(tenant.occurredAt());
+	// Because default null optional identifier of sample id assign automatically
+	// the parent id to the tenant, child and parent identifier are equals
+	assertEquals(id, tenant.parent().identified(), "Invalid sample identifier!");
+	assertEquals(id, tenant.identified(), "Invalid sample identifier!");
 
 	// Named tenant check
 	OrganizationDescriptor orgaDesc = (OrganizationDescriptor) tenant.organization();
@@ -154,15 +161,20 @@ public class TenantUseCaseTest {
 	    @Override
 	    public void execute() throws Throwable {
 		// Try instantiation based on not supported identifier name
-		new Tenant(new IdentifierStringBased("other", UUID.randomUUID().toString()), Boolean.TRUE);
+		new Tenant(
+			new DomainEntityImpl(new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(),
+				UUID.randomUUID().toString())),
+			new IdentifierStringBased("other", UUID.randomUUID().toString()), Boolean.TRUE);
 	    }
 	});
 	// Check null id is not supported
 	assertThrows(IllegalArgumentException.class, new Executable() {
 	    @Override
 	    public void execute() throws Throwable {
-		// Try instantiation based on none identifier
-		new Tenant(null, Boolean.TRUE);
+		// Try instantiation based on none predecessor
+		new Tenant(null,
+			new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
+			Boolean.TRUE);
 	    }
 	});
     }
@@ -178,6 +190,8 @@ public class TenantUseCaseTest {
     public void givenDefaultInstance_whenActivate_thenStateUpdatedWithHistoryMaintained() throws Exception {
 	// Create default tenant
 	Tenant tenant = new Tenant(
+		new DomainEntityImpl(
+			new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString())),
 		new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
 		/* null as default unknown state */ null);
 	assertNull(tenant.status(), "Unknown by default!");
@@ -190,7 +204,7 @@ public class TenantUseCaseTest {
 	assertTrue(tenant.status().isActive());
 
 	// Check the ownership of the activity state property
-	assertEquals(tenant.reference(), tenant.status().ownerReference(),
+	assertEquals(tenant.parent().reference(), tenant.status().ownerReference(),
 		"Owner of state property shall had been defined as the tenant!");
 
 	// Verify that none history is by default existent
@@ -213,5 +227,21 @@ public class TenantUseCaseTest {
 	// Check good updated unactive state into the changed tenant
 	assertFalse(tenant.status().isActive());
 	assertEquals(HistoryState.COMMITTED, tenant.status().historyStatus(), "Invalid default committed history!");
+    }
+
+    /**
+     * Verify that creation of immutable version include all required elements.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void givenInstance_whenImmutable_completedCopy() throws Exception {
+	tenant.activate(); // Activate status replacing originally unknown
+	Tenant copy = (Tenant) tenant.immutable();
+	assertNotNull(copy.identified());
+	assertNotNull(copy.occurredAt());
+	assertNotNull(copy.organization());
+	assertNotNull(copy.parent());
+	assertNotNull(copy.status());
     }
 }
