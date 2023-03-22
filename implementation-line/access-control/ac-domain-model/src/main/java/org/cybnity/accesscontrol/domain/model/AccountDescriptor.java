@@ -3,10 +3,7 @@ package org.cybnity.accesscontrol.domain.model;
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 
-import org.cybnity.framework.IContext;
-import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.IdentifierStringBased;
-import org.cybnity.framework.domain.model.IAggregate;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.EntityReference;
@@ -29,7 +26,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
  *
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_3")
-public class AccessAccountDescriptor extends Entity implements IAggregate {
+public class AccountDescriptor extends Entity {
 
     /**
      * Owner entity (identifier) of this account.
@@ -45,7 +42,7 @@ public class AccessAccountDescriptor extends Entity implements IAggregate {
      * Version of this class
      */
     private static final long serialVersionUID = new VersionConcreteStrategy()
-	    .composeCanonicalVersionHash(AccessAccountDescriptor.class).hashCode();
+	    .composeCanonicalVersionHash(AccountDescriptor.class).hashCode();
 
     /**
      * Default constructor.
@@ -58,7 +55,7 @@ public class AccessAccountDescriptor extends Entity implements IAggregate {
      * @throws IllegalArgumentException When id parameter is null and does not
      *                                  include name and value.
      */
-    protected AccessAccountDescriptor(Identifier id, EntityReference userIdentity, EntityReference tenantIdentity)
+    protected AccountDescriptor(Identifier id, EntityReference userIdentity, EntityReference tenantIdentity)
 	    throws IllegalArgumentException {
 	super(id);
 	if (!BaseConstants.IDENTIFIER_ID.name().equals(id.name()))
@@ -82,14 +79,14 @@ public class AccessAccountDescriptor extends Entity implements IAggregate {
      * @throws IllegalArgumentException When identifiers parameter is null or each
      *                                  item does not include name and value.
      */
-    private AccessAccountDescriptor(LinkedHashSet<Identifier> identifiers) throws IllegalArgumentException {
+    private AccountDescriptor(LinkedHashSet<Identifier> identifiers) throws IllegalArgumentException {
 	super(identifiers);
     }
 
     @Override
     public Serializable immutable() throws ImmutabilityException {
 	LinkedHashSet<Identifier> ids = new LinkedHashSet<>(this.identifiers());
-	AccessAccountDescriptor account = new AccessAccountDescriptor(ids);
+	AccountDescriptor account = new AccountDescriptor(ids);
 	account.createdAt = this.occurredAt();
 	account.owner = this.owner();
 	account.tenant = this.tenant();
@@ -144,15 +141,6 @@ public class AccessAccountDescriptor extends Entity implements IAggregate {
 	    }
 	}
 	return null;
-    }
-
-    @Override
-    public void execute(Command change, IContext ctx) throws IllegalArgumentException {
-	if (ctx == null)
-	    throw new IllegalArgumentException("Context parameter is required!");
-
-	throw new IllegalArgumentException(
-		"Unsupported type of command by " + AccessAccountDescriptor.class.getName() + "!");
     }
 
 }

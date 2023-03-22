@@ -1,12 +1,10 @@
 package org.cybnity.accesscontrol.domain.model;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
 import java.util.HashMap;
 
 import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.EntityReference;
-import org.cybnity.framework.immutable.Evaluations;
 import org.cybnity.framework.immutable.HistoryState;
 import org.cybnity.framework.immutable.ImmutabilityException;
 import org.cybnity.framework.immutable.MutableProperty;
@@ -27,17 +25,13 @@ public class ActivityState extends MutableProperty {
     private static final long serialVersionUID = new VersionConcreteStrategy()
 	    .composeCanonicalVersionHash(ActivityState.class).hashCode();
 
-    private OffsetDateTime versionedAt;
-
     /**
      * The keys set regarding the multiple attributes defining this state, and that
      * each change need to be versioned/treated as a single atomic fact.
      */
     public enum PropertyAttributeKey {
-	/** Boolean state **/
-	StateValue,
-	/** Owner of this property */
-	OwnerRef, VersionedAt;
+	/** Boolean active/deactive state **/
+	StateValue;
     }
 
     /**
@@ -53,19 +47,32 @@ public class ActivityState extends MutableProperty {
      */
     public ActivityState(EntityReference propertyOwner, Boolean status)
 	    throws IllegalArgumentException, ImmutabilityException {
-	this( /* Reference identifier equals to the owner of this state */
-		(propertyOwner != null) ? propertyOwner.getEntity() : null,
-		(status != null) ? buildPropertyValue(PropertyAttributeKey.StateValue, status) : null,
-		HistoryState.COMMITTED);
-
-	// Save owner original entity reference object (allowing the build of future
-	// immutable version of this state)
-	this.currentValue().put(PropertyAttributeKey.OwnerRef.name(), propertyOwner);
+	this(propertyOwner, status, (ActivityState) null);
     }
 
     /**
-     * Internal constructor with automatic initialization of an empty value set
-     * (prior chain).
+     * Constructor with predecessors state automatically to save as history.
+     * 
+     * @param propertyOwner Mandatory owner of this state (e.g account entity),
+     *                      including the entity information.
+     * @param status        Mandatory value of state property (e.g true when
+     *                      active).
+     * @param predecessors  Optional prior states.
+     * @throws IllegalArgumentException When mandatory parameter is missing.
+     * @throws ImmutabilityException    When impossible creation of immutable
+     *                                  version regarding the owner instance.
+     */
+    public ActivityState(EntityReference propertyOwner, Boolean status, ActivityState... predecessors)
+	    throws IllegalArgumentException, ImmutabilityException {
+	this( /* Reference identifier equals to the owner of this state */
+		(propertyOwner != null) ? propertyOwner.getEntity() : null,
+		(status != null) ? buildPropertyValue(PropertyAttributeKey.StateValue, status) : null,
+		HistoryState.COMMITTED, predecessors);
+    }
+
+    /**
+     * Constructor with automatic initialization of an empty value set (prior
+     * chain).
      * 
      * @param propertyOwner        Mandatory entity which is owner of this mutable
      *                             property chain.
@@ -75,27 +82,23 @@ public class ActivityState extends MutableProperty {
      * @param status               Optional state of this property version. If null,
      *                             {@link org.cybnity.framework.immutable.HistoryState.Committed}
      *                             is defined as default state.
+     * @param predecessors         Optional prior states.
      * @throws IllegalArgumentException When mandatory parameter is missing, or when
      *                                  cant' be cloned regarding immutable entity
      *                                  parameter.
      */
-    private ActivityState(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue, HistoryState status)
-	    throws IllegalArgumentException {
-	super(propertyOwner, propertyCurrentValue, status);
-	this.versionedAt = OffsetDateTime.now();
-	// Save the current (last) version date
-	this.currentValue().put(PropertyAttributeKey.VersionedAt.name(), this.versionedAt);
+    public ActivityState(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue, HistoryState status,
+	    @Requirement(reqType = RequirementCategory.Consistency, reqId = "REQ_CONS_3") ActivityState... predecessors) {
+	super(propertyOwner, propertyCurrentValue, status, predecessors);
     }
 
     @Override
     public Serializable immutable() throws ImmutabilityException {
-	ActivityState copy = new ActivityState(
-		(EntityReference) this.currentValue().get(PropertyAttributeKey.OwnerRef.name()),
+	ActivityState copy = new ActivityState(this.ownerReference(),
 		(Boolean) this.currentValue().get(PropertyAttributeKey.StateValue.name()));
 	// Complete with additional attributes of this complex property
 	copy.changedAt = this.occurredAt();
 	copy.historyStatus = this.historyStatus();
-	copy.versionedAt = this.versionedAt;
 	copy.updateChangesHistory(this.changesHistory());
 	return copy;
     }
@@ -108,7 +111,7 @@ public class ActivityState extends MutableProperty {
      * @return A definition of the property.
      * @throws IllegalArgumentException When any mandatory parameter is missing.
      */
-    static private HashMap<String, Object> buildPropertyValue(PropertyAttributeKey key, Object value)
+    static public HashMap<String, Object> buildPropertyValue(PropertyAttributeKey key, Object value)
 	    throws IllegalArgumentException {
 	if (key == null)
 	    throw new IllegalArgumentException("key parameter is required!");
@@ -124,17 +127,6 @@ public class ActivityState extends MutableProperty {
     @Override
     public String versionHash() {
 	return new VersionConcreteStrategy().composeCanonicalVersionHash(getClass());
-    }
-
-    /**
-     * Who is the owner of this property.
-     * 
-     * @return The owner
-     * @throws ImmutabilityException If impossible creation of immutable version of
-     *                               instance
-     */
-    public Entity owner() throws ImmutabilityException {
-	return (Entity) this.entity.immutable();
     }
 
     /**
@@ -159,23 +151,16 @@ public class ActivityState extends MutableProperty {
      * Get the entity reference which is owner of this activity state property.
      * 
      * @return An owner reference.
+     * @throws ImmutabilityException If impossible creation of immutable version of
+     *                               instance.
      */
-    public EntityReference ownerReference() {
-	return (EntityReference) this.currentValue().get(PropertyAttributeKey.OwnerRef.name());
-    }
-
-    /**
-     * Get the time when this activity state was versioned.
-     * 
-     * @return A date of this status creation.
-     */
-    public OffsetDateTime versionedAt() {
-	return (OffsetDateTime) this.currentValue().get(PropertyAttributeKey.VersionedAt.name());
+    public EntityReference ownerReference() throws ImmutabilityException {
+	return this.owner().reference();
     }
 
     /**
      * Redefined equality evaluation including the owner, the status, the version in
-     * history and the time of version attributes compared.
+     * history in terms of functional attributes compared.
      */
     @Override
     public boolean equals(Object obj) {
@@ -191,8 +176,7 @@ public class ActivityState extends MutableProperty {
 		    if (compared.isActive().equals(this.isActive())) {
 			// Check if same history version
 			if (compared.historyStatus() == this.historyStatus()) {
-			    // Check if same activity state versioned
-			    isEquals = Evaluations.isEpochSecondEquals(compared.versionedAt(), this.versionedAt);
+			    isEquals = true;
 			}
 		    }
 		}

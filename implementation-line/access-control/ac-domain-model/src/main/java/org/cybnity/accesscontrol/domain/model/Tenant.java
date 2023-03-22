@@ -3,10 +3,7 @@ package org.cybnity.accesscontrol.domain.model;
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 
-import org.cybnity.framework.IContext;
-import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.IdentifierStringBased;
-import org.cybnity.framework.domain.model.IAggregate;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.Identifier;
@@ -32,7 +29,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
  *
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_3")
-public class Tenant extends Entity implements IAggregate {
+public class Tenant extends Entity {
 
     /**
      * Version of this class
@@ -41,33 +38,41 @@ public class Tenant extends Entity implements IAggregate {
 	    .hashCode();
 
     /**
-     * Logical name of this tenant (e.g business name of a company) that facilitate
-     * to resolve queries.
+     * Logical organization representing this tenant (e.g business name of a
+     * company) that facilitate to resolve queries.
      */
-    private MutableProperty name;
+    private MutableProperty organization;
 
     /**
-     * Current status of activity regarding this tenant.
+     * Current mutable status of activity regarding this tenant.
      */
     private ActivityState activityStatus;
 
     /**
      * Default constructor.
      * 
-     * @param id   Mandatory identifier of this tenant.
-     * @param name Optional logical name (e.g organization name, owner or company
-     *             specific official identifying information) of this tenant.
+     * @param id            Mandatory identifier of this tenant.
+     * @param currentStatus Optional current status of this tenant subscription (e.g
+     *                      True when active).
      * @throws IllegalArgumentException When any mandatory parameter is missing.
      *                                  When id parameter's name is not equals to
      *                                  BaseConstants.IDENTIFIER_ID. When a problem
      *                                  of immutability is occurred.
      */
-    public Tenant(Identifier id) throws IllegalArgumentException {
+    public Tenant(Identifier id, Boolean currentStatus) throws IllegalArgumentException {
 	super(id);
 	if (!BaseConstants.IDENTIFIER_ID.name().equals(id.name()))
 	    throw new IllegalArgumentException(
 		    "id parameter is not valid because identifier name shall be equals to only supported value ("
 			    + BaseConstants.IDENTIFIER_ID.name() + ")!");
+	if (currentStatus != null) {
+	    try {
+		this.activityStatus = new ActivityState(this.reference(), currentStatus);
+	    } catch (ImmutabilityException ie) {
+		// Normally shall never arrive
+		// TODO : add technical log
+	    }
+	}
     }
 
     /**
@@ -85,7 +90,7 @@ public class Tenant extends Entity implements IAggregate {
     /**
      * Get the current state of activity regarding this tenant.
      * 
-     * @return A status.
+     * @return A status or null when unknown.
      * @throws ImmutabilityException When problem of instantiation regarding the
      *                               immutable version of the current status.
      */
@@ -97,87 +102,100 @@ public class Tenant extends Entity implements IAggregate {
     }
 
     /**
-     * Change the current activity state as active. This method update the hsitory
-     * of previous activity states and replace the current state with a new
-     * immutable state version.
+     * Update the current activity status of this tenant.
      * 
-     * @return An immutable version of the new current state.
+     * @param status A status. If existent tenant's status is not included already
+     *               in this parameter, this method verify it and add the current
+     *               state as previous version to maintain the changes history
+     *               regaarding the mutable state. If null, the method ignore the
+     *               requested change and maintain the already existent state.
+     */
+    private void setStatus(ActivityState status) {
+	if (status != null) {
+	    if (this.activityStatus != null) {
+		// Check that status is already included into the history
+		if (!status.changesHistory().contains(this.activityStatus)) {
+		    // Add the current status as old (prior) regarding the new version of the status
+		    // to save
+		    status.changesHistory().add(this.activityStatus);
+		    // Current status become last historized status in history chain of new status
+		    // to save
+		}
+	    }
+	    // Replace current version of mutable state of this tenant
+	    this.activityStatus = status;
+	}
+    }
+
+    /**
+     * Change the current activity state as active. This method update the history
+     * of previous activity states and replace the current state with a new state
+     * version.
+     * 
+     * @return A mutable version of the new current state.
      * @throws ImmutabilityException When impossible assignation of this reference
      *                               as owner of an activity state change.
      */
     public MutableProperty activate() throws ImmutabilityException {
-	ActivityState state = null;
-	if (this.activityStatus == null) {
-	    // Create initial status as active
-	    state = new ActivityState(this.reference(), Boolean.TRUE);
-	    this.activityStatus = state;
-	} else {
-	    // TODO: créer nouvelle version de status, alimenter et mettre à jour
-	    // l'historique de la mutable property. Rédiger le TU
-	}
-	return (ActivityState) state.immutable();
+	// Create initial status as active
+	setStatus(new ActivityState(this.reference(), Boolean.TRUE, this.activityStatus));
+	return status();
     }
 
     /**
-     * Change the current activity state as inactive. This method update the hsitory
-     * of previous activity states and replace the current state with a new
-     * immutable state version.
+     * Change the current activity state as inactive. This method update the history
+     * of previous activity states and replace the current state with a new state
+     * version.
      * 
-     * @return An immutable version of the new current state.
+     * @return A mutable version of the new current state.
      * @throws ImmutabilityException When impossible assignation of this reference
      *                               as owner of an activity state change.
      */
     public MutableProperty deactivate() throws ImmutabilityException {
-	ActivityState state = null;
-	if (this.activityStatus == null) {
-	    // Create initial status as inactive
-	    state = new ActivityState(this.reference(), Boolean.FALSE);
-	    this.activityStatus = state;
-	} else {
-	    // TODO: créer nouvelle version de status, alimenter et mettre à jour
-	    // l'historique de la mutable property. Rédiger le TU
-	}
-	return (ActivityState) state.immutable();
+	// Create initial status as inactive
+	setStatus(new ActivityState(this.reference(), Boolean.FALSE, this.activityStatus));
+	return status();
     }
 
     /**
-     * Define a logical name regarding this tenant when none previously defined.
-     * When existent previous name about this tenant, this method make a change on
-     * the previous defined name (changes history is saved) to defined the new name
-     * as current.
+     * Define a logical organization regarding this tenant when none previously
+     * defined. When existent previous organization about this tenant, this method
+     * make a change on the previous defined organization (changes history is saved)
+     * to defined the new one as current.
      * 
-     * @param tenantName A name.
+     * @param tenantRepresentedBy An organization (e.g social entity, physical
+     *                            entity).
      */
-    public void setName(MutableProperty tenantName) {
-	if (this.name != null) {
+    public void setOrganization(MutableProperty tenantRepresentedBy) {
+	if (this.organization != null) {
 	    // Check if history shall be maintained
-	    if (!tenantName.changesHistory().contains(this.name)) {
-		// Save the previous name into the new name's versions history
-		MutableProperty enhanced = this.name.enhanceHistoryOf(tenantName,
+	    if (!tenantRepresentedBy.changesHistory().contains(this.organization)) {
+		// Save the previous name into the new organization's versions history
+		MutableProperty enhanced = this.organization.enhanceHistoryOf(tenantRepresentedBy,
 			/* Don't manage the already defined history state */ null);
-		// Update the current name of this tenant with the new version enhanced
-		this.name = enhanced;
+		// Update the current organization of this tenant with the new version enhanced
+		this.organization = enhanced;
 	    } else {
 		// new version is already instantiated with prior versions defined
-		// No need to enhance, but only to replace this current name
-		this.name = tenantName;
+		// No need to enhance, but only to replace this current organization
+		this.organization = tenantRepresentedBy;
 	    }
 	} else {
 	    // Initialize the first defined name of this tenant
-	    this.name = tenantName;
+	    this.organization = tenantRepresentedBy;
 	}
     }
 
     /**
-     * Get the logical name of this tenant.
+     * Get the representative organization of this tenant.
      * 
-     * @return A name or null if unknown.
+     * @return An organization or null if unknown.
      * @throws ImmutabilityException When problem of immutable version
      *                               instantiation.
      */
-    public MutableProperty name() throws ImmutabilityException {
-	if (this.name != null)
-	    return (MutableProperty) this.name.immutable();
+    public MutableProperty organization() throws ImmutabilityException {
+	if (this.organization != null)
+	    return (MutableProperty) this.organization.immutable();
 	return null;
     }
 
@@ -186,7 +204,7 @@ public class Tenant extends Entity implements IAggregate {
 	LinkedHashSet<Identifier> ids = new LinkedHashSet<>(this.identifiers());
 	Tenant tenant = new Tenant(ids);
 	tenant.createdAt = this.occurredAt();
-	tenant.name = this.name();
+	tenant.organization = this.organization();
 	tenant.activityStatus = this.status();
 	return tenant;
     }
@@ -208,14 +226,6 @@ public class Tenant extends Entity implements IAggregate {
 	}
 	// Return combined identifier
 	return new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), combinedId.toString());
-    }
-
-    @Override
-    public void execute(Command change, IContext ctx) throws IllegalArgumentException {
-	if (ctx == null)
-	    throw new IllegalArgumentException("Context parameter is required!");
-
-	throw new IllegalArgumentException("Unsupported type of command by " + Tenant.class.getName() + "!");
     }
 
 }

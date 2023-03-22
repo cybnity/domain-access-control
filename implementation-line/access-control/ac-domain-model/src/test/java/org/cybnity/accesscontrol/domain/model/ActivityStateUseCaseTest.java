@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
+import org.cybnity.accesscontrol.domain.model.ActivityState.PropertyAttributeKey;
 import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.EntityReference;
@@ -31,7 +32,8 @@ public class ActivityStateUseCaseTest {
     public void initOwner() throws Exception {
 	// Create tenant
 	Tenant owner = new Tenant(
-		new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()));
+		new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
+		Boolean.TRUE);
 	// Deactivate by default
 	owner.deactivate();
 	propertyOwner = owner.reference();
@@ -96,7 +98,7 @@ public class ActivityStateUseCaseTest {
      * @throws Exception
      */
     @Test
-    public void givenActivityStateVersion_whenUpdateOldVersionsHistory_thenEnhancedNewVersion() throws Exception {
+    public void givenActivityStateVersion_whenUpdateVersion_thenVersionsHitorized() throws Exception {
 	// Create a state without history
 	ActivityState v1 = new ActivityState(propertyOwner, Boolean.TRUE);
 	// Check empty history and current valid status
@@ -104,12 +106,11 @@ public class ActivityStateUseCaseTest {
 	assertTrue(v1.changesHistory().isEmpty());
 
 	// Create another version with changed of status (simulate a temporary unactive
-	// status of a subject)
-	ActivityState v2 = new ActivityState(propertyOwner, Boolean.FALSE);
+	// status of a subject) from constructor that attach directly prior version
+	ActivityState v2 = new ActivityState(propertyOwner.getEntity(),
+		ActivityState.buildPropertyValue(PropertyAttributeKey.StateValue, Boolean.FALSE),
+		HistoryState.CANCELLED, v1);
 	assertFalse(v2.isActive());
-	// Enhance its history with V1 previous version and automatic cancelling new
-	// state
-	v1.enhanceHistoryOf(v2, HistoryState.CANCELLED);
 	// Check that history of previous versions is not lost and was updated into the
 	// V2
 	assertEquals(1, v2.changesHistory().size(), "Only v1 previous version shall exist in history!");
@@ -118,9 +119,10 @@ public class ActivityStateUseCaseTest {
 		"enhanced V2 instance shall had been automatically setted during the enhancement executed method!");
 
 	// Create another version with again changed state
-	ActivityState v3 = new ActivityState(propertyOwner, Boolean.TRUE);
-	v3.setHistoryStatus(HistoryState.MERGED);// Redefined default status during constructor run
-	// Enhance history about old versions
+	ActivityState v3 = new ActivityState(propertyOwner.getEntity(),
+		ActivityState.buildPropertyValue(PropertyAttributeKey.StateValue, Boolean.FALSE), HistoryState.MERGED,
+		v2);
+	// Enhance history about all old versions chain
 	v2.enhanceHistoryOf(v3, null /* without change of new version state */);
 	assertTrue(HistoryState.MERGED == v3.historyStatus(), "State shall had not been modified during enhancement!");
 
@@ -131,5 +133,14 @@ public class ActivityStateUseCaseTest {
 	assertTrue(v3.changesHistory().contains(v2));// Based on equals evaluation
 	assertFalse(v3.changesHistory().contains(v3),
 		"Current version shall not be recorded as duplicata into its history!");
+
+	// Create another version with only prior last version (without all old versions
+	// chain)
+	ActivityState v4 = new ActivityState(propertyOwner.getEntity(),
+		ActivityState.buildPropertyValue(PropertyAttributeKey.StateValue, Boolean.FALSE),
+		HistoryState.COMMITTED, v3);
+	// Check that only one previous version is saved as prioi into its history
+	// attribute
+	assertEquals(1, v4.changesHistory().size(), "Invalid historized prior quantity!");
     }
 }

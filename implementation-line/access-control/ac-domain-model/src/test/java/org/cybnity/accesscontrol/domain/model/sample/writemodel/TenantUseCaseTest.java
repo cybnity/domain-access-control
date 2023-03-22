@@ -31,7 +31,7 @@ import org.junit.jupiter.api.function.Executable;
 public class TenantUseCaseTest {
 
     private Tenant tenant;
-    private String organisationName = "CYBNITY";
+    private String namedOrganization = "CYBNITY France";
     private OrganizationDescriptor organization;
     private Identifier id;
 
@@ -39,13 +39,13 @@ public class TenantUseCaseTest {
     public void initTenantSample() {
 	id = new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString());
 	// Create named tenant
-	tenant = new Tenant(id);
+	tenant = new Tenant(id, /* Simulate unknown original activity state */ null);
 
 	// Define attributes of tenant owner
 	HashMap<String, Object> organisationAttr = new HashMap<String, Object>();
-	organisationAttr.put(PropertyAttributeKey.Name.name(), organisationName);
+	organisationAttr.put(PropertyAttributeKey.Name.name(), namedOrganization);
 	organization = new OrganizationDescriptor(tenant, organisationAttr, HistoryState.COMMITTED);
-	tenant.setName(organization);
+	tenant.setOrganization(organization);
     }
 
     @AfterEach
@@ -56,37 +56,40 @@ public class TenantUseCaseTest {
     }
 
     /**
-     * Test that when a named tenant (original name) is upgraded regarding its
-     * naming mutable property, the attribute versions history is managed by the
-     * tenant.
+     * Test that when a named tenant (original organization representant) is
+     * upgraded regarding its naming mutable property, the attribute versions
+     * history is managed by the tenant.
      * 
      * @throws Exception
      */
     @Test
-    public void givenDefineName_whenSetName_thenMutableVersionsHistorized() throws Exception {
-	// Created tenant with a name (sample)
+    public void givenDefineOrganization_whenChangeOrganization_thenMutableVersionsHistorized() throws Exception {
+	// Created tenant with a name (organization sample)
 
-	// Define a new name changed regarding the tenant (e.g simulate a company brand
+	// Define a new organization changed regarding the tenant (e.g simulate a
+	// company brand
 	// change)
-	String renamedAs = "Men in Black corp";
+	String renamedAs = "CYBNITY Corp";
 	HashMap<String, Object> attr = new HashMap<String, Object>();
 	attr.put(PropertyAttributeKey.Name.name(), renamedAs);
 
 	OrganizationDescriptor renamed1 = new OrganizationDescriptor(tenant, attr, HistoryState.COMMITTED,
 		/*
-		 * prior link about old names automatically included into the versions history
-		 * of this renaming
-		 */ (OrganizationDescriptor) tenant.name());
+		 * prior link about old organizations automatically included into the versions
+		 * history of this renaming
+		 */ (OrganizationDescriptor) tenant.organization());
 
-	// Update the tenant with new name (that have already previous name in history
+	// Update the tenant with new organization (that have already previous
+	// organization in history
 	// attached)
-	tenant.setName(renamed1);
-	// Verify saved name regarding the tenant
-	assertEquals(renamed1, tenant.name());
-	// Verify that previous name is maintained into the tenant mutable property
+	tenant.setOrganization(renamed1);
+	// Verify saved organization regarding the tenant
+	assertEquals(renamed1, tenant.organization());
+	// Verify that previous organization is maintained into the tenant mutable
+	// property
 	// history
-	assertEquals(1, tenant.name().changesHistory().size(),
-		"Initial name of the tenant shall had been maintained in the versions history!");
+	assertEquals(1, tenant.organization().changesHistory().size(),
+		"Initial organization of the tenant shall had been maintained in the versions history!");
     }
 
     /**
@@ -100,9 +103,9 @@ public class TenantUseCaseTest {
 	assertNotNull(tenant.occurredAt());
 
 	// Named tenant check
-	OrganizationDescriptor orgaDesc = (OrganizationDescriptor) tenant.name();
+	OrganizationDescriptor orgaDesc = (OrganizationDescriptor) tenant.organization();
 	assertNotNull(orgaDesc);
-	assertEquals(organisationName, orgaDesc.getOrganizationName(),
+	assertEquals(namedOrganization, orgaDesc.getOrganizationName(),
 		"Shall be defined equals as defined by the initTenantSample() call!");
 
 	// Default status is unknown
@@ -151,7 +154,7 @@ public class TenantUseCaseTest {
 	    @Override
 	    public void execute() throws Throwable {
 		// Try instantiation based on not supported identifier name
-		new Tenant(new IdentifierStringBased("other", UUID.randomUUID().toString()));
+		new Tenant(new IdentifierStringBased("other", UUID.randomUUID().toString()), Boolean.TRUE);
 	    }
 	});
 	// Check null id is not supported
@@ -159,8 +162,56 @@ public class TenantUseCaseTest {
 	    @Override
 	    public void execute() throws Throwable {
 		// Try instantiation based on none identifier
-		new Tenant(null);
+		new Tenant(null, Boolean.TRUE);
 	    }
 	});
+    }
+
+    /**
+     * Test that default tenant without defined original state, is activable with
+     * valid instantiated contents (e.g maintained history of previous state
+     * versions).
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void givenDefaultInstance_whenActivate_thenStateUpdatedWithHistoryMaintained() throws Exception {
+	// Create default tenant
+	Tenant tenant = new Tenant(
+		new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
+		/* null as default unknown state */ null);
+	assertNull(tenant.status(), "Unknown by default!");
+	// Activate it (e.g simulate registration/subscription state changed)
+	assertNotNull(tenant.activate(), "Mutable property state shall have been created!");
+
+	// Check activity state initialized
+	ActivityState v1State = tenant.status();
+	assertNotNull(v1State);
+	assertTrue(tenant.status().isActive());
+
+	// Check the ownership of the activity state property
+	assertEquals(tenant.reference(), tenant.status().ownerReference(),
+		"Owner of state property shall had been defined as the tenant!");
+
+	// Verify that none history is by default existent
+	assertTrue(tenant.status().changesHistory().isEmpty());
+
+	// Update the activity state of the tenant
+	ActivityState updated = (ActivityState) tenant.deactivate(); // change current status of the tenant, including
+								     // the automatic add of previous state into the
+								     // history of the new created state instance
+	// Check maintained history
+	assertEquals(1, updated.changesHistory().size(),
+		"previous original status shall have been saved in history (as prior of new instantiated status)!");
+	ActivityState savedV1 = (ActivityState) tenant.status().changesHistory().iterator().next();
+	assertEquals(v1State, savedV1,
+		"Original state shall had been saved into the history chain of the new actived/created status!");
+	assertTrue(v1State.changesHistory().isEmpty() && savedV1.changesHistory().isEmpty()); // Check none any previous
+											      // history version in the
+											      // original state
+
+	// Check good updated unactive state into the changed tenant
+	assertFalse(tenant.status().isActive());
+	assertEquals(HistoryState.COMMITTED, tenant.status().historyStatus(), "Invalid default committed history!");
     }
 }
