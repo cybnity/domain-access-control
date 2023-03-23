@@ -11,4 +11,11 @@
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<name>- AC domain model</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.cybnity.framework</groupId>
+			<artifactId>domain</artifactId>
+			<version>${revision}</version>
+		</dependency>
+	</dependencies>
 </project>

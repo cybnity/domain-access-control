@@ -25,16 +25,16 @@ Several systems are built as executable modules, containerized (Docker images) a
 
 # APPLICATION COMPONENTS
 The source codes managed in theses sub-projects (Maven projects) are supporting the features (as micro-service components constituing the business capabilities provided by the application domain) provided by the bounded context:
-- [Adapter API library](access-control/ac-adapter-api)
-- [Adapter Implementation library](access-control/ac-adapter-impl)
-- [Adapter Translator library](access-control/ac-translator)
-- [Domain Model library](access-control/ac-domain-model)
-- [Domain Service API library](access-control/ac-service-api)
-- [Domain Service Implementation module](access-control/ac-service-impl)
+- Adapter API library
+- Adapter Implementation
+- Adapter Translator library
+- [Domain Model library](implementation-line/access-control/ac-domain-model/)
+- Domain Service API library
+- Domain Service Implementation module
 
 ## RUNNABLE PACKAGED COMPONENTS
 Several systems are developed as executable modules, which are containerized and ready for deployment via provisioning management solution:
-- [Domain Gateway Server](access-control/ac-system/ac-domain-gateway-server)
+- Domain Gateway Server
   - For example, to start auto-generated docker image (by Maven) into a Minikube platform, execute command line `kubectl run cybnity-ac-domain-gateway --image=cybnity/access-control-domain-gateway --image-pull-policy=Never`
-- [Real-Time Stream Computation Unit](access-control/ac-system/ac-rts-computation-unit)
+- Real-Time Stream Computation Unit
   - For example, to start docker image as Pod in Minikube, execute command line `kubectl run cybnity-ac-domain-rts-process --image=cybnity/access-control-process-module --image-pull-policy=Never`
