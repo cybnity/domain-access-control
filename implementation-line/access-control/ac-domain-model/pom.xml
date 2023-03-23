@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>org.cybnity.framework</groupId>
 			<artifactId>domain</artifactId>
-			<version>${revision}</version>
+			<version>${foundation.compatibility.version}</version>
 		</dependency>
 	</dependencies>
 </project>
