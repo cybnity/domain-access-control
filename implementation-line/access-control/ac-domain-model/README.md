@@ -3,6 +3,73 @@ Presentation of the domain components.
 
 # FUNCTIONAL VIEW
 
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+        'background': '#ffffff',
+        'fontFamily': 'arial',
+        'fontSize': '10px',
+        'primaryColor': '#fff',
+        'primaryTextColor': '#0e2a43',
+        'primaryBorderColor': '#0e2a43',
+        'secondaryColor': '#fff',
+        'secondaryTextColor': '#fff',
+        'secondaryBorderColor': '#fff',
+        'tertiaryColor': '#fff',
+        'tertiaryTextColor': '#fff',
+        'tertiaryBorderColor': '#fff',
+        'edgeLabelBackground':'#fff',
+        'lineColor': '#0e2a43',
+        'titleColor': '#fff',
+        'textColor': '#fff',
+        'lineColor': '#0e2a43',
+        'nodeTextColor': '#fff',
+        'nodeBorder': '#0e2a43',
+        'noteTextColor': '#fff',
+        'noteBorderColor': '#fff'
+    },
+    'flowchart': { 'curve': 'monotoneX' }
+  }
+}%%
+flowchart TB
+  subgraph global
+    direction TB
+    id1(AUTHENTICATION)
+    id1 -- type of --> id2(Identification)
+    id1 -- is a --> id3(PROCESS)
+    id1 -- yields --> id4(Security Context)
+    id2 -- with a level of --> id5(Confidence)
+    id3 -- that provides high levels of --> id5
+    id3 -- verifies & test --> id6(CLAIMS)
+    id5 -- about --> id6
+    id3 -- implemented via --> id7(Mechanism)
+    id7 -- evaluate & test --> id14(CREDENTIAL)
+
+    id6 -- from or about an --> id22(ENTITY)
+    id22 -- that is identifiable in an --> id29(PRINCIPAL)
+    id22 -- can be a --> id23(Subject)
+    id14 -- bind --> id6
+
+    id14 -- expressed as --> id13
+    id13(Factors) -- are --> id8(Ownership Factors) & id9(Knowledge Factors) & id10(Inheritance Factors)
+    id8 -- examples --> id11((Token)) & id12((Device))
+    id9 -- examples --> id15((Session<br>ID)) & id16((Password))
+    id10 -- examples --> id17((Camera)) & id18((Finger<br>Print))
+    id14 -- example --> id20((Digital<br>Certificate)) & id21((User ID<br>& Password))
+    id23 -- can be --> id24(Process) & id25(Machine) & id26(Person) & id27(System) & id28(User)
+    id23 -- has --> id19
+    id14 -- bind --> id19(Identity)
+  end
+  classDef future stroke-dasharray: 5 5
+  classDef concern fill:#0e2a43, color:#fff
+  classDef example fill:#e5302a, stroke:#e5302a, color:#fff
+  class id2,id4,id5,id7,id8,id9,id10,id13,id19,id23,id24,id25,id26,id27,id28 future;
+  class id1,id3,id6,id14,id22,id29 concern;
+  class id11,id12,id15,id16,id17,id18,id20,id21 example;
+
+```
 
 # DESIGN VIEW
 Several components of specification or implementation are supporting the domain provided over the `org.cybnity.application.access-control.domain` project's main package.
