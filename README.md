@@ -32,9 +32,21 @@ The source codes managed in theses sub-projects (Maven projects) are supporting 
 - Domain Service API library
 - Domain Service Implementation module
 
-## RUNNABLE PACKAGED COMPONENTS
+# INFRASTRUCTURE COMPONENTS
+The source code managed in this area are about the infrastructure components supporting the features and applications modules.
+- Keycloak server
+
+# DEPLOYABLE & RUNNABLE MODULES
 Several systems are developed as executable modules, which are containerized and ready for deployment via provisioning management solution:
 - Domain Gateway Server
   - For example, to start auto-generated docker image (by Maven) into a Minikube platform, execute command line `kubectl run cybnity-ac-domain-gateway --image=cybnity/access-control-domain-gateway --image-pull-policy=Never`
 - Real-Time Stream Computation Unit
   - For example, to start docker image as Pod in Minikube, execute command line `kubectl run cybnity-ac-domain-rts-process --image=cybnity/access-control-process-module --image-pull-policy=Never`
+
+## REUSABLE PROVISIONING SYSTEM PROJECTS
+Perimeter: some infrastructure third-party software (e.g Keycloak, Postgresql) are available on the market as template of provisioning helping to quickly customize the runtime (provisioning of pre-configured Docker image) into a Kubernetes platform. Some infrastructure components are reused by CYBNITY as infrastructure systems with customization of the prepared templates of their images helmization.
+
+Project type: Helm implementation structures.
+
+Description: several generic infrastructure projects required by the CYBNITY implementation architecture are managed.
+- [Keycloak server](implementation-line/systems/charts/keycloak): bitnami Helm project of Keycloak image provisioning, customized for the CYBNITY needs. This provisioning project is deployable and is supported by a `bitnami/keycloak 13.4.0` version hosted on `20.0.5-debian-11-r4` operating system version, and including a `postgresql 12.2.1` database version deployment. This implementation (hosted on [GitHUB](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)) is currently used to reduce the maintenance effort of a dedicated Helm project.
