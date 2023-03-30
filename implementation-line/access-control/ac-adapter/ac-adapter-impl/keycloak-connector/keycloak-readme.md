@@ -16,14 +16,14 @@ Manage several tasks from the accessed Keycloak's adminisation console.
 Create a Realm similar to a TenantId relative to an organization (e.g named cybnity) from the top-left select menu with click on `Create Realm` button and switch on the new created real area.
 
 ### Realm configuration
-From __Realm Settings__ created:
+From **Realm Settings** created:
 - Frontend URL:
   - Define the external (e.g url and port exposed outside the K8s cluster) of Keycloak realm
 - Security Defenses to configure the Clickjacking security
-  - Default `SAMEORIGIN` value of __X-Frame-Options__
+  - Default `SAMEORIGIN` value of **X-Frame-Options**
     - See https://datatracker.ietf.org/doc/html/rfc7034#section-2.2.1 for more details about X-Frame-Options
     - See https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/threat/clickjacking.html for help about mitigation of Clickjacking
-  - Default `frame-src 'self'; frame-ancestors 'self'; object-src 'none';` value of __Content-Security-Policy__
+  - Default `frame-src 'self'; frame-ancestors 'self'; object-src 'none';` value of **Content-Security-Policy**
     - See https://www.w3.org/TR/CSP/#directive-frame-src about frame-src to restrict the URLS which may be loaded into nested browsing contexts
     - See https://www.w3.org/TR/CSP/#directive-frame-ancestors about frame-ancestors to define the URLs which can embed the resource using frame of iframe
     - See https://www.w3.org/TR/CSP/#directive-object-src about object-src to restrict URLS from which plugin context may be loaded
@@ -32,8 +32,8 @@ From __Realm Settings__ created:
 
 ### Web Reactive Frontend System client
 #### Creation
-Register a new Keycloak client dedicated to frontend module (allowing user authentication from web browser when access to web UI provided by the __web-reactive-frontend-system__ that is running into the K8s cluster):
-- Navigate to __Clients__ and use __Create client__ button for add a new client
+Register a new Keycloak client dedicated to frontend module (allowing user authentication from web browser when access to web UI provided by the **web-reactive-frontend-system** that is running into the K8s cluster):
+- Navigate to **Clients** and use **Create client** button for add a new client
 - Set client to create's description about web app source to integrate with Keycloak login:
   - General Settings
     - Client type: `OpenID Connect`
@@ -57,7 +57,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
         (means that client has access to username/password of user and exchange it directly with Keycloak server for access token. In terms of OAuth2 specification, this enables support of 'Resource Owner Password Credentials Grant' for this client)
 
 - Complete the created client details
-  Don't forget to SAVE any changed information via __Save__ button!
+  Don't forget to SAVE any changed information via **Save** button!
   - Settings
     - Access settings
       - Root URL: `http://localhost:8081/`
@@ -75,15 +75,15 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
       - Backchannel logout session required: `ON`
 
 #### Applicative role definition
-From __Roles__ section, add a new standard role named `user` described as `standard user role of the frontend user interface`.
+From **Roles** section, add a new standard role named `user` described as `standard user role of the frontend user interface`.
 
-From __Realm Roles__ menu, add a new realm role named `tenant-user` via the __Create role__ button:
+From **Realm Roles** menu, add a new realm role named `tenant-user` via the **Create role** button:
 - Role name: `tenant-user`
 - Description: `Standard role of a user role (e.g frontend web user interface, backend api system) authorized to be used into the CYBNITY tenant context`
 
 A composite role is a role that has one or more additional roles associated with it. When a composite role is mapped to a user, the user gains the roles associated with the composite role.
 
-From new created realm role, define associated roles (filter by clients) via the __Action > Add associated roles__ top-right button:
+From new created realm role, define associated roles (filter by clients) via the **Action > Add associated roles** top-right button:
 - Find and select the `web-reactive-frontend-system` item
 - Assign it to the `tenant-user` account type
 
@@ -91,7 +91,7 @@ From new created realm role, define associated roles (filter by clients) via the
 If there are many applications to secure and register within the organization (e.g multi tenant), it can become tedious to configure role scope mappings for each of these systems' clients. Keycloak allows to define a shared client configuration in an entity called a client scope.
 To get client roles as a custom key in the JWT token, add client scope to put client roles in access token.
 
-From __Client Scopes__, create a new scope via the __Create client scope__ button:
+From **Client Scopes**, create a new scope via the **Create client scope** button:
 - Name: `ui-layer-systems-roles`
   (name of the client scope. Must be unique in the realm. Name should not contain space characters as it is used as value of scope parameter)
 - Description: `Shared configuration of clients used by systems executed in the UI layer`
@@ -103,13 +103,13 @@ From __Client Scopes__, create a new scope via the __Create client scope__ butto
   (when on, the name of this client scope will be added to the access token property 'scope' as well as to the Token Introspection Endpoint response. If off, this client scope will be omitted from the token and from the Token Introspection Endpoint response)
 
 #### Generated setting files
-The generated client setting resulting of this settings should be equals (see it via the top-right __Action > Export__ menu) to [client configuration file](web-reactive-frontend-system.json).
+The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](web-reactive-frontend-system.json).
 
-The adapter config (keycloak.json file used by the Keycloak OIDC client adapter to configure clients) usable by the web-reactive-frontend-system should be equals to [client adapter file](/implementation-line/access-control/ac-adapter/ac-adapter-impl/web-reactive-frontend-system-keycloak.json) of Maven sub-project __ac-adapter-impl__.
+The adapter config (keycloak.json file used by the Keycloak OIDC client adapter to configure clients) usable by the web-reactive-frontend-system should be equals to [client adapter file](/implementation-line/access-control/ac-adapter/ac-adapter-impl/web-reactive-frontend-system-keycloak.json) of Maven sub-project **ac-adapter-impl**.
 
 ### Reactive Backend System client
-Register a new Keycloak client dedicated to backend messaging gateway module (allowing gateway api usage of services since the web browser UI components, and that are exposed by the __reactive-backend-system__ that is running into the K8s cluster):
-- Navigate to __Clients__ and use __Create client__ button for add a new client
+Register a new Keycloak client dedicated to backend messaging gateway module (allowing gateway api usage of services since the web browser UI components, and that are exposed by the **reactive-backend-system** that is running into the K8s cluster):
+- Navigate to **Clients** and use **Create client** button for add a new client
 - Set client to create's description about web app source to integrate with Keycloak sso checking:
   - General Settings
     - Client type: `OpenID Connect`
@@ -137,7 +137,7 @@ Register a new Keycloak client dedicated to backend messaging gateway module (al
         (allows to authenticate this client to Keycloak and retrieve access token dedicated to this client. In terms of OAuth2 specification, this enables support of 'Client Credentials Grant' for this client)
 
 - Complete the created client details
-  Don't forget to SAVE any changed information via __Save__ button!
+  Don't forget to SAVE any changed information via **Save** button!
   - Settings
     - Access settings
       - Root URL: `http://localhost:8082/`
@@ -170,9 +170,9 @@ Register a new Keycloak client dedicated to backend messaging gateway module (al
       - Set assigned type to the reactive-backend-system-dedicated item
 
 #### Client roles mapping
-From __Client Scopes > ui-layer-systems-roles__:
+From **Client Scopes > ui-layer-systems-roles**:
 - Mappers
-  - Create a new mapper since the __Configure a new mapper__ button:
+  - Create a new mapper since the **Configure a new mapper** button:
     - Choose `User Client Role` mapper type
     - Name: `ui-clients-role`
     - Client ID: `web-reactive-frontend-system`
@@ -185,7 +185,7 @@ From __Client Scopes > ui-layer-systems-roles__:
     - Add to access token: `ON`
     - Add to userinfo: `ON`
 
-  - Create a new mapper since the __Add mapper > By configuration__ button:
+  - Create a new mapper since the **Add mapper > By configuration** button:
     - Choose `User Realm Role`
     - Name: `ui-realm-role`
     - Multivalued: `ON`
@@ -197,23 +197,23 @@ From __Client Scopes > ui-layer-systems-roles__:
 - Scope
   - Make new assignment of `tenant-user` role to `ui-layer-systems-roles` account
 
-From __Clients > web-reactive-frontend-system > Client Scopes__ panel, add the custom scope previously created via the __Add client scope__ button:
+From **Clients > web-reactive-frontend-system > Client Scopes** panel, add the custom scope previously created via the **Add client scope** button:
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
 
-Now, we can get the client roles from the JWT token with __resource_access.role__ key, allowing to enable/disable web-reactive-frontend-system's view (e.g UI component, functions visibility) to particular roles received from the token.
+Now, we can get the client roles from the JWT token with **resource_access.role** key, allowing to enable/disable web-reactive-frontend-system's view (e.g UI component, functions visibility) to particular roles received from the token.
 
-From __Clients > reactive-backend-system > Client Scopes__ panel, add the custom scope previously created via the __Add client scope__ button:
+From **Clients > reactive-backend-system > Client Scopes** panel, add the custom scope previously created via the **Add client scope** button:
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
 
 #### Applicative role definition
-From __Real roles__ menu, complete the __tenant-user__ existing composite realm role, with definition of additional associated role (filter by clients) via the __Associated roles__ section's __Assign role__ button:
+From **Real roles** menu, complete the **tenant-user** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
 - Find and select the `reactive-backend-system` item
 - Assign it to the `tenant-user` account type
 
 #### Generated setting files
-The generated client setting resulting of this settings should be equals (see it via the top-right __Action > Export__ menu) to [client configuration file](reactive-backend-system.json).
+The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](reactive-backend-system.json).
 
-The adapter config (keycloak.json file used by the Keycloak OIDC client adapter to configure clients) usable by the reactive-backend-system should be equals to [client adapter file](/implementation-line/access-control/ac-adapter/ac-adapter-impl/reactive-backend-system-keycloak.json) of Maven sub-project __ac-adapter-impl__.
+The adapter config (keycloak.json file used by the Keycloak OIDC client adapter to configure clients) usable by the reactive-backend-system should be equals to [client adapter file](/implementation-line/access-control/ac-adapter/ac-adapter-impl/reactive-backend-system-keycloak.json) of Maven sub-project **ac-adapter-impl**.
 
 ### Tests
 
@@ -221,17 +221,17 @@ The adapter config (keycloak.json file used by the Keycloak OIDC client adapter 
 By default, new created Realm has none user.
 
 Create a test account (e.g dedicated to the frontend application test) declared regarding a tester allowing to use the web-reactive-frontend-system web UI:
-- Add a user account sample from the __Users__ menu as:
+- Add a user account sample from the **Users** menu as:
   - Username: `tester`
   - User enabled: `true`
-- From __Users > tester__ account item:
-  - __Details__ section:
-    - Toggle the __Email verified__ as `ON` and save (simulate that email address verification procedure have been performed with success without need of mail smtp server setting ;) )
+- From **Users > tester** account item:
+  - **Details** section:
+    - Toggle the **Email verified** as `ON` and save (simulate that email address verification procedure have been performed with success without need of mail smtp server setting ;) )
     - Define a First and last names
-  - __Credentials__ section:
+  - **Credentials** section:
     - Set a password for the user account and toggle `Temporary` to `OFF`
     - Validate password creation
-  - __Role Mapping__ section:
+  - **Role Mapping** section:
       - Assign the `tenant-user` realm role to the user allowing him to have automatically assigned mapped role defined for each client
 
 #### User account authentication check
