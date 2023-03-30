@@ -105,8 +105,6 @@ From **Client Scopes**, create a new scope via the **Create client scope** butto
 #### Generated setting files
 The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](web-reactive-frontend-system.json).
 
-The adapter config (keycloak.json file used by the Keycloak OIDC client adapter to configure clients) usable by the web-reactive-frontend-system should be equals to [client adapter file](/implementation-line/access-control/ac-adapter/ac-adapter-impl/web-reactive-frontend-system-keycloak.json) of Maven sub-project **ac-adapter-impl**.
-
 ### Reactive Backend System client
 Register a new Keycloak client dedicated to backend messaging gateway module (allowing gateway api usage of services since the web browser UI components, and that are exposed by the **reactive-backend-system** that is running into the K8s cluster):
 - Navigate to **Clients** and use **Create client** button for add a new client
@@ -212,8 +210,6 @@ From **Real roles** menu, complete the **tenant-user** existing composite realm 
 
 #### Generated setting files
 The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](reactive-backend-system.json).
-
-The adapter config (keycloak.json file used by the Keycloak OIDC client adapter to configure clients) usable by the reactive-backend-system should be equals to [client adapter file](/implementation-line/access-control/ac-adapter/ac-adapter-impl/reactive-backend-system-keycloak.json) of Maven sub-project **ac-adapter-impl**.
 
 ### Tests
 
