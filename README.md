@@ -25,10 +25,11 @@ Several systems are built as executable modules, containerized (Docker images) a
 
 # APPLICATION COMPONENTS
 The source codes managed in theses sub-projects (Maven projects) are supporting the features (as micro-service components constituing the business capabilities provided by the application domain) provided by the bounded context:
-- Adapter API library
-- Adapter Implementation
+- [Adapter libraries](implementation-line/access-control/ac-adapter)
+  - API library
+  - Implementation library
 - Adapter Translator library
-- [Domain Model library](implementation-line/access-control/ac-domain-model/)
+- [Domain Model library](implementation-line/access-control/ac-domain-model)
 - Domain Service API library
 - Domain Service Implementation module
 
