@@ -63,7 +63,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
       - Root URL: `http://localhost:8081/`
         (defined according to the external port exposed by the web-reactive-frontend-system module executed into the K8s cluster. Root URL appended to relative URLs)
       - Valid Redirect URIs: `http://localhost:8081/*`
-        (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as 'http://example.com/*'. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
+        (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as `http://example.com/*`. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
       - Web Origins: `http://localhost:8081` or `+`
         (allowed CORS origins. To permit all origins of Valid Redirect URIs, add '+')
       - Admin URL: `http://localhost:8081/`
@@ -103,7 +103,7 @@ From **Client Scopes**, create a new scope via the **Create client scope** butto
   (when on, the name of this client scope will be added to the access token property 'scope' as well as to the Token Introspection Endpoint response. If off, this client scope will be omitted from the token and from the Token Introspection Endpoint response)
 
 #### Generated setting files
-The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](web-reactive-frontend-system.json).
+The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](web-reactive-frontend-system-keycloak.json).
 
 ### Reactive Backend System client
 Register a new Keycloak client dedicated to backend messaging gateway module (allowing gateway api usage of services since the web browser UI components, and that are exposed by the **reactive-backend-system** that is running into the K8s cluster):
@@ -141,7 +141,7 @@ Register a new Keycloak client dedicated to backend messaging gateway module (al
       - Root URL: `http://localhost:8082/`
         (defined according to the external port exposed by the reactive-backend-system module executed into the K8s cluster. Root URL appended to relative URLs)
       - Valid Redirect URIs: `http://localhost:8082/*`
-        (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as 'http://example.com/*'. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
+        (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as `http://example.com/*`. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
       - Web Origins: `http://localhost:8082` or `+`
         (allowed CORS origins. To permit all origins of Valid Redirect URIs, add '+')
       - Admin URL: `http://localhost:8082/`
@@ -209,7 +209,7 @@ From **Real roles** menu, complete the **tenant-user** existing composite realm 
 - Assign it to the `tenant-user` account type
 
 #### Generated setting files
-The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](reactive-backend-system.json).
+The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](reactive-backend-system-keycloak.json).
 
 ### Tests
 
