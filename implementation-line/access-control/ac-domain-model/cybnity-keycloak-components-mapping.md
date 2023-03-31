@@ -22,12 +22,18 @@ The conceptual mapping of main concerns supported by the CYBNITY domain model an
 |CYBNITY Object Type|Description|KEYCLOAK Object Type|Description|
 | :-- | :-- | :-- | :-- |
 |Account|Set of credentials (e.g cryptographic keys that enable the subject to sign or encrypt data) to an owner (e.g organization's member), according to a role (e.g user principal), with accorder privileges (e.g regarding systems and/or capabilities) in the frame of a context (e.g specific Tenant scope). Domain root aggregate object relative to a subject's usable account|User|Registred identity of a user|
-|OrganizationalStructure|Represent a company, association, group of companies, or institution who can have interactions with systems| | |
+|IPolicy|Access Control Mechanism (ACM) allowing to protect a resource| | |
+|IResource|Represent an identifiable and referenceabl object (e.g file, service provider, data) being protected| | |
+|IResourceServer|Host of protected resources which accept requests performed over confidential clients| | |
+|IScope|One or many policies and permissions allowed for users to access on a resource| | |
+|IPolicyProvider|Service providing policies regarding protectable resources| | |
+|Tenant|Represent an organization subscription that allow to define a scope of multi-tenant application regarding a named organization which facilitates the users registrations through invitation|Realm|Define a tenant and its context that define a boundary of User Identity & Access Management (UIAM)|
+|OrganizationalStructure|Represent a company, association, group of companies, or institution who is owner of an account who can have interactions with systems. Social entity defining an owner of a Tenant| | |
 |Person|Physical social entity (e.g human person) who can have interactions with systems| | |
-|SmartSystem|Software and/or hardware system (e.g autonomous accessory representing a person or organization) who can have interactions with systems|Client|Client adapter allowing authorization management and representing a system; include settings regarding permissions allowed to adapter. Can be linked to a ServiceAccount regarding group of permissions allowed|
-| | |ServiceAccount|Group of shared permissions accorging to allowed role(s)|
 | | |Permission|Privilege allowed regarding a subject|
 | | |Role|Logical role (e.g applicative role) allowing assigning of permissions set|
+|SmartSystem|Software and/or hardware system (e.g autonomous accessory representing a person or organization) who can have interactions with users, other systems, and UIAM system.|Client|Client adapter allowing authorization management and representing a system; include settings regarding permissions allowed to adapter. Can be linked to a ServiceAccount regarding group of permissions allowed|
+| | |ServiceAccount|Group of shared permissions accorging to allowed role(s)|
 
 #
 [Back To Home](/README.md)
