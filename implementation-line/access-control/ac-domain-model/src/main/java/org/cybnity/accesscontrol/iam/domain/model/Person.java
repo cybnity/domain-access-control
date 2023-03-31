@@ -1,4 +1,4 @@
-package org.cybnity.accesscontrol.domain.model;
+package org.cybnity.accesscontrol.iam.domain.model;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;
