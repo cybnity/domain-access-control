@@ -1,5 +1,5 @@
 ## PURPOSE
-Presentation of the domain components.
+Presentation of the domain concerns and logical components supporting the Access Control bounded context at the model layer.
 
 # FUNCTIONAL VIEW
 
@@ -143,6 +143,14 @@ classDiagram
     }
 
 ```
+
+# IMPLEMENTATION VIEW
+Presentation of the core components and files organization, packaging models and dependencies, and addressed configuration management of systems released. Globally this section give overview of technical components and structures implemented as domain layer.
+
+- Structural diagrams regarding the domain model components matching the Keycloak domain elements
+  - [CYBNITY Domain Model Mapping with Keycloak domain components](cybnity-keycloak-components-mapping.md)
+- Behavioral diagrams regarding the interactions, states machins and activities provided by the model
+- System assembly is mainly managed by Maven as a Java library artifact reused by the application service layer
 
 # RELEASES HISTORY
 - [V0 - FRAMEWORK changes list](v0-changes.md)
