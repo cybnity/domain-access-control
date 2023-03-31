@@ -5,7 +5,8 @@ The AC domain model is encapsulating the Keycloak implementation model reused as
 
 # OBJECT MODELS
 ## AC-DOMAIN-MODEL PROJECT
-Deliverable: `org.cybnity.application.access-control:domain` java library
+Deliverable: `org.cybnity.application.access-control:domain` java library.
+
 Goal: several CYBNITY domain objects are exposed to other Access Control domain elements (e.g service layer) as specification components or implementation components hosting behaviors required by the domain promise.
 
 Some structural elements already provided by the Keycloak domain library are manipulated to reused existing capabilities (e.g OAuth features; security concerns of the Identity Management).
