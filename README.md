@@ -20,8 +20,8 @@ The source codes managed in theses sub-projects are providing capabilities to fi
 
 ## RUNNABLE PACKAGED COMPONENTS
 Several systems are built as executable modules, containerized (Docker images) and that are ready for deployment via provisioning management solution (e.g Helm charts):
-- [Backend Server](access-control/ac-ui/ac-ui-system/ac-backend-server)
-- [Frontend Server](access-control/ac-ui/ac-ui-system/ac-frontend-server)
+- [Backend Server](implementation-line/access-control/ac-ui/ac-ui-system/ac-backend-server)
+- [Frontend Server](implementation-line/access-control/ac-ui/ac-ui-system/ac-frontend-server)
 
 # APPLICATION COMPONENTS
 The source codes managed in theses sub-projects (Maven projects) are supporting the features (as micro-service components constituing the business capabilities provided by the application domain) provided by the bounded context:
