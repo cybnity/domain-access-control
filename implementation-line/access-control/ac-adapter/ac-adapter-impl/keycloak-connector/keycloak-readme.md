@@ -62,6 +62,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
     - Access settings
       - Root URL: `http://localhost:8081/`
         (defined according to the external port exposed by the web-reactive-frontend-system module executed into the K8s cluster. Root URL appended to relative URLs)
+      - Home URL: `http://localhost:8081/`
       - Valid Redirect URIs: `http://localhost:8081/*`
         (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as `http://example.com/*`. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
       - Web Origins: `http://localhost:8081` or `+`
@@ -140,6 +141,7 @@ Register a new Keycloak client dedicated to backend messaging gateway module (al
     - Access settings
       - Root URL: `http://localhost:8082/`
         (defined according to the external port exposed by the reactive-backend-system module executed into the K8s cluster. Root URL appended to relative URLs)
+      - Home URL: `http://localhost:8082/`
       - Valid Redirect URIs: `http://localhost:8082/*`
         (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as `http://example.com/*`. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
       - Web Origins: `http://localhost:8082` or `+`
