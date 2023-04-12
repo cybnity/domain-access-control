@@ -732,7 +732,7 @@ metrics:
   ## @param metrics.enabled Enable exposing Keycloak statistics
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/keycloak#enabling-statistics
   ##
-  enabled: false
+  enabled: true
   ## Keycloak metrics service parameters
   ##
   service:
@@ -919,7 +919,8 @@ keycloakConfigCli:
   ## @param keycloakConfigCli.nodeSelector Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
-  nodeSelector: {}
+  nodeSelector:
+    layer : user-interfaces-area
   ##
   ## @param keycloakConfigCli.podTolerations Tolerations for job pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/

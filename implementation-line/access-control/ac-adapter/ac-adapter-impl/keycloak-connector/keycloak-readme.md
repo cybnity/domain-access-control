@@ -60,14 +60,15 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
   Don't forget to SAVE any changed information via **Save** button!
   - Settings
     - Access settings
-      - Root URL: `http://localhost:8081/`
+      - Root URL: `${authBaseUrl}`
         (defined according to the external port exposed by the web-reactive-frontend-system module executed into the K8s cluster. Root URL appended to relative URLs)
-      - Home URL: `http://localhost:8081/`
-      - Valid Redirect URIs: `http://localhost:8081/*`
+      - Home URL: `/realms/CYBNITY/account/`
+      - Valid Redirect URIs: `/*`
         (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as `http://example.com/*`. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
-      - Web Origins: `http://localhost:8081` or `+`
+      - Valid post logout redirect URIs: `+`
+      - Web Origins: `+`
         (allowed CORS origins. To permit all origins of Valid Redirect URIs, add '+')
-      - Admin URL: `http://localhost:8081/`
+      - Admin URL: `${authBaseUrl}`
         (URL to the admin interface of the client. Set this if the client supports the adapter REST API. This REST API allows the auth server to push revocation policies and other administrative tasks. Usually this is set to the base URL of the client)
     - Login settings
       - Login theme: `base`
@@ -139,14 +140,15 @@ Register a new Keycloak client dedicated to backend messaging gateway module (al
   Don't forget to SAVE any changed information via **Save** button!
   - Settings
     - Access settings
-      - Root URL: `http://localhost:8082/`
+      - Root URL: `${authBaseUrl}`
         (defined according to the external port exposed by the reactive-backend-system module executed into the K8s cluster. Root URL appended to relative URLs)
-      - Home URL: `http://localhost:8082/`
-      - Valid Redirect URIs: `http://localhost:8082/*`
+      - Home URL: `/realms/CYBNITY/account/`
+      - Valid Redirect URIs: `/*`
         (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as `http://example.com/*`. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
-      - Web Origins: `http://localhost:8082` or `+`
+      - Valid post logout redirect URIs: `+`
+      - Web Origins: `+`
         (allowed CORS origins. To permit all origins of Valid Redirect URIs, add '+')
-      - Admin URL: `http://localhost:8082/`
+      - Admin URL: `${authBaseUrl}`
         (URL to the admin interface of the client. Set this if the client supports the adapter REST API. This REST API allows the auth server to push revocation policies and other administrative tasks. Usually this is set to the base URL of the client)
     - Login settings
       - Login theme: `base`
