@@ -17,8 +17,10 @@ Create a Realm similar to a TenantId relative to an organization (e.g named cybn
 
 ### Realm configuration
 From **Realm Settings** created:
-- Frontend URL:
-  - Define the external (e.g url and port exposed outside the K8s cluster) of Keycloak realm
+- General
+  - Frontend URL
+    - Define the external (e.g url and port exposed outside the K8s cluster) of Keycloak realm (e.g `http://10.101.238.65/auth/` regarding a host based on IP address)
+    - Require SSL: `External requests`
 - Security Defenses to configure the Clickjacking security
   - Default `SAMEORIGIN` value of **X-Frame-Options**
     - See https://datatracker.ietf.org/doc/html/rfc7034#section-2.2.1 for more details about X-Frame-Options
@@ -62,9 +64,9 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
     - Access settings
       - Root URL: `${authBaseUrl}`
         (defined according to the external port exposed by the web-reactive-frontend-system module executed into the K8s cluster. Root URL appended to relative URLs)
-      - Home URL: `/realms/CYBNITY/account/`
+      - Home URL: `http://localhost:3000/`
       - Valid Redirect URIs: `/*`
-        (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as `http://example.com/*`. Relative path can be specified too such as `/my/relative/path/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
+        (valid URI pattern a browser can redirect to after a successful login. Simple wildcards are allowed such as `http://example.com/*`. Relative path can be specified too such as `http://localhost:3000/*`. Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used)
       - Valid post logout redirect URIs: `+`
       - Web Origins: `+`
         (allowed CORS origins. To permit all origins of Valid Redirect URIs, add '+')
