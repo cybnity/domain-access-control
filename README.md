@@ -51,3 +51,4 @@ Project type: Helm implementation structures.
 
 Description: several generic infrastructure projects required by the CYBNITY implementation architecture are managed.
 - [Keycloak server](implementation-line/systems/charts/access-control-sso): bitnami Helm project of Keycloak image provisioning, customized for the CYBNITY needs. This provisioning project is deployable and is supported by a `bitnami/keycloak 13.4.0` version hosted on `20.0.5-debian-11-r4` operating system version, and including a `postgresql 12.2.1` database version deployment. This implementation (hosted on [GitHUB](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)) is currently used to reduce the maintenance effort of a dedicated Helm project.
+   - Installation from command line: `helm install access-control-sso-system -f access-control-sso/values.yaml bitnami/keycloak`
