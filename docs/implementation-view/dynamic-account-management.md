@@ -1,6 +1,8 @@
-# AC-2(8) Dynamic account management
+# AC-2(8) DYNAMIC ACCOUNT MANAGEMENT
 
-[Requirement](https://www.notion.so/cybnity/AC-2-8-Dynamic-account-management-72d42a96723c48e5b254c59fd24b6bc8?pvs=4) specification
+Feature Type: security control
+
+Requirement: [defined specification](https://www.notion.so/cybnity/AC-2-8-Dynamic-account-management-72d42a96723c48e5b254c59fd24b6bc8?pvs=4)
 
 ## Account Registration Flow
 
@@ -22,6 +24,7 @@
     }
   }
 }%%
+
 sequenceDiagram
 	actor Person
 	participant SignUpWebUI as <<Javascript View>><br>Sign Up UI
