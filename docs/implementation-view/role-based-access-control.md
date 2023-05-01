@@ -4,7 +4,7 @@ Feature Type: security control
 
 Requirement: [defined specification](https://www.notion.so/cybnity/AC-3-7-Role-based-access-control-43fa18e487fa43cabf3ae7d9aeb691a6?pvs=4)
 
-## Authoization policy strategy
+## Authorization policy strategy
 Several policy strategy types are supported by the Access Control Process Module according to the kind of resource and relation between clients and object where usage privileges are controlled.
 
 Some policy types usage make sens into specific context (e.g Identity and Access Management; Client Identity and Access Management).
@@ -40,13 +40,8 @@ classDiagram
   note for AttributesBasedAccessControl "Policy of policies that can depend of context"
   note for RoleBasedAccessControl "Ideal for least privilege and need to know approach.<br>For a system (e.g basis network module)<br><br>"
   note for TimeBasedAccessControl "During a defined time period"
-  RoleBasedAccessControl "1..*" o-- "1" ControlledResource
-  TimeBasedAccessControl "1..*" o-- "1" ControlledResource
-  RegexBasedAccessControl "1..*" o-- "1" ControlledResource
-  ClientScopeBasedAccessControl "1..*" o-- "1" ControlledResource
-  GroupBasedAccessControl "1..*" o-- "1" ControlledResource
-  UserBasedAccessControl "1..*" o-- "1" ControlledResource
-  ClientBasedAccessControl "1..*" o-- "1" ControlledResource
+  ControlledResource ..|> IResource
+  ControlledResource ..|> Unmodifiable
   ControlledResource "1" --o AttributesBasedAccessControl
   AttributesBasedAccessControl o-- "1..*" SubjectAttribute :subjectDescriptions
   AttributesBasedAccessControl o-- "1..*" ActionAttribute :actionDescriptions
@@ -57,7 +52,7 @@ classDiagram
   note for EnvironmentAttribute "Common attribute related to the current time and location from<br>where access is requested, type of communication channel, or client type<br><br>"
 
   class AuthorizationPolicy {
-		<<IAM scope>>
+    <<IAM scope>>
   }
   class RoleBasedAccessControl {
   }
@@ -67,7 +62,12 @@ classDiagram
     <<CIAM scope>>
   }
   class ControlledResource {
-    <<interface>>
+    <<abstract>>
+    #resource : IResource
+    -policies : Collection~AuthorizationPolicy~
+    ControlledResource(IResource resource, Collection~AuthorizationPolicy~ controls)
+    #resource() IResource
+    +controledBy() Collection~AuthorizationPolicy~
   }
   class UserBasedAccessControl {
   }
@@ -98,4 +98,4 @@ classDiagram
 ```
 
 #
-[Back To Home](README.md)
+[Back To View](README.md)

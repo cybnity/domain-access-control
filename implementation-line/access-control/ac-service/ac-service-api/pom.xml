@@ -11,4 +11,11 @@
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<name>-- AC service api (spec)</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.cybnity.framework</groupId>
+			<artifactId>domain</artifactId>
+			<version>${foundation.compatibility.version}</version>
+		</dependency>
+	</dependencies>
 </project>
