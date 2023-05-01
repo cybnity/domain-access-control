@@ -10,6 +10,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Represent a resource that access is controllable via authorization policy.
+ * It's an information asset or object impacted by an authorized action.
  * 
  * @author olivier
  *
@@ -21,7 +22,7 @@ public abstract class ControlledResource implements IResource, Unmodifiable {
      * Original resource under control.
      */
     protected IResource resource;
-    
+
     /**
      * Controls applied to this resource.
      */

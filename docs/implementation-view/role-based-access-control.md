@@ -88,7 +88,6 @@ classDiagram
   note for AttributesBasedAccessControl "Policy of policies that can depend of context"
   IResource <|.. ControlledResource
   Unmodifiable <|.. ControlledResource
-  ControlledResource "1" --o AttributesBasedAccessControl
   AttributesBasedAccessControl o-- "1..*" SubjectAttribute :subjectDescriptions
   AttributesBasedAccessControl o-- "1..*" ActionAttribute :actionDescriptions
   AttributesBasedAccessControl o-- "1..*" EnvironmentAttribute :environmentDescriptions
@@ -102,11 +101,14 @@ classDiagram
     #resource : IResource
     -policies : Collection~AuthorizationPolicy~
     ControlledResource(IResource resource, Collection~AuthorizationPolicy~ controls)
-    #resource() IResource
     +controledBy() Collection~AuthorizationPolicy~
   }
   class AttributesBasedAccessControl {
     <<AuthorizationPolicy>>
+    -subjectDescription : Collection~SubjectAttribute~
+    -actionableActions : Collection~ActionAttribute~
+    -environmentDescription : Collection~EnvironmentAttribute~
+    +AttributesBasedAccessControl(Collection~SubjectAttribute~ subjectDescription, Collection~ActionAttribute~ actionableActions, Collection~EnvironmentAttribute~ environmentDescription)
   }
   class ActionAttribute {
     <<interface>>
