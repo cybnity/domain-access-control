@@ -48,7 +48,7 @@ sequenceDiagram
 
 	ExternalSystem-)ACBackendServer: notify(new AuthorizedAccessEvent(user token))
 	alt "invalid | no signed token"
-		Note right of ACBackendServer: Ignore and create security incident
+	Note right of ACBackendServer: Ignore and create security incident
 	else
 		ACBackendServer->>UISAdapter: notify(authorizedAccessEvent)
 		UISAdapter-)UsersInteractionsSpace: append(authorizedAccessEvent, accessControlDomain topic...)

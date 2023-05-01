@@ -39,7 +39,7 @@ classDiagram
   GroupBasedAccessControl --> "0..*" GroupBasedAccessControl :children
   note for AttributesBasedAccessControl "Policy of policies that can depend of context"
   note for RoleBasedAccessControl "Ideal for least privilege and need to know approach.<br>For a system (e.g basis network module)<br><br>"
-	note for TimeBasedAccessControl "During a defined time period"
+  note for TimeBasedAccessControl "During a defined time period"
   RoleBasedAccessControl "1..*" o-- "1" ControlledResource
   TimeBasedAccessControl "1..*" o-- "1" ControlledResource
   RegexBasedAccessControl "1..*" o-- "1" ControlledResource
@@ -72,24 +72,24 @@ classDiagram
   class UserBasedAccessControl {
   }
   class AttributesBasedAccessControl {
-		<<AuthorizationPolicy>>
+    <<AuthorizationPolicy>>
   }
-	class ActionAttribute {
-		<<interface>>
-	}
+  class ActionAttribute {
+    <<interface>>
+  }
   class EnvironmentAttribute {
-		<<interface>>
+	<<interface>>
   }
-	class SubjectAttribute {
-		<<abstract>>
-	}
-	class ActionAttribute {
-		<<interface>>
-	}
+  class SubjectAttribute {
+	<<abstract>>
+  }
+  class ActionAttribute {
+	<<interface>>
+  }
   class GroupBasedAccessControl {
   }
   class ClientScopeBasedAccessControl {
-		-scope : ScopeAttribute
+	-scope : ScopeAttribute
   }
   class RegexBasedAccessControl {
     -identityPattern : IdentityAttribute[]

@@ -29,18 +29,18 @@ Requirement: [defined specification](https://www.notion.so/cybnity/AC-2-8-Dynami
 }%%
 
 sequenceDiagram
-	actor Person
-	participant SignUpWebUI as <<Javascript View>><br>Sign Up UI
-	participant AccessControlJSAdapter as <<JS Library>><br>AccessControlJSAdapter
+  actor Person
+  participant SignUpWebUI as <<Javascript View>><br>Sign Up UI
+  participant AccessControlJSAdapter as <<JS Library>><br>AccessControlJSAdapter
   participant IdentityServer as <<Keycloak IAM>><br>IdentityServer
   participant AuthorizationServer as <<Keycloak UAM>><br>AuthorizationServer
-	participant IAMDB as <<Keycloak Identities DB>><br>IdentityRepository
-	participant UAMDB as <<Keycloak Accounts/Roles/SSOTokens DB>><br>AccountRepository
+  participant IAMDB as <<Keycloak Identities DB>><br>IdentityRepository
+  participant UAMDB as <<Keycloak Accounts/Roles/SSOTokens DB>><br>AccountRepository
   participant AccessControlJavaAdapter as <<Keycloak Connector>><br>AccessControlJavaAdapter
-	participant ACBackendServer as <<Reactive Backend Server>><br>ACBackendServer
-	Person->>SignUpWebUI: signUp(tenantID, mailAddress, firstName, lastName...)
-	SignUpWebUI->>AccessControlJSAdapter: createAccount(tenantID, identity...)
-	AccessControlJSAdapter->>IdentityServer: addIdentity(tenantID, identity description)
+  participant ACBackendServer as <<Reactive Backend Server>><br>ACBackendServer
+  Person->>SignUpWebUI: signUp(tenantID, mailAddress, firstName, lastName...)
+  SignUpWebUI->>AccessControlJSAdapter: createAccount(tenantID, identity...)
+  AccessControlJSAdapter->>IdentityServer: addIdentity(tenantID, identity description)
   IdentityServer->>IAMDB: findIdentity(tenandID, identity...)
 	alt "existing identity"
 		IAMDB-->>IdentityServer: previous subject identity attributes
