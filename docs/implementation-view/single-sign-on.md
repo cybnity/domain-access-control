@@ -30,26 +30,26 @@ OAuth2 and OIDC protocol are selected as main supported elements by the Access C
 }%%
 
 classDiagram
-  RefreshToken --|> SecurityToken
-  SecurityToken <|.. IDToken
-  AccessToken --|> SecurityToken
+  IRefreshToken --|> ISecurityToken
+  ISecurityToken <|.. IDToken
+  IAccessToken --|> ISecurityToken
 
-  note for AccessToken "OAuth2 token type, digitally signed by the SSO realm"
-  note for SecurityToken "Signed artifact, base64 encoded value and including SSO server’s signature private key"
-  note for RefreshToken "OAuth2 protocol based"
+  note for IAccessToken "OAuth2 token type, digitally signed by the SSO realm"
+  note for ISecurityToken "Signed artifact, base64 encoded value and including SSO server’s signature private key"
+  note for IRefreshToken "OAuth2 protocol based"
   note for IDToken "OIDC protocol based, standardized JWT token by OpenID core fields"
-  note for Accreditation "Habilitation and roles allowed to a JWT token owner"
+  note for IAccreditation "Habilitation and roles allowed to a JWT token owner"
 
-  IDToken o-- "0..*" Claim : userClaims
+  IDToken o-- "0..*" IClaim : userClaims
   IDToken "0..1" --o JWTToken
-  IDToken o-- "0..*" Accreditation : userHabilitations
+  IDToken o-- "0..*" IAccreditation : userHabilitations
   SubjectAttribute *-- "1" ScopeAttribute : scope
   JWTToken "1" --* AccreditedUserToken
 
-  class RefreshToken {
+  class IRefreshToken {
     <<interface>>
   }
-  class SecurityToken {
+  class ISecurityToken {
     <<interface>>
     +base64TokenValue() String
     +plainTextTokenValue() String
@@ -57,36 +57,36 @@ classDiagram
     +hashCode() int
     +equals(Object token) boolean
   }
-  class AccessToken {
+  class IAccessToken {
     <<interface>>
-    +authorizedBy() Authorization
+    +authorizedBy() IAuthorization
     +expireAt() OffsetDateTime
-    +isSigned() Boolean
+    +isSigned() boolean
     +tenant() EntityReference
     +type() String
   }
   class IDToken {
     <<abstract>>
-    +IDToken(Claim[] userClaims, Accreditation[] userHabilitations)
+    +IDToken(Collection~IClaim~ userClaims, Collection~IAccreditation~ userHabilitations, OffsetDateTime expiration, OffsetDateTime authentifiedAt)
     +IDToken()
     +expireAt() OffsetDateTime
     +createdAt() OffsetDateTime
     +authentifiedAt() OffsetDateTime
-    +isValid(AccessToken access) boolean
-    +userClaims() Claim[]
-    +userHabilitations() Accreditation[]
+    ~isValid(IAccessToken access) boolean
+    +userClaims() Collection~IClaim~
+    +userHabilitations() Collection~IAccreditation~
   }
-  class Claim {
+  class IClaim {
     <<interface>>
   }
-  class Accreditation {
+  class IAccreditation {
     <<interface>>
-    +userIdentity() SubjectAttribute[]
+    +userIdentity() Collection~SubjectAttribute~
   }
   class JWTToken {
     <<OAuth2 exchange format>>
-    +userClaims() Claim[]
-    +userHabilitations() Accreditation[]
+    +userClaims() Collection~IClaim~
+    +userHabilitations() Collection~IAccreditation~
     +hashCode() int
     +equals(Object event) boolean
   }
@@ -95,10 +95,11 @@ classDiagram
     +SubjectAttribute(ScopeAttribute scope)
   }
   class ScopeAttribute {
-    -name : String
+    <<interface>>
+    +name() String
   }
   class AccreditedUserToken {
-	+AccreditedUserToken(Tenant, String UserIdentityId, String UserAccountId, JWTToken originalToken, Claims[] userClaims, Accreditations[] userHabilitations)
+	+AccreditedUserToken(Tenant tenant, String userIdentityId, String userAccountId, JWTToken originalToken, Collection~IClaim~ userClaims, Collection~IAccreditation~ userHabilitations)
   }
 
 ```
@@ -231,7 +232,7 @@ classDiagram
   AuthorizationServer ..|> Revocation : allow
   AuthorizationServer ..|> Token : provide
   UserInfoAPIEndpoint <|.. AuthorizationServer
-  AuthorizationServer ..|> Authorization
+  AuthorizationServer ..|> IAuthorization
   OpenIDServerDiscovery <|.. AuthorizationServer
   Introspection <|.. AuthorizationServer
   UserInfoAPIEndpoint ..> Permission
@@ -242,20 +243,20 @@ classDiagram
   }
   class Revocation {
 	<<OIDC interface>>
-	+delete(RefreshToken token)
-	+delete(AccessToken token)
+	+delete(IRefreshToken token)
+	+delete(IAccessToken token)
   }
   class Token {
 	<<OIDC interface>>
-	+getToken(String type) SecurityToken
+	+getToken(String type) ISecurityToken
   }
   class OpenIDServerDiscovery {
 	<<OIDC interface>>
   }
   class Introspection {
 	<<OIDC interface>>
-	+validate(AccessToken token)
-	+validate(RefreshToken token)
+	+validate(IAccessToken token)
+	+validate(IRefreshToken token)
   }
   class UserInfoAPIEndpoint {
 	<<OIDC interface>>
@@ -265,9 +266,9 @@ classDiagram
   class Permission {
 	<<interface>>
   }
-  class Authorization {
+  class IAuthorization {
 	<<OIDC interface>>
-	+getAccessToken(Credential[] userAuthenticationCredentials) AccessToken
+	+getAccessToken(Credential[] userAuthenticationCredentials) IAccessToken
   }
   class SSOSession {
 	<<interface>>
