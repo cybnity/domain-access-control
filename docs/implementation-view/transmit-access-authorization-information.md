@@ -24,6 +24,7 @@ The JWT shared end-to-end between systems only include SSO validated token (is u
         'primaryColor': '#fff',
         'primaryBorderColor': '#0e2a43',
         'secondaryBorderColor': '#0e2a43',
+        'secondaryColor': '#0e2a43',
         'tertiaryBorderColor': '#0e2a43',
         'edgeLabelBackground':'#0e2a43',
         'lineColor': '#0e2a43',
