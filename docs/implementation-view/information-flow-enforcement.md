@@ -34,12 +34,13 @@ Generally used for JavaScript application without backend module, this approach 
 }%%
 
 classDiagram
-  AuthorizationFlow <|-- AuthorizationCodeFlow
-  note for AuthorizationCodeFlow "For mobile application, web app, backend<br>token API used, 2 steps<br><br>"
-  class AuthorizationFlow {
+  IAuthorizationFlow <|-- IAuthorizationCodeFlow
+  note for IAuthorizationCodeFlow "For mobile application, web app, backend<br>token API used, 2 steps<br><br>"
+  class IAuthorizationFlow {
 	<<interface>>
   }
-  class AuthorizationCodeFlow {
+  class IAuthorizationCodeFlow {
+    <<interface>>
   }
 
 ```
@@ -81,12 +82,16 @@ classDiagram
   note for Implicit "Usable by client-side (e.g web browser javascript module).<br>Be carefull, type of authorization artifact (e.g access token)<br>that can be intercepted if none security measure is implemented<br><br>"
 
   class AuthorizationType {
+    <<interface>>
   }
   class AuthorizationCode {
+    <<interface>>
   }
   class Implicit {
+    <<interface>>
   }
   class ClientCredentials {
+    <<interface>>
   }
 
 ```
