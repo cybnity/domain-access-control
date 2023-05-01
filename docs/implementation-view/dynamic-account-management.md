@@ -21,6 +21,9 @@ Requirement: [defined specification](https://www.notion.so/cybnity/AC-2-8-Dynami
         'edgeLabelBackground':'#0e2a43',
         'lineColor': '#0e2a43',
         'tertiaryColor': '#fff'
+    },
+    'sequence': {
+		'mirrorActors': false
     }
   }
 }%%
