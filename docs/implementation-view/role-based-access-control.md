@@ -37,19 +37,8 @@ classDiagram
   AuthorizationPolicy <|-- ClientBasedAccessControl
   AuthorizationPolicy <|-- GroupBasedAccessControl
   GroupBasedAccessControl --> "0..*" GroupBasedAccessControl :children
-  note for AttributesBasedAccessControl "Policy of policies that can depend of context"
   note for RoleBasedAccessControl "Ideal for least privilege and need to know approach.<br>For a system (e.g basis network module)<br><br>"
   note for TimeBasedAccessControl "During a defined time period"
-  ControlledResource ..|> IResource
-  ControlledResource ..|> Unmodifiable
-  ControlledResource "1" --o AttributesBasedAccessControl
-  AttributesBasedAccessControl o-- "1..*" SubjectAttribute :subjectDescriptions
-  AttributesBasedAccessControl o-- "1..*" ActionAttribute :actionDescriptions
-  AttributesBasedAccessControl o-- "1..*" EnvironmentAttribute :environmentDescriptions
-  note for SubjectAttribute "Attributes describing the subject who is demanding access<br>(e.g roles, group memberships, competencies, user ID, etc..)<br><br>"
-  note for ActionAttribute "Combination of attributes describing what user<br>want to perform (e.g read, write, action type)<br><br>"
-  note for ControlledResource "Information asset or object impacted by the action"
-  note for EnvironmentAttribute "Common attribute related to the current time and location from<br>where access is requested, type of communication channel, or client type<br><br>"
 
   class AuthorizationPolicy {
     <<IAM scope>>
@@ -61,6 +50,53 @@ classDiagram
   class ClientBasedAccessControl {
     <<CIAM scope>>
   }
+  class UserBasedAccessControl {
+  }
+  class AttributesBasedAccessControl {
+    <<AuthorizationPolicy>>
+  }
+  class GroupBasedAccessControl {
+  }
+  class ClientScopeBasedAccessControl {
+	-scope : ScopeAttribute
+  }
+  class RegexBasedAccessControl {
+    -identityPattern : IdentityAttribute[]
+  }
+
+```
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+        'background': '#ffffff',
+        'fontFamily': 'arial',
+        'fontSize': '18px',
+        'primaryColor': '#fff',
+        'primaryBorderColor': '#0e2a43',
+        'secondaryBorderColor': '#0e2a43',
+        'tertiaryBorderColor': '#0e2a43',
+        'edgeLabelBackground':'#0e2a43',
+        'lineColor': '#0e2a43',
+        'tertiaryColor': '#fff'
+    }
+  }
+}%%
+
+classDiagram
+  note for AttributesBasedAccessControl "Policy of policies that can depend of context"
+  IResource <|.. ControlledResource
+  Unmodifiable <|.. ControlledResource
+  ControlledResource "1" --o AttributesBasedAccessControl
+  AttributesBasedAccessControl o-- "1..*" SubjectAttribute :subjectDescriptions
+  AttributesBasedAccessControl o-- "1..*" ActionAttribute :actionDescriptions
+  AttributesBasedAccessControl o-- "1..*" EnvironmentAttribute :environmentDescriptions
+  note for SubjectAttribute "Attributes describing the subject who is demanding access<br>(e.g roles, group memberships, competencies, user ID, etc..)<br><br>"
+  note for ActionAttribute "Combination of attributes describing what user<br>want to perform (e.g read, write, action type)<br><br>"
+  note for ControlledResource "Information asset or object impacted by the action"
+  note for EnvironmentAttribute "Common attribute related to the current time and location from<br>where access is requested, type of communication channel, or client type<br><br>"
+
   class ControlledResource {
     <<abstract>>
     #resource : IResource
@@ -68,8 +104,6 @@ classDiagram
     ControlledResource(IResource resource, Collection~AuthorizationPolicy~ controls)
     #resource() IResource
     +controledBy() Collection~AuthorizationPolicy~
-  }
-  class UserBasedAccessControl {
   }
   class AttributesBasedAccessControl {
     <<AuthorizationPolicy>>
@@ -85,14 +119,6 @@ classDiagram
   }
   class ActionAttribute {
 	<<interface>>
-  }
-  class GroupBasedAccessControl {
-  }
-  class ClientScopeBasedAccessControl {
-	-scope : ScopeAttribute
-  }
-  class RegexBasedAccessControl {
-    -identityPattern : IdentityAttribute[]
   }
 
 ```
