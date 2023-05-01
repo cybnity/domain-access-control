@@ -4,7 +4,7 @@ Feature Type: security control
 
 Requirement: [defined specification](https://www.notion.so/cybnity/AC-3-7-Role-based-access-control-43fa18e487fa43cabf3ae7d9aeb691a6?pvs=4)
 
-## Authoization policyt strategy
+## Authoization policy strategy
 Several policy strategy types are supported by the Access Control Process Module according to the kind of resource and relation between clients and object where usage privileges are controlled.
 
 Some policy types usage make sens into specific context (e.g Identity and Access Management; Client Identity and Access Management).
