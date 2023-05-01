@@ -7,6 +7,7 @@ The space presents the implementation view of the developed components.
 |AC-2(8)|[Dynamic account management](dynamic-account-management.md)|- Account registration flow<br>|
 |AC-3|[User access enforcement](user-access-enforcement.md)|- Authentication flow<br>|
 |AC-3(7)|[Role-based access control](role-based-access-control.md)|- Authorization policy strategy<br>|
+|AC-24(1)|[Transmit access authorization information](transmit-access-authorization-information.md)|- Access control enforcement flow<br>|
 
 #
 [Back To Home](/README.md)
