@@ -1,4 +1,4 @@
-package org.cybnity.accesscontrol.domain.model;
+package org.cybnity.accesscontrol.iam.domain.model;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;
@@ -12,21 +12,20 @@ import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
- * Represent a software and/or hardware system (e.g autonomous accessory
- * representing a person or organization) who can have interactions with
- * systems.
+ * Represent an organizational structure (e.g company, association, group of
+ * companies, institution) who can have interactions with systems.
  * 
  * @author olivier
  *
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_3")
-public class SmartSystem extends SocialEntity {
+public class OrganizationalStructure extends SocialEntity {
 
     /**
      * Version of this class type.
      */
     private static final long serialVersionUID = new VersionConcreteStrategy()
-	    .composeCanonicalVersionHash(SmartSystem.class).hashCode();
+	    .composeCanonicalVersionHash(OrganizationalStructure.class).hashCode();
 
     /**
      * Default constructor.
@@ -36,7 +35,7 @@ public class SmartSystem extends SocialEntity {
      * @throws IllegalArgumentException When predecessor mandatory parameter is not
      *                                  defined or without defined identifier.
      */
-    public SmartSystem(Entity predecessor, Identifier id) throws IllegalArgumentException {
+    public OrganizationalStructure(Entity predecessor, Identifier id) throws IllegalArgumentException {
 	super(predecessor, id);
     }
 
@@ -49,16 +48,17 @@ public class SmartSystem extends SocialEntity {
      * @throws IllegalArgumentException When identifiers parameter is null or each
      *                                  item does not include name and value.
      */
-    public SmartSystem(Entity predecessor, LinkedHashSet<Identifier> identifiers) throws IllegalArgumentException {
+    public OrganizationalStructure(Entity predecessor, LinkedHashSet<Identifier> identifiers)
+	    throws IllegalArgumentException {
 	super(predecessor, identifiers);
     }
 
     @Override
     public Serializable immutable() throws ImmutabilityException {
 	LinkedHashSet<Identifier> ids = new LinkedHashSet<>(this.identifiers());
-	SmartSystem smartSystem = new SmartSystem(parent(), ids);
-	smartSystem.createdAt = this.occurredAt();
-	return smartSystem;
+	OrganizationalStructure organization = new OrganizationalStructure(parent(), ids);
+	organization.createdAt = this.occurredAt();
+	return organization;
     }
 
 }

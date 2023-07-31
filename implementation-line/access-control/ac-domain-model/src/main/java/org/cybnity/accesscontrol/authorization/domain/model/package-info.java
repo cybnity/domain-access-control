@@ -1,0 +1,1 @@
+package org.cybnity.accesscontrol.authorization.domain.model;

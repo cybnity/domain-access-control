@@ -1,0 +1,13 @@
+{
+  "realm": "CYBNITY",
+  "auth-server-url": "http://127.0.0.1:8080/",
+  "ssl-required": "external",
+  "resource": "reactive-backend-system",
+  "verify-token-audience": true,
+  "credentials": {
+    "secret": "5Uq7DAhhyP5kN1rZ2MIv8s0d4EWzct4m"
+  },
+  "use-resource-role-mappings": true,
+  "confidential-port": 0,
+  "policy-enforcer": {}
+}

@@ -9,6 +9,9 @@
 	<groupId>org.cybnity.application.access-control</groupId>
 	<artifactId>adapter-impl</artifactId>
 	<version>${revision}</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 	<name>-- AC domain adapter impl</name>
+	<modules>
+		<module>keycloak-connector</module>
+	</modules>
 </project>

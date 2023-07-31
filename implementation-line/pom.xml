@@ -15,7 +15,8 @@
 		<!-- CYBNITY project default revision -->
 		<revision>0.1.0</revision>
 		<!-- CYBNITY Foundation dependencies link-->
-		<foundation.compatibility.version>staging-latest-SNAPSHOT</foundation.compatibility.version>
+		<!-- staging-latest-SNAPSHOT -->
+		<foundation.compatibility.version>feature-95-latest-SNAPSHOT</foundation.compatibility.version>
 		<!-- Standard Trusted Execution Environment (TEE) of java runtime container template -->
 		<docker.java.tee.image.name>cybnity/jre-tee</docker.java.tee.image.name>
 		<!-- NodeJS container template (Bullseye or buster based on Debian)-->

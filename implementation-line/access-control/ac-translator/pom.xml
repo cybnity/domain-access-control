@@ -9,6 +9,9 @@
 	<groupId>org.cybnity.application.access-control</groupId>
 	<artifactId>translator</artifactId>
 	<version>${revision}</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 	<name>- AC translator</name>
+	<modules>
+		<module>keycloak-translator</module>
+	</modules>
 </project>
