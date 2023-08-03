@@ -19,7 +19,7 @@ Formalizes software functional and/or technical analysis according to the functi
 Feature specifications API versions (e.g interface versions) are delivered according to requirements and specification identified by MVF project line's prototyping results.
 
 ### Artifacts
-The managed source files are stored in the [functional-view](docs/functional-view) sub-folder like:
+The managed source files are stored in the functional-view sub-folder like:
 - Static aspects (structural diagrams): use cases
 - Dynamic aspects (behavioral diagrams): interactions, statecharts, activities
 - Model sub-packages:
@@ -36,7 +36,7 @@ Formalizes the specification of the software and sub-components produced during 
 Feature implementations versions are designed and delivered as implementation software which extends the Foundation Core project.
 
 ### Artifacts
-The managed source files are stored in the [design-view](docs/design-view) sub-folder like:
+The managed source files are stored in the design-view sub-folder like:
 - Static aspects (structural diagrams): classes, objects
 - Dynamic aspects (behavioral diagrams): interactions, statecharts, activities, sequences
 
@@ -49,7 +49,7 @@ The managed source files are stored in the [design-view](docs/design-view) sub-f
 Describes execution models and synchronization rules, identified during the technical design phase and implementation rules definition.
 
 ### Artifacts
-The managed source files are stored in the [process-view](docs/process-view) sub-folder like:
+The managed source files are stored in the process-view sub-folder like:
 - Static aspects: equals to design view's diagrams, with focus on the active classes that represent theses threads and processes.
 - Model sub-packages:
   - Performance
@@ -110,7 +110,7 @@ The source code managed in this area are about the infrastructure components sup
 Describes the environment(s), infrastructure and operating conditions required to install, activate and operate the systems safely.
 
 ### Artifacts
-The managed source files are stored in the [deployment-view](docs/deployment-view) sub-folder like:
+The managed source files are stored in the deployment-view sub-folder like:
 - Static aspects (structural diagrams): components, deployment.
 - Model sub-packages:
   - Installation
