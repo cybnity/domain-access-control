@@ -55,7 +55,7 @@ The managed source files are stored in the [process-view](docs/process-view) sub
   - Performance
   - Scalability
 
-# IMPLEMENTATION VIEW (Packaed Components)
+# IMPLEMENTATION VIEW (Packaged Components)
 ## PURPOSE
 - Show the organization of the core components and files (e.g source code, setting files);
 - Packaging models and dependencies distribution;
