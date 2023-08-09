@@ -4,6 +4,9 @@ Feature Type: security control
 
 Requirement: [defined specification](https://www.notion.so/cybnity/AC-2-8-Dynamic-account-management-72d42a96723c48e5b254c59fd24b6bc8?pvs=4)
 
+Keycloack documentation:
+- [Notified Events](https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/events/login.html)
+
 ## Account Registration Flow
 
 ```mermaid
@@ -36,7 +39,7 @@ sequenceDiagram
   participant AuthorizationServer as <<Keycloak UAM>><br>AuthorizationServer
   participant IAMDB as <<Keycloak Identities DB>><br>IdentityRepository
   participant UAMDB as <<Keycloak Accounts/Roles/SSOTokens DB>><br>AccountRepository
-  participant AccessControlJavaAdapter as <<Keycloak Connector>><br>AccessControlJavaAdapter
+  participant AccessControlJavaAdapter as <<Keycloak Events Listener>><br>AccessControlJavaAdapter
   participant ACBackendServer as <<Reactive Backend Server>><br>ACBackendServer
   Person->>SignUpWebUI: signUp(tenantID, mailAddress, firstName, lastName...)
   SignUpWebUI->>AccessControlJSAdapter: createAccount(tenantID, identity...)
@@ -47,8 +50,8 @@ sequenceDiagram
 	else "unknow identity"
 		IAMDB->>IAMDB: createIdentity(tenantID, identity...)
 		IAMDB-->>IdentityServer: new subject identity attributes
-		IdentityServer-->>AccessControlJavaAdapter: notify(new IdentityRegisteredEvent(tenantID, identity...))
-		AccessControlJavaAdapter-)ACBackendServer: notify(identityRegisteredEvent)
+		IdentityServer-->>AccessControlJavaAdapter: notify(RegisterEvent)
+		AccessControlJavaAdapter-)ACBackendServer: notify(new IdentityRegisteredEvent(tenantID, identity...))
 		IdentityServer->>AuthorizationServer: addAccount(tenantID, identity)
 		AuthorizationServer->>UAMDB: findAccount(tenantID, identity...)
 		alt "existing account"
@@ -56,8 +59,8 @@ sequenceDiagram
 				par
 					AuthorizationServer-->>IdentityServer: existing authenticated active account, roles and permissions
 			  and
-					AuthorizationServer-->>AccessControlJavaAdapter: notify(new UserAccountAuthentifiedEvent(tenantID, account...))
-					AccessControlJavaAdapter-)ACBackendServer: notify(userAccountAuthentifiedEvent)
+					AuthorizationServer-->>AccessControlJavaAdapter: notify(Login)
+					AccessControlJavaAdapter-)ACBackendServer: notify(new UserAccountAuthentifiedEvent(tenantID, account...))
 				end
 				IdentityServer-->>AccessControlJSAdapter: existing authenticated account
 				AccessControlJSAdapter-->>SignUpWebUI: account description
@@ -67,8 +70,8 @@ sequenceDiagram
 					IdentityServer-->>AccessControlJSAdapter: notify(new UnusableExistingAccountEvent(tenantID, cause))
 					AccessControlJSAdapter->>SignUpWebUI: notify(new AccountCreationRejectedEvent(tenantID, cause))
 				and
-					AuthorizationServer-->>AccessControlJavaAdapter: notify(new UnusableAccountAuthenticationAttemptedEvent(tenantID, account id))
-					AccessControlJavaAdapter-)ACBackendServer: notify(unusableAccountAuthenticationAttemptedEvent)
+					AuthorizationServer-->>AccessControlJavaAdapter: notify(LoginError)
+					AccessControlJavaAdapter-)ACBackendServer: notify(new UnusableAccountAuthenticationAttemptedEvent(tenantID, account id))
 				end
 			end
 		else "unknown account"
@@ -78,8 +81,8 @@ sequenceDiagram
 			  IdentityServer-->>AccessControlJSAdapter: assigned account
 			  AccessControlJSAdapter-->>SignUpWebUI: account description
 			and
-				AuthorizationServer-->>AccessControlJavaAdapter: notify(new UserAccountRegisteredEvent(tenandID, account...))
-				AccessControlJavaAdapter-)ACBackendServer: notify(userAccountCreatedEvent)
+				AuthorizationServer-->>AccessControlJavaAdapter: notify(RegisterEvent)
+				AccessControlJavaAdapter-)ACBackendServer: notify(new UserAccountRegisteredEvent(tenandID, account...))
 			end
 		end
 	end
