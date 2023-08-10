@@ -7,6 +7,83 @@ Requirement: [defined specification](https://www.notion.so/cybnity/AC-2-8-Dynami
 Keycloack documentation:
 - [Notified Events](https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/events/login.html)
 
+## Tenant (Realm) Registration Flow
+
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+        'background': '#ffffff',
+        'fontFamily': 'arial',
+        'fontSize': '18px',
+        'primaryColor': '#fff',
+        'primaryBorderColor': '#0e2a43',
+        'secondaryBorderColor': '#0e2a43',
+        'tertiaryBorderColor': '#0e2a43',
+        'edgeLabelBackground':'#0e2a43',
+        'lineColor': '#0e2a43',
+        'tertiaryColor': '#fff'
+    },
+    'sequence': {
+		'mirrorActors': false
+    }
+  }
+}%%
+sequenceDiagram
+  actor Person
+  participant OrganizationRegistrationWebUI as <<Javascript View>><br>Organization Registration UI
+  participant AccessControlJSAdapter as <<JS Library>><br>AccessControlJSAdapter
+  participant ACBackendServer as <<Reactive Backend Server>><br>ACBackendServer
+  participant ACDomainGatewayServer as <<Access Control Process Module>><br>ACDomainGatewayServer
+  participant AccessControlJavaAdapter as <<Keycloak Connector>><br>AccessControlJavaAdapter
+  participant IdentityServer as <<Keycloak IAM>><br>IdentityServer
+  participant SignUpWebUI as <<Javascript View>><br>Sign Up UI
+  participant DomainsInteractionSpace as <<DIS System>><br>DomainsInteractionSpace
+  Person->>OrganizationRegistrationWebUI: signUp(organizationName)
+  OrganizationRegistrationWebUI->>AccessControlJSAdapter: createOrganization(organizationName)
+  AccessControlJSAdapter->>ACBackendServer: execute(new RegisterOrganization(organizationNaming))
+  ACBackendServer->>ACDomainGatewayServer: execute(new RegisterOrganization(organizationNaming))
+  ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming)
+  AccessControlJavaAdapter->>IdentityServer: realm(String realmName)
+  alt "existing tenant"
+	IdentityServer-->>AccessControlJavaAdapter: RealmResource (existing equals organization named)
+	AccessControlJavaAdapter-->>ACDomainGatewayServer: Tenant(existing equals organization named)
+	ACDomainGatewayServer-->>ACBackendServer: Tenant(existing equals organization named)
+	ACBackendServer-->> AccessControlJSAdapter: rejected creation for cause of existing named organization
+	AccessControlJSAdapter-->>OrganizationRegistrationWebUI: refused creation for cause
+	OrganizationRegistrationWebUI-->>Person: rejection cause notification
+  else "unknow tenant"
+	IdentityServer-->>AccessControlJavaAdapter: unknown realm
+	AccessControlJavaAdapter-->>ACDomainGatewayServer: none equals tenant
+	ACDomainGatewayServer->>AccessControlJavaAdapter: createTenant(String organizationName)
+	AccessControlJavaAdapter->>AccessControlJavaAdapter: buildRealmRepresentation(configurationSettings)
+	AccessControlJavaAdapter->>IdentityServer: create(RealmRepresentation organizationRealm)
+	IdentityServer-->>AccessControlJavaAdapter: success realm registration confirmation (and access control settings recorded)
+	AccessControlJavaAdapter-->>ACDomainGatewayServer: new TenantRegistered(success created tenant description)
+	par
+		ACDomainGatewayServer->>DomainsInteractionSpace: execute(new AddTenant(tenant description, new TenantConnectorConfiguration(tenant regarding future Keycloack adapter client connections via dedicated realm's clientscope setting)))
+	and
+		ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming)
+		AccessControlJavaAdapter->>IdentityServer: realm(String realmName)
+		IdentityServer-->>AccessControlJavaAdapter: RealmResource (existing equals organization named)
+		AccessControlJavaAdapter-->>ACDomainGatewayServer: Tenant(found organization description)
+		ACDomainGatewayServer->>ACDomainGatewayServer: prepare new OrganizationRegistered(new created tenant description) for domain storage notification and confirmation send
+		par
+			ACDomainGatewayServer->>DomainsInteractionSpace: [received keycloack admin event]/execute(new SaveRegisteredOrganization(Keycloack registered realm as Organization and Tenant)) into Access Control domain layer
+		and
+			ACDomainGatewayServer-->>ACBackendServer: OrganizationRegistered(tenantName...)
+			ACBackendServer->>AccessControlJSAdapter: OrganizationRegistered(tenantName...)
+			ACBackendServer-->>AccessControlJSAdapter: tenantID of created organization
+			AccessControlJSAdapter-->>OrganizationRegistrationWebUI: tenantID
+			OrganizationRegistrationWebUI-->>Person: success organization registration notification
+			OrganizationRegistrationWebUI->>SignUpWebUI: show(tenantID)
+		end
+	end
+  end
+
+```
+
 ## Account Registration Flow
 
 ```mermaid
