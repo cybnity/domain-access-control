@@ -9,6 +9,8 @@ Keycloack documentation:
 
 ## Tenant (Realm) Registration Flow
 
+RealmRepresentation that is dynamically defined and include all the settings regarding the client scopes and security information required for future connections to Keycloak realm by the CYBNITY backend components (e.g client scopes).
+
 ```mermaid
 %%{
   init: {
