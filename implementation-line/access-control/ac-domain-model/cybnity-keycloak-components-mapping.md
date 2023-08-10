@@ -24,7 +24,7 @@ The conceptual mapping of main concerns supported by the CYBNITY domain model an
 | :-- | :-- | :-- | :-- |
 |Account|Set of credentials (e.g cryptographic keys that enable the subject to sign or encrypt data) to an owner (e.g organization's member), according to a role (e.g user principal), with accorder privileges (e.g regarding systems and/or capabilities) in the frame of a context (e.g specific Tenant scope). Domain root aggregate object relative to a subject's usable account|User|Registred identity of a user|
 |IPolicy|Access Control Mechanism (ACM) allowing to protect a resource| | |
-|IResource|Represent an identifiable and referenceabl object (e.g file, service provider, data) being protected| | |
+|IResource|Represent an identifiable and referenceable object (e.g file, service provider, data) being protected| | |
 |IResourceServer|Host of protected resources which accept requests performed over confidential clients| | |
 |IScope|One or many policies and permissions allowed for users to access on a resource| | |
 |IPolicyProvider|Service providing policies regarding protectable resources| | |
