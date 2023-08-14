@@ -133,7 +133,8 @@ sequenceDiagram
   participant IAMDB as <<Keycloak Identities DB>><br>IdentityRepository
   participant UAMDB as <<Keycloak Accounts/Roles/SSOTokens DB>><br>AccountRepository
   participant AccessControlJavaAdapter as <<Keycloak Events Listener>><br>AccessControlJavaAdapter
-  participant ACBackendServer as <<Reactive Backend Server>><br>ACBackendServer
+  participant ACDomainGatewayServer as <<Access Control Process Module>><br>ACDomainGatewayServer
+	participant DomainsInteractionSpace as <<DIS System>><br>DomainsInteractionSpace
   Person->>SignUpWebUI: signUp(tenantID, mailAddress, firstName, lastName...)
   SignUpWebUI->>AccessControlJSAdapter: createAccount(tenantID, identity...)
   AccessControlJSAdapter->>IdentityServer: addIdentity(tenantID, identity description)
@@ -144,27 +145,30 @@ sequenceDiagram
 		IAMDB->>IAMDB: createIdentity(tenantID, identity...)
 		IAMDB-->>IdentityServer: new subject identity attributes
 		IdentityServer-->>AccessControlJavaAdapter: notify(RegisterEvent)
-		AccessControlJavaAdapter-)ACBackendServer: notify(new IdentityRegisteredEvent(tenantID, identity...))
+		AccessControlJavaAdapter-)ACDomainGatewayServer: execute(new AddIdentity(tenantID, identity...))
+		ACDomainGatewayServer->>DomainsInteractionSpace: execute(new AddIdentity(tenantID, identity...))
 		IdentityServer->>AuthorizationServer: addAccount(tenantID, identity)
 		AuthorizationServer->>UAMDB: findAccount(tenantID, identity...)
 		alt "existing account"
 			alt "active account"
 				par
 					AuthorizationServer-->>IdentityServer: existing authenticated active account, roles and permissions
+				  IdentityServer-->>AccessControlJSAdapter: existing authenticated account
+				  AccessControlJSAdapter-->>SignUpWebUI: account description
 			  and
 					AuthorizationServer-->>AccessControlJavaAdapter: notify(Login)
-					AccessControlJavaAdapter-)ACBackendServer: notify(new UserAccountAuthentifiedEvent(tenantID, account...))
+					AccessControlJavaAdapter-)ACDomainGatewayServer: notify(new UserAccountAuthentified(tenantID, account...))
+					ACDomainGatewayServer->>DomainsInteractionSpace: notify(new UserAccountAuthentified(tenantID, account...))
 				end
-				IdentityServer-->>AccessControlJSAdapter: existing authenticated account
-				AccessControlJSAdapter-->>SignUpWebUI: account description
 			else "deactived || expired account"
 				par
-					AuthorizationServer-->>IdentityServer: notify(new AccountDeactivedEvent(tenantID, account id))
-					IdentityServer-->>AccessControlJSAdapter: notify(new UnusableExistingAccountEvent(tenantID, cause))
-					AccessControlJSAdapter->>SignUpWebUI: notify(new AccountCreationRejectedEvent(tenantID, cause))
+					AuthorizationServer-->>IdentityServer: notify(new AccountDeactived(tenantID, account id))
+					IdentityServer-->>AccessControlJSAdapter: notify(new UnusableExistingAccount(tenantID, cause))
+					AccessControlJSAdapter->>SignUpWebUI: notify(new AccountCreationRejected(tenantID, cause))
 				and
 					AuthorizationServer-->>AccessControlJavaAdapter: notify(LoginError)
-					AccessControlJavaAdapter-)ACBackendServer: notify(new UnusableAccountAuthenticationAttemptedEvent(tenantID, account id))
+					AccessControlJavaAdapter-)ACDomainGatewayServer: notify(new UnusableAccountAuthenticationAttempted(tenantID, account id))
+					ACDomainGatewayServer->>DomainsInteractionSpace: notify(new UnusableAccountAuthenticationAttempted(tenantID, account id))
 				end
 			end
 		else "unknown account"
@@ -175,7 +179,8 @@ sequenceDiagram
 			  AccessControlJSAdapter-->>SignUpWebUI: account description
 			and
 				AuthorizationServer-->>AccessControlJavaAdapter: notify(RegisterEvent)
-				AccessControlJavaAdapter-)ACBackendServer: notify(new UserAccountRegisteredEvent(tenandID, account...))
+				AccessControlJavaAdapter-)ACDomainGatewayServer: execute(new AddUserAccount(tenandID, account...))
+				ACDomainGatewayServer->>DomainsInteractionSpace: execute(new AddUserAccount(tenandID, account...))
 			end
 		end
 	end
