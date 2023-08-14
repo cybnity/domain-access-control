@@ -54,7 +54,7 @@ sequenceDiagram
   opt "authorizedRegistration == false"
 	opt withoutExistingUsers
 		AccessControlJavaAdapter->>RealmResource: authorizedRegistration = (users().count().countEmailVerified() == 0)
-		RealmResource-->>AccessControlJavaAdapter: confirmation that realm is existing but without real registered account (e.g previous registration attempt by another requestor that never confirmed mail address and account; so can be owned by new requestor as free realm)
+		RealmResource-->>AccessControlJavaAdapter: confirmation that realm is existing but without real registered account
 	end
 	opt "authorizedRegistration == false"
 		AccessControlJavaAdapter-->>ACDomainGatewayServer: immutable copy of Tenant(named) that is known with equals organization name
