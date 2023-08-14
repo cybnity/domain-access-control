@@ -51,12 +51,12 @@ sequenceDiagram
   AccessControlJavaAdapter->>IdentityServer: realm(String realmName)
   IdentityServer-->>AccessControlJavaAdapter: RealmResource existingTenant = found realm || null
   AccessControlJavaAdapter->>AccessControlJavaAdapter: boolean authorizedRegistration = (existingTenant == null)
-  opt "authorizedRegistration == false"
+  opt authorizedRegistration == false
 	opt withoutExistingUsers
 		AccessControlJavaAdapter->>RealmResource: authorizedRegistration = (users().count().countEmailVerified() == 0)
 		RealmResource-->>AccessControlJavaAdapter: confirmation that realm is existing but without real registered account
 	end
-	opt "authorizedRegistration == false"
+	opt authorizedRegistration == false
 		AccessControlJavaAdapter-->>ACDomainGatewayServer: immutable copy of Tenant(named) that is known with equals organization name
 		ACDomainGatewayServer-->>ACBackendServer: Tenant
 		ACBackendServer-->> AccessControlJSAdapter: rejected creation for cause of existing named organization
@@ -64,7 +64,7 @@ sequenceDiagram
 		OrganizationRegistrationWebUI-->>Person: rejection cause notification
 	end
   end
-  opt "authorizedRegistration == true"
+  opt authorizedRegistration == true
 	AccessControlJavaAdapter-->>ACDomainGatewayServer: none equals tenant confirmation
 	ACDomainGatewayServer->>AccessControlJavaAdapter: createTenant(String organizationName)
 	AccessControlJavaAdapter->>AccessControlJavaAdapter: buildRealmRepresentation(configurationSettings)
