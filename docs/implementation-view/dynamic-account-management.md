@@ -47,20 +47,25 @@ sequenceDiagram
   OrganizationRegistrationWebUI->>AccessControlJSAdapter: createOrganization(organizationName)
   AccessControlJSAdapter->>ACBackendServer: execute(new RegisterOrganization(organizationNaming))
   ACBackendServer->>ACDomainGatewayServer: execute(new RegisterOrganization(organizationNaming))
-  ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming, Boolean includingExistingUsers)
+  ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming, Boolean withoutExistingUsers = true)
   AccessControlJavaAdapter->>IdentityServer: realm(String realmName)
-  alt "existing tenant"
-	IdentityServer-->>AccessControlJavaAdapter: RealmResource (existing equals organization named)
-	AccessControlJavaAdapter->>RealmResource: users().count().countEmailVerified()
-	RealmResource-->>AccessControlJavaAdapter: zero verified user account regarding existing realm name
-	AccessControlJavaAdapter-->>ACDomainGatewayServer: Tenant(existing equals organization named)
-	ACDomainGatewayServer-->>ACBackendServer: Tenant(existing equals organization named)
-	ACBackendServer-->> AccessControlJSAdapter: rejected creation for cause of existing named organization
-	AccessControlJSAdapter-->>OrganizationRegistrationWebUI: refused creation for cause
-	OrganizationRegistrationWebUI-->>Person: rejection cause notification
-  else "unknow tenant"
-	IdentityServer-->>AccessControlJavaAdapter: unknown realm
-	AccessControlJavaAdapter-->>ACDomainGatewayServer: none equals tenant
+  IdentityServer-->>AccessControlJavaAdapter: RealmResource existingTenant = found realm || null
+  AccessControlJavaAdapter->>AccessControlJavaAdapter: boolean authorizedRegistration = (existingTenant == null)
+  opt authorizedRegistration == false
+	opt withoutExistingUsers
+		AccessControlJavaAdapter->>RealmResource: authorizedRegistration = (users().count().countEmailVerified() == 0)
+		RealmResource-->>AccessControlJavaAdapter: confirmation that realm is existing but without real registered account (e.g previous registration attempt by another requestor that never confirmed mail address and account; so can be owned by new requestor as free realm)
+	end
+	opt authorizedRegistration == false
+		AccessControlJavaAdapter-->>ACDomainGatewayServer: immutable copy of Tenant(named) that is known with equals organization name
+		ACDomainGatewayServer-->>ACBackendServer: Tenant
+		ACBackendServer-->> AccessControlJSAdapter: rejected creation for cause of existing named organization
+		AccessControlJSAdapter-->>OrganizationRegistrationWebUI: refused creation for cause
+		OrganizationRegistrationWebUI-->>Person: rejection cause notification
+	end
+  end
+  opt authorizedRegistration == true
+	AccessControlJavaAdapter-->>ACDomainGatewayServer: none equals tenant confirmation
 	ACDomainGatewayServer->>AccessControlJavaAdapter: createTenant(String organizationName)
 	AccessControlJavaAdapter->>AccessControlJavaAdapter: buildRealmRepresentation(configurationSettings)
 	AccessControlJavaAdapter->>IdentityServer: create(RealmRepresentation organizationRealm)
