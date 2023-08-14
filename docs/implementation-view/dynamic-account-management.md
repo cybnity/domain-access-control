@@ -39,6 +39,7 @@ sequenceDiagram
   participant ACBackendServer as <<Reactive Backend Server>><br>ACBackendServer
   participant ACDomainGatewayServer as <<Access Control Process Module>><br>ACDomainGatewayServer
   participant AccessControlJavaAdapter as <<Keycloak Connector>><br>AccessControlJavaAdapter
+  participant RealmResource as <<Keycloak Resource>><br>RealmResource
   participant IdentityServer as <<Keycloak IAM>><br>IdentityServer
   participant SignUpWebUI as <<Javascript View>><br>Sign Up UI
   participant DomainsInteractionSpace as <<DIS System>><br>DomainsInteractionSpace
@@ -46,10 +47,12 @@ sequenceDiagram
   OrganizationRegistrationWebUI->>AccessControlJSAdapter: createOrganization(organizationName)
   AccessControlJSAdapter->>ACBackendServer: execute(new RegisterOrganization(organizationNaming))
   ACBackendServer->>ACDomainGatewayServer: execute(new RegisterOrganization(organizationNaming))
-  ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming)
+  ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming, Boolean includingExistingUsers)
   AccessControlJavaAdapter->>IdentityServer: realm(String realmName)
   alt "existing tenant"
 	IdentityServer-->>AccessControlJavaAdapter: RealmResource (existing equals organization named)
+	AccessControlJavaAdapter->>RealmResource: users().count().countEmailVerified()
+	RealmResource-->>AccessControlJavaAdapter: zero verified user account regarding existing realm name
 	AccessControlJavaAdapter-->>ACDomainGatewayServer: Tenant(existing equals organization named)
 	ACDomainGatewayServer-->>ACBackendServer: Tenant(existing equals organization named)
 	ACBackendServer-->> AccessControlJSAdapter: rejected creation for cause of existing named organization
