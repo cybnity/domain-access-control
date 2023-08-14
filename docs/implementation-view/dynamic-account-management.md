@@ -47,48 +47,54 @@ sequenceDiagram
   OrganizationRegistrationWebUI->>AccessControlJSAdapter: createOrganization(organizationName)
   AccessControlJSAdapter->>ACBackendServer: execute(new RegisterOrganization(organizationNaming))
   ACBackendServer->>ACDomainGatewayServer: execute(new RegisterOrganization(organizationNaming))
-  ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming, Boolean withoutExistingUsers = true)
-  AccessControlJavaAdapter->>IdentityServer: realm(String realmName)
-  IdentityServer-->>AccessControlJavaAdapter: RealmResource existingTenant = found realm || null
-  AccessControlJavaAdapter->>AccessControlJavaAdapter: boolean authorizedRegistration = (existingTenant == null)
-  opt authorizedRegistration == false
-	opt withoutExistingUsers
-		AccessControlJavaAdapter->>RealmResource: authorizedRegistration = (users().count().countEmailVerified() == 0)
-		RealmResource-->>AccessControlJavaAdapter: confirmation that realm is existing but without real registered account
-	end
-	opt authorizedRegistration == false
-		AccessControlJavaAdapter-->>ACDomainGatewayServer: immutable copy of Tenant(named) that is known with equals organization name
-		ACDomainGatewayServer-->>ACBackendServer: Tenant
-		ACBackendServer-->> AccessControlJSAdapter: rejected creation for cause of existing named organization
-		AccessControlJSAdapter-->>OrganizationRegistrationWebUI: refused creation for cause
-		OrganizationRegistrationWebUI-->>Person: rejection cause notification
-	end
+  ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming, Boolean includingExistingUsers)
+  AccessControlJavaAdapter->>IdentityServer: RealmResource existingRealm = realm(String realmName)
+  IdentityServer-->>AccessControlJavaAdapter: null or existing realm returned as equals organization named
+  alt existingRealm != null
+	AccessControlJavaAdapter->>RealmResource: Integer realmIncludingValidUsersQty = users().count().countEmailVerified()
+	RealmResource-->>AccessControlJavaAdapter: zero or count of verified user accounts regarding the existing realm name
+	AccessControlJavaAdapter-->>ACDomainGatewayServer: Tenant existingTenant = new Tenant(equals organization name, current verified accounts quantity)
+  else
+    	AccessControlJavaAdapter-->>ACDomainGatewayServer: Tenant existingTenant = null
   end
-  opt authorizedRegistration == true
-	AccessControlJavaAdapter-->>ACDomainGatewayServer: none equals tenant confirmation
-	ACDomainGatewayServer->>AccessControlJavaAdapter: createTenant(String organizationName)
-	AccessControlJavaAdapter->>AccessControlJavaAdapter: buildRealmRepresentation(configurationSettings)
-	AccessControlJavaAdapter->>IdentityServer: create(RealmRepresentation organizationRealm)
-	IdentityServer-->>AccessControlJavaAdapter: success realm registration confirmation (and access control settings recorded)
-	AccessControlJavaAdapter-->>ACDomainGatewayServer: new TenantRegistered(success created tenant description)
+
+  alt existingTenant != null && existingTenant.validUsers() > 0
+	ACDomainGatewayServer-->>ACBackendServer: existingTenant already confirmed as used by a minimum one previous valid registered account
+	ACBackendServer-->> AccessControlJSAdapter: rejected creation for cause of existing named organization that is already used by previous register
+	AccessControlJSAdapter-->>OrganizationRegistrationWebUI: refused creation for cause
+	OrganizationRegistrationWebUI-->>Person: rejection cause notification
+  else (existingTenant != null && existingTenant.validUsers() == 0) as re-assignable to new requestor
+	ACDomainGatewayServer->>ACDomainGatewayServer: boolean authorizedRealAssigning = true
+  end
+
+  opt (existingTenant != null && authorizedRealAssigning == true) || existingTenant == null
+	opt existingTenant == null
+	  ACDomainGatewayServer->>AccessControlJavaAdapter: createTenant(String organizationName)
+	  AccessControlJavaAdapter->>AccessControlJavaAdapter: RealmRepresentation organizationRealm = buildRealmRepresentation(configurationSettings)
+	  AccessControlJavaAdapter->>IdentityServer: create(organizationRealm)
+	  IdentityServer-->>AccessControlJavaAdapter: success realm registration confirmation (and access control settings recorded)
+	  AccessControlJavaAdapter->>IdentityServer: RealmResource existingRes = realm(String realmName)
+	  IdentityServer-->>AccessControlJavaAdapter: existingRes equals organization named
+	  AccessControlJavaAdapter-->>ACDomainGatewayServer: new Tenant(found organization description)
+	end
+	alt authorizedRealAssigning == false
+	  par
+	  ACDomainGatewayServer->>DomainsInteractionSpace: execute(new AddTenant(existingTenant description, new TenantConnectorConfiguration(new created tenant regarding future Keycloack adapter client connections via dedicated realm's clientscope setting)))
+	  and
+	  ACDomainGatewayServer->>ACDomainGatewayServer: OrganizationRegistered organizationActioned = prepare new OrganizationRegistered(new created tenant description) for domain storage notification and confirmation send
+	  end
+	else authorizedRealAssigning == true
+	  ACDomainGatewayServer->>ACDomainGatewayServer: OrganizationRegistered organizationActioned = prepare new OrganizationRegistered(previous existing tenant description) for domain storage notification and confirmation send
+	end
+		
 	par
-		ACDomainGatewayServer->>DomainsInteractionSpace: execute(new AddTenant(tenant description, new TenantConnectorConfiguration(tenant regarding future Keycloack adapter client connections via dedicated realm's clientscope setting)))
+	  ACDomainGatewayServer-->>ACBackendServer: organizationActioned
+	  ACBackendServer-->>AccessControlJSAdapter: organizationActioned about tenantID of created or reassigned organization
+	  AccessControlJSAdapter-->>OrganizationRegistrationWebUI: tenantID
+	  OrganizationRegistrationWebUI-->>Person: success organization registration notification
+	  OrganizationRegistrationWebUI->>SignUpWebUI: show(tenantID)
 	and
-		ACDomainGatewayServer->>AccessControlJavaAdapter: findTenant(String organizationNaming)
-		AccessControlJavaAdapter->>IdentityServer: realm(String realmName)
-		IdentityServer-->>AccessControlJavaAdapter: RealmResource (existing equals organization named)
-		AccessControlJavaAdapter-->>ACDomainGatewayServer: Tenant(found organization description)
-		ACDomainGatewayServer->>ACDomainGatewayServer: prepare new OrganizationRegistered(new created tenant description) for domain storage notification and confirmation send
-		par
-			ACDomainGatewayServer->>DomainsInteractionSpace: [received keycloack admin event]/execute(new SaveRegisteredOrganization(Keycloack registered realm as Organization and Tenant)) into Access Control domain layer
-		and
-			ACDomainGatewayServer-->>ACBackendServer: OrganizationRegistered(tenantName...)
-			ACBackendServer->>AccessControlJSAdapter: OrganizationRegistered(tenantName...)
-			ACBackendServer-->>AccessControlJSAdapter: tenantID of created organization
-			AccessControlJSAdapter-->>OrganizationRegistrationWebUI: tenantID
-			OrganizationRegistrationWebUI-->>Person: success organization registration notification
-			OrganizationRegistrationWebUI->>SignUpWebUI: show(tenantID)
-		end
+	  ACDomainGatewayServer->>DomainsInteractionSpace: [received keycloack admin event]/execute(new SaveRegisteredOrganization(Keycloack registered realm as Organization and Tenant)) into Access Control domain layer
 	end
   end
 
