@@ -2,10 +2,7 @@
 
 Feature Type: security control
 
-Requirement: [defined specification](https://www.notion.so/cybnity/AC-2-8-Dynamic-account-management-72d42a96723c48e5b254c59fd24b6bc8?pvs=4)
-
-Keycloack documentation:
-- [Notified Events](https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/events/login.html)
+Requirement: [defined specification](https://www.notion.so/cybnity/AC-2-8-Dynamic-account-management-72d42a96723c48e5b254c59fd24b6bc8?pvs=4) including customer journey diagrams.
 
 ## Tenant (Realm) Registration Flow
 
