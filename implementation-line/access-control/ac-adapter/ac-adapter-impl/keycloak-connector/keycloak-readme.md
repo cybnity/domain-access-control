@@ -247,8 +247,7 @@ When disconnected of any user account:
 
 # INTEGRATION WITH APPLICATION LAYER
 
-# INTEGRATION WITH KEYCLOAK EVENTS
-## Keycloak observable events
+## KEYCLOAK OBSERVABLE EVENTS
 Several type of events are promoted by Keycloak during its running, that can be listened by Access Control modules for detection and collaborative actions to perform into the Access Control domain:
 - [Error events](https://www.keycloak.org/docs-api/22.0.1/javadocs/org/keycloak/events/Errors.html)
 - [User events](https://www.keycloak.org/docs-api/22.0.1/javadocs/org/keycloak/events/Event.html)
