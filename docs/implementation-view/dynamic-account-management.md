@@ -86,7 +86,7 @@ sequenceDiagram
 
 ```
 
-## Account Registration Flow
+## User Account Registration Flow
 
 ```mermaid
 %%{
