@@ -124,73 +124,76 @@ sequenceDiagram
     }
   }
 }%%
-
 sequenceDiagram
   actor Person
   participant SignUpWebUI as <<Javascript View>><br>Sign Up UI
-  participant AccessControlJSAdapter as <<JS Library>><br>AccessControlJSAdapter
+  participant AccessControlJSAdapter as <<React Keycloak Web JS Library>><br>AccessControlJSAdapter
   participant IdentityServer as <<Keycloak IAM>><br>IdentityServer
   participant AuthorizationServer as <<Keycloak UAM>><br>AuthorizationServer
   participant IAMDB as <<Keycloak Identities DB>><br>IdentityRepository
   participant UAMDB as <<Keycloak Accounts/Roles/SSOTokens DB>><br>AccountRepository
   participant AccessControlJavaAdapter as <<Keycloak Events Listener>><br>AccessControlJavaAdapter
   participant ACDomainGatewayServer as <<Access Control Process Module>><br>ACDomainGatewayServer
-	participant DomainsInteractionSpace as <<DIS System>><br>DomainsInteractionSpace
+  participant DomainsInteractionsSpace as <<DIS System>><br>DomainsInteractionsSpace
+  participant ACDomainIAMFeature as <<Access Control Computation Unit>><br>ACDomainIAMFeature
   Person->>SignUpWebUI: signUp(tenantID, mailAddress, firstName, lastName...)
   SignUpWebUI->>AccessControlJSAdapter: createAccount(tenantID, identity...)
   AccessControlJSAdapter->>IdentityServer: addIdentity(tenantID, identity description)
   IdentityServer->>IAMDB: findIdentity(tenandID, identity...)
-	alt "existing identity"
-		IAMDB-->>IdentityServer: previous subject identity attributes
-	else "unknow identity"
-		IAMDB->>IAMDB: createIdentity(tenantID, identity...)
-		IAMDB-->>IdentityServer: new subject identity attributes
-		IdentityServer-->>AccessControlJavaAdapter: notify(RegisterEvent)
-		AccessControlJavaAdapter-)ACDomainGatewayServer: execute(new AddIdentity(tenantID, identity...))
-		ACDomainGatewayServer->>DomainsInteractionSpace: execute(new AddIdentity(tenantID, identity...))
-		IdentityServer->>AuthorizationServer: addAccount(tenantID, identity)
-		AuthorizationServer->>UAMDB: findAccount(tenantID, identity...)
-		alt "existing account"
-			alt "active account"
-				par
-					AuthorizationServer-->>IdentityServer: existing authenticated active account, roles and permissions
-				  IdentityServer-->>AccessControlJSAdapter: existing authenticated account
-				  AccessControlJSAdapter-->>SignUpWebUI: account description
-			  and
-					AuthorizationServer-->>AccessControlJavaAdapter: notify(Login)
-					AccessControlJavaAdapter-)ACDomainGatewayServer: notify(new UserAccountAuthentified(tenantID, account...))
-					ACDomainGatewayServer->>DomainsInteractionSpace: notify(new UserAccountAuthentified(tenantID, account...))
-				end
-			else "deactived || expired account"
-				par
-					AuthorizationServer-->>IdentityServer: notify(new AccountDeactived(tenantID, account id))
-					IdentityServer-->>AccessControlJSAdapter: notify(new UnusableExistingAccount(tenantID, cause))
-					AccessControlJSAdapter->>SignUpWebUI: notify(new AccountCreationRejected(tenantID, cause))
-				and
-					AuthorizationServer-->>AccessControlJavaAdapter: notify(LoginError)
-					AccessControlJavaAdapter-)ACDomainGatewayServer: notify(new UnusableAccountAuthenticationAttempted(tenantID, account id))
-					ACDomainGatewayServer->>DomainsInteractionSpace: notify(new UnusableAccountAuthenticationAttempted(tenantID, account id))
-				end
-			end
-		else "unknown account"
-			AuthorizationServer->>UAMDB: createAccount(tenantID, identity..., default roles, default permissions...)
-			par
-				AuthorizationServer-->>IdentityServer: new user account
-			  IdentityServer-->>AccessControlJSAdapter: assigned account
-			  AccessControlJSAdapter-->>SignUpWebUI: account description
-			and
-				AuthorizationServer-->>AccessControlJavaAdapter: notify(RegisterEvent)
-				AccessControlJavaAdapter-)ACDomainGatewayServer: execute(new AddUserAccount(tenandID, account...))
-				ACDomainGatewayServer->>DomainsInteractionSpace: execute(new AddUserAccount(tenandID, account...))
-			end
+  alt "existing identity"
+	IAMDB-->>IdentityServer: previous subject identity attributes
+  else "unknow identity"
+	IAMDB->>IAMDB: createIdentity(tenantID, identity...)
+	IAMDB-->>IdentityServer: new subject identity attributes
+	IdentityServer-->>AccessControlJavaAdapter: notify(RegisterEvent)
+	AccessControlJavaAdapter-)ACDomainGatewayServer: execute(new AddIdentity(tenantID, identity...))
+	ACDomainGatewayServer->>DomainsInteractionsSpace: send(addIdentity(tenantID, identity...))
+	DomainsInteractionsSpace->>ACDomainIAMFeature: poll(addIdentity)
+	IdentityServer->>AuthorizationServer: addAccount(tenantID, identity)
+	AuthorizationServer->>UAMDB: findAccount(tenantID, identity...)
+	alt "existing account"
+	  alt "active account"
+		par
+		  AuthorizationServer-->>IdentityServer: existing authenticated active account, roles and permissions
+		  IdentityServer-->>AccessControlJSAdapter: existing authenticated account
+		  AccessControlJSAdapter-->>SignUpWebUI: account description
+		and
+		  AuthorizationServer-->>AccessControlJavaAdapter: notify(Login)
+		  AccessControlJavaAdapter-)ACDomainGatewayServer: notify(new UserAccountAuthentified(tenantID, account...))
+		  ACDomainGatewayServer->>DomainsInteractionsSpace: send(userAccountAuthentified(tenantID, account...))
+		  DomainsInteractionsSpace->>ACDomainIAMFeature: poll(userAccountAuthentified)
 		end
+	  else "deactived || expired account"
+		par
+		  AuthorizationServer-->>IdentityServer: notify(new AccountDeactived(tenantID, account id))
+		  IdentityServer-->>AccessControlJSAdapter: notify(new UnusableExistingAccount(tenantID, cause))
+		  AccessControlJSAdapter->>SignUpWebUI: notify(new AccountCreationRejected(tenantID, cause))
+		and
+		  AuthorizationServer-->>AccessControlJavaAdapter: notify(LoginError)
+		  AccessControlJavaAdapter-)ACDomainGatewayServer: notify(new UnusableAccountAuthenticationAttempted(tenantID, account id))
+		  ACDomainGatewayServer->>DomainsInteractionsSpace: send(unusableAccountAuthenticationAttempted(tenantID, account id))
+		  DomainsInteractionsSpace->>ACDomainIAMFeature: poll(unusableAccountAuthenticationAttempted)
+		end
+	  end
+	else "unknown account"
+	  AuthorizationServer->>UAMDB: createAccount(tenantID, identity..., default roles, default permissions...)
+	  par
+	  	AuthorizationServer-->>IdentityServer: new user account
+		IdentityServer-->>AccessControlJSAdapter: assigned account
+		AccessControlJSAdapter-->>SignUpWebUI: account description
+	  and
+		AuthorizationServer-->>AccessControlJavaAdapter: notify(RegisterEvent)
+		AccessControlJavaAdapter-)ACDomainGatewayServer: execute(new AddUserAccount(tenandID, account...))
+		ACDomainGatewayServer->>DomainsInteractionsSpace: send(addUserAccount(tenandID, account...))
+		DomainsInteractionsSpace->>ACDomainIAMFeature: poll(addUserAccount)
+	  end
 	end
-	alt "success available account"
-	  SignUpWebUI-->>Person: success registration notification
-	else "failure event"
-		SignUpWebUI-->>Person: rejection cause notification
-	end
-
+  end
+  alt "success available account"
+  	SignUpWebUI-->>Person: success registration notification
+  else "failure event"
+  	SignUpWebUI-->>Person: rejection cause notification
+  end
 ```
 
 #
