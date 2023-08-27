@@ -244,3 +244,12 @@ When disconnected of any user account:
     - The standard Sign page is shown allowing to authenticate the test user account
     - Re-use the Tester account credential for try authentication
     - When authenticated, the personal information screen is shown with success
+
+# INTEGRATION WITH APPLICATION LAYER
+
+## KEYCLOAK OBSERVABLE EVENTS
+Several type of events are promoted by Keycloak during its running, that can be listened by Access Control modules for detection and collaborative actions to perform into the Access Control domain:
+- [Error events](https://www.keycloak.org/docs-api/22.0.1/javadocs/org/keycloak/events/Errors.html)
+- [User events](https://www.keycloak.org/docs-api/22.0.1/javadocs/org/keycloak/events/Event.html)
+- [Admin events](https://www.keycloak.org/docs-api/22.0.1/javadocs/org/keycloak/events/admin/ResourceType.html) that represents Keycloak resource types
+- [Operation type events](https://www.keycloak.org/docs-api/22.0.1/javadocs/org/keycloak/events/admin/OperationType.html)
