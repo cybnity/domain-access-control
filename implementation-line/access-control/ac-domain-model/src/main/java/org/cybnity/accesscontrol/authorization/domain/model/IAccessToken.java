@@ -20,21 +20,21 @@ public interface IAccessToken extends ISecurityToken {
      * 
      * @return An authorization.
      */
-    public IAuthorization authorizedBy();
+    IAuthorization authorizedBy();
 
     /**
      * Get the expiration time regarding this authorized token usage.
      * 
      * @return A time.
      */
-    public OffsetDateTime expireAt();
+    OffsetDateTime expireAt();
 
     /**
      * Identify if this token have been signed.
      * 
      * @return True if signed token. Else return false.
      */
-    public boolean isSigned();
+    boolean isSigned();
 
     /**
      * Get reference of the tenant which is a scope of usage regarding this
@@ -42,12 +42,12 @@ public interface IAccessToken extends ISecurityToken {
      * 
      * @return A tenant reference.
      */
-    public EntityReference tenant();
+    EntityReference tenant();
 
     /**
      * Get the type name of this access token.
      * 
      * @return A type name of this access token.
      */
-    public String type();
+    String type();
 }

@@ -14,7 +14,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_IA_2")
 public class JWTToken {
 
-    private IDToken token;
+    private final IDToken token;
 
     /**
      * Default constructor.

@@ -1,4 +1,4 @@
-package org.cybnity.application.access_control.domain.system.gateway;
+package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;

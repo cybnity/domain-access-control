@@ -124,7 +124,7 @@ Several systems are built as executable modules, containerized (Docker images) a
 - [Backend Server](/implementation-line/access-control/ac-ui/ac-ui-system/ac-backend-server)
 - [Frontend Server](/implementation-line/access-control/ac-ui/ac-ui-system/ac-frontend-server)
 
-Several systems are developed as executable modules, which are containerized and ready for deployment via provisioning management solution:
+Several servers are developed as executable domain components, which are containerized and ready for deployment via provisioning management solution:
 - Domain Gateway Server
   - For example, to start auto-generated docker image (by Maven) into a Minikube platform, execute command line `kubectl run cybnity-ac-domain-gateway --image=cybnity/access-control-domain-gateway --image-pull-policy=Never`
 - Real-Time Stream Computation Unit

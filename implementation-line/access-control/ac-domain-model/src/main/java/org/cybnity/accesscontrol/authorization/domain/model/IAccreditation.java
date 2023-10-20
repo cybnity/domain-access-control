@@ -20,5 +20,5 @@ public interface IAccreditation {
      * 
      * @return An owner identity.
      */
-    public Collection<SubjectAttribute> userIdentity();
+    Collection<SubjectAttribute> userIdentity();
 }

@@ -13,7 +13,7 @@
 	<name>-- AC domain gateway impl module</name>
 
 	<properties>
-		<main.verticle>org.cybnity.application.access_control.domain.system.gateway.AccessControlDomainIOGateway</main.verticle>
+		<main.verticle>org.cybnity.application.accesscontrol.domain.system.gateway.AccessControlDomainIOGateway</main.verticle>
 		<module.system.image.name>access-control-domain-gateway</module.system.image.name>
 	</properties>
 

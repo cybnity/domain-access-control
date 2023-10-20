@@ -16,9 +16,9 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_AC_3")
 public class AttributesBasedAccessControl extends AuthorizationPolicy {
 
-    private Collection<SubjectAttribute> subjectDescription;
-    private Collection<ActionAttribute> actionableActions;
-    private Collection<EnvironmentAttribute> environmentDescription;
+    private final Collection<SubjectAttribute> subjectDescription;
+    private final Collection<ActionAttribute> actionableActions;
+    private final Collection<EnvironmentAttribute> environmentDescription;
 
     /**
      * Default constructor.

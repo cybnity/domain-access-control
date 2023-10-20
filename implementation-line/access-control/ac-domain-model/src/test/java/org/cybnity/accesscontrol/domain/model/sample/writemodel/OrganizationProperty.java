@@ -34,8 +34,8 @@ public class OrganizationProperty extends MutableProperty {
 	 * atomic fact.
 	 */
 	public enum PropertyAttributeKey {
-		Name, LocationCity, LocationCountry;
-	}
+		Name, LocationCity, LocationCountry
+    }
 
 	public OrganizationProperty(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue, HistoryState status)
 			throws IllegalArgumentException {

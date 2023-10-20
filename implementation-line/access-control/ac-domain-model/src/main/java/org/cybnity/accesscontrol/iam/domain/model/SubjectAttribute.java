@@ -16,7 +16,7 @@ public abstract class SubjectAttribute {
     /**
      * Dedicated scope regarding this attribute.
      */
-    private ScopeAttribute scope;
+    private final ScopeAttribute scope;
 
     /**
      * Default constructor based on a scope.

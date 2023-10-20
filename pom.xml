@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.cybnity</groupId>
 		<artifactId>techstack</artifactId>
-		<version>0.18.0</version>
+		<version>0.19.0</version>
 	</parent>
 
 	<groupId>org.cybnity</groupId>
@@ -85,7 +85,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<!-- Sub-projects transversal dependencies -->
 	<dependencies>
 	</dependencies>

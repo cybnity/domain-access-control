@@ -18,10 +18,10 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 public abstract class IDToken implements ISecurityToken {
 
     protected OffsetDateTime expiration;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime authentifiedAt;
-    private Collection<IClaim> userClaims;
-    private Collection<IAccreditation> userHabilitations;
+    private final OffsetDateTime createdAt;
+    private final OffsetDateTime authentifiedAt;
+    private final Collection<IClaim> userClaims;
+    private final Collection<IAccreditation> userHabilitations;
 
     /**
      * Default constructor.

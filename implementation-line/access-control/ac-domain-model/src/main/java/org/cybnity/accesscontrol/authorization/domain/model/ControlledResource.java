@@ -26,7 +26,7 @@ public abstract class ControlledResource implements IResource, Unmodifiable {
     /**
      * Controls applied to this resource.
      */
-    private Collection<AuthorizationPolicy> policies;
+    private final Collection<AuthorizationPolicy> policies;
 
     /**
      * Default constructor.

@@ -17,5 +17,5 @@ public interface ScopeAttribute {
      * 
      * @return A name.
      */
-    public String name();
+    String name();
 }
