@@ -13,7 +13,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
  * @author olivier
  */
 @ExtendWith({VertxExtension.class, SystemStubsExtension.class})
-public class ACBackendServerTest {
+public class TestACBackendServer {
 
     @SystemStub
     private static EnvironmentVariables environmentVariables;

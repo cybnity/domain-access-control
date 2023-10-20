@@ -26,7 +26,7 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
  */
 @ExtendWith(SystemStubsExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableBackendCheckerUseCaseTest {
+public class TestExecutableBackendChecker {
 
     @SystemStub
     private EnvironmentVariables environmentVariables;

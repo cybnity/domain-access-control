@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  * @author olivier
  */
 @ExtendWith({VertxExtension.class, SystemStubsExtension.class})
-public class APIRootResourceUseCaseTest {
+public class TestAPIRootResource {
 
     @SystemStub
     private static EnvironmentVariables environmentVariables;
@@ -36,7 +36,7 @@ public class APIRootResourceUseCaseTest {
      */
     private final IContext context = new Context();
     private HttpClient client;
-    private final static Logger LOGGER = Logger.getLogger(APIRootResourceUseCaseTest.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(TestAPIRootResource.class.getName());
     private String rootUrl;
 
     @BeforeEach
