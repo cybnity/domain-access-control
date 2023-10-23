@@ -6,17 +6,11 @@ import io.vertx.core.http.*;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import org.cybnity.framework.Context;
-import org.cybnity.framework.IContext;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -25,47 +19,25 @@ import java.util.logging.Logger;
  *
  * @author olivier
  */
-@ExtendWith({VertxExtension.class, SystemStubsExtension.class})
-public class TestAPIRootResource {
+@ExtendWith({VertxExtension.class})
+public class APIRootResourceUseCaseTest extends ContextualizedTest {
 
-    @SystemStub
-    private static EnvironmentVariables environmentVariables;
-
-    /**
-     * Current context of adapter runtime.
-     */
-    private final IContext context = new Context();
     private HttpClient client;
-    private final static Logger LOGGER = Logger.getLogger(TestAPIRootResource.class.getName());
-    private String rootUrl;
+    private final static Logger LOGGER = Logger.getLogger(APIRootResourceUseCaseTest.class.getName());
 
     @BeforeEach
     @DisplayName("Deploy backend verticle")
     void prepare(Vertx vertx, VertxTestContext testContext) {
+        // Create instance of Http client
         int serverPort = Integer
                 .parseInt(context.get(AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT));
         var options = new HttpClientOptions().setDefaultHost("localhost").setDefaultPort(serverPort);
         vertx.deployVerticle(new AccessControlBackendServer(), testContext.succeedingThenComplete());
-
         this.client = vertx.createHttpClient(options);
-        this.rootUrl = context.get(AppConfigurationVariable.ENDPOINT_HTTP_RESOURCE_API_ROOT_URL);
-    }
-
-    @BeforeAll
-    public static void showVariableEnvironmentToSet() {
-        Map<String, String> envVariables = environmentVariables.getVariables();
-        envVariables.forEach((k, v) -> System.out.println((k + ":" + v)));
-
-        String b = "---------\nCheck that environment variables are defined into the test configuration:\n" +
-                "ENDPOINT_HTTP_RESOURCE_API_ROOT_URL=/api/access-control\n" +
-                "REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT=8080\n" +
-                "AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS=http://localhost:8080,http://localhost:3000" +
-                "\n---------";
-        System.out.println(b);
     }
 
     private Future<HttpClientRequest> prepareRequest(HttpMethod methodType, String resourceURLPath) {
-        return client.request(methodType, rootUrl + resourceURLPath);
+        return client.request(methodType, apiRootURL + resourceURLPath);
     }
 
     /**

@@ -7,16 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import io.vertx.core.Vertx;
 import org.cybnity.framework.IReadableConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 /**
  * Tests regarding the utility class that check the healthy and operational
@@ -24,22 +19,8 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
  *
  * @author olivier
  */
-@ExtendWith(SystemStubsExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class TestExecutableBackendChecker {
-
-    @SystemStub
-    private EnvironmentVariables environmentVariables;
-
-    public void initMinimumRequiredEnvVariables() {
-        // Define environment variables in execution context
-
-        // All environment variables
-        for (IReadableConfiguration aReq : EnumSet.allOf(AppConfigurationVariable.class)) {
-            environmentVariables.set(aReq.getName(),
-                    /* Insert random value as variable value */ UUID.randomUUID().toString());
-        }
-    }
+public class ExecutableBackendCheckerUseCaseTest extends ContextualizedTest {
 
     /**
      * Test that a backend checker which is executed and that require some specific
@@ -49,10 +30,6 @@ public class TestExecutableBackendChecker {
     @Test
     public void givenValidSystemEnvironmentVariables_whenCheckConfigurationVariables_thenHealthyAndOperableStateConfirmed()
             throws Exception {
-        // Simulate existent environment variables on a context where
-        // operability checker could be used
-        initMinimumRequiredEnvVariables();
-
         // Execute the checker process
         ExecutableBackendChecker checker = new ExecutableBackendChecker();
         checker.checkOperableState();
@@ -95,6 +72,7 @@ public class TestExecutableBackendChecker {
     @Test
     void givenUndefinedHttpPortEnvironmentVariable_whenHealthyStateChecked_thenMissingConfigurationException() {
         // None http port defined in environment variable
+        removeAllEnvVariables();
 
         Vertx vertx = Vertx.vertx();
 
