@@ -3,6 +3,8 @@ package org.cybnity.application.accesscontrol.ui.system.backend;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.*;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -23,7 +26,6 @@ import java.util.logging.Logger;
 public class APIRootResourceUseCaseTest extends ContextualizedTest {
 
     private HttpClient client;
-    private final static Logger LOGGER = Logger.getLogger(APIRootResourceUseCaseTest.class.getName());
 
     @BeforeEach
     @DisplayName("Deploy backend verticle")
@@ -86,9 +88,11 @@ public class APIRootResourceUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenExistingTenant_whenRegisterOrganization_thenOrganizationActioned(Vertx vertx, VertxTestContext testContext) {
         // Prepare json object (RegisterOrganization command event including organization naming)
+        JsonObject command = JsonObject.of("RegisterOrganisation", JsonObject.of("organizationNaming", "CYBNITY"));
+        logger.log(Level.INFO, command.toString());
 
         // Send command it to RestAPI service "/organizations/:organizationNaming"
-
+        ConcreteCommandEvent
         // --- CASE : rejected creation for cause of existing named organization that is already used by previous register
         // Listen potential existing tenant [existingTenant != null && existingTenant.validUsers() > 0]
 

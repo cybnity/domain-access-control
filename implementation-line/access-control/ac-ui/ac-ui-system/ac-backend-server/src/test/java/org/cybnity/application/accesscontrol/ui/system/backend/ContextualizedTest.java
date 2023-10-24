@@ -9,11 +9,18 @@ import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
+import java.util.logging.Logger;
+
 /**
  * Generic helped about unit test contextualized with environment variables.
  */
 @ExtendWith(SystemStubsExtension.class)
 public class ContextualizedTest {
+
+    /**
+     * Utility logger
+     */
+    protected Logger logger;
 
     /**
      * Environment variable defined as an operational executed container.
@@ -31,6 +38,7 @@ public class ContextualizedTest {
 
     @BeforeEach
     public void initRedisConnectionChainValues() {
+        logger = Logger.getLogger(this.getClass().getName());
         apiRootURL = "/api/access-control";
         httpServerPort = 8080;
         whiteListOriginServerURLs = "http://localhost:8080,http://localhost:3000";
@@ -79,5 +87,6 @@ public class ContextualizedTest {
     public void cleanValues() {
         removeAllEnvVariables();
         context = null;
+        logger = null;
     }
 }
