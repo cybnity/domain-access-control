@@ -1,5 +1,6 @@
 package org.cybnity.application.accesscontrol.ui.system.backend.routing;
 
+import io.netty.handler.codec.http.HttpStatusClass;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerResponse;
@@ -7,12 +8,15 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.SharedData;
 import io.vertx.ext.web.AllowForwardHeaders;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.web.handler.ResponseContentTypeHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.impl.RouterImpl;
+import org.cybnity.application.accesscontrol.ui.api.experience.CollectionResourceArchetype;
 import org.cybnity.application.accesscontrol.ui.system.backend.AppConfigurationVariable;
 import org.cybnity.framework.IContext;
 
@@ -55,24 +59,50 @@ public class UICapabilitiesHTTPRouterImpl extends RouterImpl {
         // via creation of the several routes supported
         String apiRootURL = context.get(AppConfigurationVariable.ENDPOINT_HTTP_RESOURCE_API_ROOT_URL);
 
+        /* The handler gets the appropriate content type from
+         * getAcceptableContentType. As a consequence, you can easily share the same handler to produce data of different types
+         */
+        router.route(apiRootURL + "/*").handler(ResponseContentTypeHandler.create());
+        // Allow to consume the HTTP request body (e.g json received command event)
+        router.route(apiRootURL + "/*").handler(BodyHandler.create());
+
         // ---- ROUTES CONFIGURATION ---
         router.get(apiRootURL).handler(roundingCtx -> {
             roundingCtx.fail(404);
-            /**
+            /*
              * 404 If no route matches the path
-             *405 If a route matches the path but don’t match the HTTP Method
-             *406 If a route matches the path and the method but It can’t provide a response with a content type matching Accept header
-             *415 If a route matches the path and the method but It can’t accept the Content-type
-             *400 If a route matches the path and the method but It can’t accept an empty body **/
+             * 405 If a route matches the path but don’t match the HTTP Method
+             * 406 If a route matches the path and the method but It can’t provide a response with a content type matching Accept header
+             * 415 If a route matches the path and the method but It can’t accept the Content-type
+             * 400 If a route matches the path and the method but It can’t accept an empty body */
+
         });
 
-        // New tenant registration resource
-        router.put(apiRootURL + "/organizations/:organizationNaming").produces("application/json").handler(routingCtx -> {
-            // This handler is called for any PUT request regarding creation of organization as tenant
+        // services according to MIME types that each handler can consume
 
-            sendJSONUICapabilityResponse(routingCtx, "ac");
+        // New tenant registration resource
+        router.post(apiRootURL + "/" + CollectionResourceArchetype.ORGANIZATIONS.label()).consumes("application/json").handler(routingCtx -> {
+            // e.g. content-type header set to `text/json` or `application/json` will both match
+            // This handler is called for any POST request regarding creation of organization as tenant
+            JsonObject commandEvent = routingCtx.body().asJsonObject();
+
+            if (commandEvent == null) {
+                // Unprocessable entity: the provided entity in request is not understanding or not complete
+                sendError(422, routingCtx.response());
+            } else {
+                // TODO : Publish command event to UIS space
+                System.out.println("received object= " + commandEvent.toString());
+
+                // Answer to requester that demand have been taken and is currently processing
+                // for future return of reserved organization name or reject via async protocol
+                HttpServerResponse response = routingCtx.response();
+                response.setStatusCode(102 /* Accepted  - notifying client that treatment is in progress */);
+                response.end();
+            }
         }).failureHandler(failure -> {
-            System.out.println("http route failure: " + failure.toString());
+            // Method failure: a transaction method have been failed
+            // None potential help information is provided to avoid cyber-security breach exposure based on attempt of service failures to identify supported data/behaviors
+            sendError(424, failure.response());
         });
 
     }
@@ -213,7 +243,7 @@ public class UICapabilitiesHTTPRouterImpl extends RouterImpl {
                 "Hello " + name + " (connected from " + address) + "), welcome on the called resource ("
                 + calledResourceName + ")";
         HttpServerResponse response = context.response();
-        response.putHeader("content-type", "application/json");
+        response.putHeader("Content-Type", "application/json");
         response.end(json);
     }
 }

@@ -18,6 +18,19 @@
 
 	<dependencies>
 		<dependency>
+			<!-- UI Experience API specification implemented by the backend -->
+			<groupId>org.cybnity.application.access-control.ui</groupId>
+			<artifactId>api</artifactId>
+			<version>${revision}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.cybnity.application.access-control.translator</groupId>
+			<artifactId>ui-api</artifactId>
+			<version>${revision}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-web</artifactId>
 		</dependency>
