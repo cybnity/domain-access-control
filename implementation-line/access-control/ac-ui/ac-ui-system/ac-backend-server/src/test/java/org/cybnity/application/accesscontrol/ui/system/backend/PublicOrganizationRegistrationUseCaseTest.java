@@ -113,8 +113,6 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
                     Object body = reply.result().body();
                     Assertions.assertNotNull(body, "Response shall include registration JSON object!");
 
-                    System.out.println("response:" + body.toString());
-
                     // Test read of JsonNode version
                     JsonNode changeEventNode = mapper.readTree(body.toString());
                     Assertions.assertEquals("DomainEvent", changeEventNode.get("@class").asText(), "Invalid type of domain event returned by service!");
@@ -173,16 +171,16 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
     /**
      * Test registration of existing organization that was not assigned, with callback of organization reassigned
      *
-    @Test
-    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    void givenNotAssignedExistingTenant_whenRegisterOrganization_thenOrganizationReassigned(Vertx vertx, VertxTestContext testContext) {
-        // Prepare json object (RegisterOrganization command event including organization naming)
+     @Test
+     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
+     void givenNotAssignedExistingTenant_whenRegisterOrganization_thenOrganizationReassigned(Vertx vertx, VertxTestContext testContext) {
+     // Prepare json object (RegisterOrganization command event including organization naming)
 
-        // Send command it to RestAPI service "/organizations/:organizationNaming"
+     // Send command it to RestAPI service "/organizations/:organizationNaming"
 
-        // --- CASE : organizationActioned about tenantID of created or reassigned organization
-        // Listen organizationActioned because [(existingTenant != null && existingTenant.validUsers() == 0) as re-assignable to new requestor]
-        testContext.completeNow();
-    }
-    */
+     // --- CASE : organizationActioned about tenantID of created or reassigned organization
+     // Listen organizationActioned because [(existingTenant != null && existingTenant.validUsers() == 0) as re-assignable to new requestor]
+     testContext.completeNow();
+     }
+     */
 }

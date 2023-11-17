@@ -72,7 +72,7 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
                         if (res.succeeded()) {
                             // Save undeployable verticle identifier
                             deploymentIDs.add(res.result());
-                            System.out.println("Access control worker deployed (type: " + entry.getKey() + ", id: " + res.result() + ")");
+                            System.out.println(entry.getValue().getInstances() + " access control worker instances deployed (type: " + entry.getKey() + ", id: " + res.result() + ")");
                         } else {
                             System.out.println("Access control work deployment failed!");
                         }
@@ -108,20 +108,13 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
      *
      * @param stopPromise To complete.
      */
-    public void stop(Promise<Void> stopPromise) {
+    @Override
+    public void stop(Promise<Void> stopPromise) throws Exception {
         // Undeploy each worker
         for (String deploymentId : deploymentIDs) {
-            vertx
-                    .undeploy(deploymentId)
-                    .onComplete(res -> {
-                        if (res.succeeded()) {
-                            System.out.println("Access control component undeployed (id: " + res.result() + ")");
-                        } else {
-                            System.out.println("Access control component undeploy failed (id: " + res.result() + ")!");
-                        }
-                    });
+            vertx.undeploy(deploymentId);
         }
-        stopPromise.complete();
+        super.stop(stopPromise);
     }
 
     public void checkHealthyState() throws UnoperationalStateException {
