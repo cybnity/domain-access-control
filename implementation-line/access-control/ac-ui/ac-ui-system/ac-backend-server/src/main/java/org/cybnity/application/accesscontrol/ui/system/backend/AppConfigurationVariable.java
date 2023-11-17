@@ -18,9 +18,15 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 public enum AppConfigurationVariable implements IReadableConfiguration {
 
     /**
+     * Name of the event bus path regarding the domain.
+     */
+    REACTIVE_EVENTBUS_DOMAIN_ROOT_PATH("REACTIVE_EVENTBUS_DOMAIN_ROOT_PATH"),
+
+    /**
      * HTTP port listened by the backend server as entry point.
      */
     REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT("REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT"),
+
     /**
      * URLs of origin servers (separator based on "," character) which are authorized via white list to make cross calls to the backend server.
      * For example "http://" + currentOriginDomainHost + ":8080" + ",http://" + currentOriginDomainHost + ":3000"
@@ -28,11 +34,14 @@ public enum AppConfigurationVariable implements IReadableConfiguration {
     AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS("AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS"),
 
     /**
-     * Root resource url path name (e.g /api/access-control) as endpoint.
-     * Restful pattern applied on api url is "https://cybnity.com/v1.0/books-management/north-america/payments/{payment-id}"
-     * See <a href="https://restfulapi.net/resource-naming/">Restful api resource naming convention</a> for help.
+     * Quantity of thread available as assignable to worker instances to perform a task.
      */
-    ENDPOINT_HTTP_RESOURCE_API_ROOT_URL("ENDPOINT_HTTP_RESOURCE_API_ROOT_URL");
+    DOMAIN_WORKER_THREAD_POOL_SIZE("DOMAIN_WORKER_THREAD_POOL_SIZE"),
+
+    /**
+     * Quantity of instances deployed in pool regarding each worker type.
+     */
+    DOMAIN_WORKER_INSTANCES("DOMAIN_WORKER_INSTANCES");
 
     /**
      * Name of this environment variable currently hosted by the system environment.

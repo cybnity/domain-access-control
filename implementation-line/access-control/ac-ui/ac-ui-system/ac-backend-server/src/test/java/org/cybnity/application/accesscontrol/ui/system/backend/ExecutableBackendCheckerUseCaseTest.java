@@ -1,17 +1,15 @@
 package org.cybnity.application.accesscontrol.ui.system.backend;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.vertx.core.Vertx;
+import org.cybnity.framework.IReadableConfiguration;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.vertx.core.Vertx;
-import org.cybnity.framework.IReadableConfiguration;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests regarding the utility class that check the healthy and operational
@@ -77,7 +75,7 @@ public class ExecutableBackendCheckerUseCaseTest extends ContextualizedTest {
         Vertx vertx = Vertx.vertx();
 
         // Try backend module (Verticle deployment) start
-        vertx.deployVerticle(AccessControlBackendServer.class.getName(),
+        vertx.deployVerticle(AccessControlMessagingGateway.class.getName(),
                 event -> assertTrue(event.failed(), "Start shall have been not executed for cause of undefined environment variable!"));
     }
 }

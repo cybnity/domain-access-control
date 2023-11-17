@@ -45,6 +45,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+			<dependency>
+				<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" AVERTISSEMENT on Mac -->
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>4.1.100.Final</version>
+				<scope>test</scope>
+			</dependency>
 			<!-- Foundation project dependencies -->
 			<dependency>
 				<groupId>org.cybnity.framework</groupId>
@@ -56,7 +63,8 @@
 				<groupId>org.cybnity.framework</groupId>
 				<artifactId>domain</artifactId>
 				<scope>compile</scope>
-				<version>${foundation.compatibility.version}</version>
+				<version>${revision}</version>
+				<!--<version>${foundation.compatibility.version}</version>-->
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

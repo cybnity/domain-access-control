@@ -12,9 +12,9 @@ public interface CapabilityRouter extends Router {
     /**
      * Create a router supporting HTTP protocol.
      *
-     * @param vertx the Vert.x instance
-     * @param ctx   Mandatory base context providing environment resources.
-     * @return A router including routes with HTTP handlers.
+     * @param vertx a Vert.x instance.
+     * @param ctx   An environment context
+     * @return A router including routes with SockJS handlers.
      */
     static Router httpRouter(Vertx vertx, IContext ctx) {
         return new UICapabilitiesHTTPRouterImpl(vertx, ctx);

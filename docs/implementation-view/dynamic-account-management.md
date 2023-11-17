@@ -58,8 +58,8 @@ sequenceDiagram
   end
 
   alt existingTenant != null && existingTenant.validUsers() > 0
-	ACDomainGatewayServer-->>UsersInteractionsSpace: publish(new ExistingTenantAlreadyUsed(organizationNaming used by valid registered accounts))
-	UsersInteractionsSpace-->>ACBackendServer: onMessage(existingTenantAlreadyUsed)
+	ACDomainGatewayServer-->>UsersInteractionsSpace: publish(new OrganizationRegistrationRejected(new ExistingTenantAlreadyUsed(organizationNaming used by valid registered accounts)))
+	UsersInteractionsSpace-->>ACBackendServer: onMessage(organizationRegistrationRejected)
 	ACBackendServer-->> AccessControlJSAdapter: rejected creation for cause of existing named organization that is already used by previous register
 	AccessControlJSAdapter-->>OrganizationRegistrationWebUI: refused creation for cause
 	OrganizationRegistrationWebUI-->>Person: rejection cause notification
@@ -79,7 +79,7 @@ sequenceDiagram
 	end
 	alt authorizedRealAssigning == false
 	  par
-	  	ACDomainGatewayServer->>DomainsInteractionsSpace: execute(new AddTenant(existingTenant description, new TenantConnectorConfiguration(new created tenant regarding future Keycloack adapter client connections via dedicated realm's clientscope setting)))
+	  	ACDomainGatewayServer->>DomainsInteractionsSpace: execute(new AddTenant(existingTenant description, new TenantConnectorConfiguration(new created tenant regarding future Keycloak adapter client connections via dedicated realm's clientscope setting)))
 	  and
 	  	ACDomainGatewayServer->>ACDomainGatewayServer: OrganizationRegistered organizationActioned = prepare new OrganizationRegistered(new created tenant description) for domain storage notification and confirmation send
 	  end
@@ -95,7 +95,7 @@ sequenceDiagram
 	  OrganizationRegistrationWebUI-->>Person: success organization registration notification
 	  OrganizationRegistrationWebUI->>SignUpWebUI: show(tenantID)
 	and
-	  ACDomainGatewayServer->>DomainsInteractionsSpace: [received keycloack admin event]/send(new SaveRegisteredOrganization(Keycloack registered realm as Organization and Tenant)) into Access Control domain layer
+	  ACDomainGatewayServer->>DomainsInteractionsSpace: [received Keycloak admin event]/send(new SaveRegisteredOrganization(Keycloak registered realm as Organization and Tenant)) into Access Control domain layer
 	end
   end
 

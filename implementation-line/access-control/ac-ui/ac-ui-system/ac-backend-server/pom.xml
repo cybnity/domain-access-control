@@ -12,11 +12,20 @@
 	<packaging>jar</packaging>
 	<name>--- AC UI web backend impl module</name>
 	<properties>
-		<main.verticle>org.cybnity.application.accesscontrol.ui.system.backend.AccessControlBackendServer</main.verticle>
+		<main.verticle>org.cybnity.application.accesscontrol.ui.system.backend.AccessControlBackendRxServer</main.verticle>
 		<module.system.image.name>access-control-domain-backend</module.system.image.name>
 	</properties>
 
 	<dependencies>
+		<!-- TEMP DEV DEPENDENCY WITHOUT NEED OF SYNC WITH GITHUB REPO
+		<dependency>
+			<groupId>org.cybnity.framework</groupId>
+			<artifactId>domain</artifactId>
+			<scope>compile</scope>
+			<version>${revision}</version>
+		</dependency>
+		 END OF DEPENDENCY TO REMOVE -->
+
 		<dependency>
 			<!-- UI Experience API specification implemented by the backend -->
 			<groupId>org.cybnity.application.access-control.ui</groupId>
@@ -29,6 +38,11 @@
 			<artifactId>ui-api</artifactId>
 			<version>${revision}</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-rx-java3</artifactId>
+			<version>${vertx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
@@ -66,6 +80,11 @@
 		<dependency>
 			<groupId>uk.org.webcompere</groupId>
 			<artifactId>system-stubs-jupiter</artifactId>
+		</dependency>
+		<dependency>
+			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" AVERTISSEMENT on Mac -->
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
