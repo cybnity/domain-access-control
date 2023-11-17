@@ -44,8 +44,8 @@ public class AccountUseCaseTest {
 		companySubscription = SampleDataProvider.createTenant();
 		account = new Account(accountParent,
 				new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
-				new EntityReference(owner.parent(), /* none relation */ null, HistoryState.COMMITTED),
-				new EntityReference(companySubscription.parent(), null, HistoryState.COMMITTED));
+				new EntityReference(owner.parent(), /* none relation */ null, HistoryState.COMMITTED, owner.occurredAt()),
+				new EntityReference(companySubscription.parent(), null, HistoryState.COMMITTED, companySubscription.occurredAt()));
 	}
 
 	@AfterEach

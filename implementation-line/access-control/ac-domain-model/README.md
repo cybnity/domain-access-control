@@ -78,12 +78,12 @@ Several sub-packages are implemented according to the specialization of sub-doma
 ### IAM SUB-PACKAGE
 The package `org.cybnity.accesscontrol.iam.domain.model` provide standard components regarding the access control of any type, as Identity & Access Management (IAM) features and domain objects.
 
-|Class Type|Motivation|
-| :-- | :-- |
-|Account|Domain root aggregate object relative to a subject's usable account|
-|OrganizationalStructure|Organizational structure (e.g company, association, group of companies, institution) who can have interactions with systems|
-|Person|Physical social entity (e.g human person)|
-|SmartSystem|Represent a software and/or hardware system (e.g autonomous accessory representing a person or organization)|
+| Class Type              | Motivation                                                                                                                  |
+|:------------------------|:----------------------------------------------------------------------------------------------------------------------------|
+| Account                 | Domain root aggregate object relative to a subject's usable account                                                         |
+| OrganizationalStructure | Organizational structure (e.g company, association, group of companies, institution) who can have interactions with systems |
+| Person                  | Physical social entity (e.g human person)                                                                                   |
+| SmartSystem             | Represent a software and/or hardware system (e.g autonomous accessory representing a person or organization)                |
 
 ```mermaid
 %%{
