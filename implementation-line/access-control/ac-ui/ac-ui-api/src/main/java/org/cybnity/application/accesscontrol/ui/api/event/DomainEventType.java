@@ -6,6 +6,11 @@ package org.cybnity.application.accesscontrol.ui.api.event;
 public enum DomainEventType {
 
     /**
+     * Event about a requested organization registration
+     */
+    ORGANIZATION_REGISTRATION_SUBMITTED,
+
+    /**
      * Event about an organization registered as eligible to become a tenant.
      */
     ORGANIZATION_REGISTERED,

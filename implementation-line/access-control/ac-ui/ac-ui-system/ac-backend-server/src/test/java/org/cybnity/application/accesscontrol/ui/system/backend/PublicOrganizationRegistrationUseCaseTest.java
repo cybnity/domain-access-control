@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 /**
  * Test of behaviors regarding the public registration service of new tenant.
@@ -79,7 +78,7 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
         Attribute tenantNameToRegister = new Attribute(AttributeName.OrganizationNaming.name(), "CYBNITY");
         definition.add(tenantNameToRegister);
         // Prepare RegisterOrganization command event to perform via API
-        Command requestEvent = CommandFactory.create(CommandName.ORGANIZATION_REGISTRATION_SUBMITTED.name(),
+        Command requestEvent = CommandFactory.create(CommandName.REGISTER_ORGANIZATION.name(),
                 /* No identified as anonymous transaction without correlation id need*/ null, definition,
                 /* none prior command to reference*/ null,
                 /* None pre-identified organization because new creation */ null);
@@ -157,8 +156,8 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenExistingTenant_whenRegisterOrganization_thenOrganizationActioned(Vertx vertx, VertxTestContext testContext) {
         // Prepare json object (RegisterOrganization command event including organization naming)
-        JsonObject command = JsonObject.of("RegisterOrganization", JsonObject.of("organizationNaming", "CYBNITY"));
-        logger.log(Level.INFO, command.toString());
+        JsonObject command = JsonObject.of(CommandName.REGISTER_ORGANIZATION.name(), JsonObject.of("organizationNaming", "CYBNITY"));
+        //logger.log(Level.INFO, command.toString());
 
         // Send command it to RestAPI service "/organizations/:organizationNaming"
         ConcreteCommandEvent commandEvent = new ConcreteCommandEvent();
