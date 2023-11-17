@@ -84,7 +84,7 @@ The implementation projects are supported by an Official TechStack version defin
 
 ## UI COMPONENTS
 The source codes managed in theses sub-projects are providing capabilities to final user via web interfaces (e.g visual interfaces and/or backend API services) which can enhance the Foundation Core project's capabilities layer:
-- [User Interface API](/implementation-line/access-control/ac-ui/ac-ui-api)
+- [User Interface API](/implementation-line/access-control/ac-ui/ac-ui-api/docs/README.md)
 
 ## APPLICATION COMPONENTS
 The source codes managed in theses sub-projects (Maven projects) are supporting the features (as micro-service components constituing the business capabilities provided by the application domain) provided by the bounded context:
