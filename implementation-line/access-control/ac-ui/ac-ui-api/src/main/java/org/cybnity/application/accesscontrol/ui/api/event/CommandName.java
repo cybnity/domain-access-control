@@ -8,5 +8,5 @@ public enum CommandName {
     /**
      * Registration command of an organization eligible to become a tenant as perimeter of access control.
      */
-    REGISTER_ORGANIZATION;
+    ORGANIZATION_REGISTRATION_SUBMITTED;
 }

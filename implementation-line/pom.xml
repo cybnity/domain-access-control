@@ -63,8 +63,7 @@
 				<groupId>org.cybnity.framework</groupId>
 				<artifactId>domain</artifactId>
 				<scope>compile</scope>
-				<version>${revision}</version>
-				<!--<version>${foundation.compatibility.version}</version>-->
+				<version>${foundation.compatibility.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

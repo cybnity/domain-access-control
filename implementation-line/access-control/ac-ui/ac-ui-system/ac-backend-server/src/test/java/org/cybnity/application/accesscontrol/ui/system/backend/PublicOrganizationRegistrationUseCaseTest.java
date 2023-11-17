@@ -79,7 +79,7 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
         Attribute tenantNameToRegister = new Attribute(AttributeName.OrganizationNaming.name(), "CYBNITY");
         definition.add(tenantNameToRegister);
         // Prepare RegisterOrganization command event to perform via API
-        Command requestEvent = CommandFactory.create(CommandName.REGISTER_ORGANIZATION.name(),
+        Command requestEvent = CommandFactory.create(CommandName.ORGANIZATION_REGISTRATION_SUBMITTED.name(),
                 /* No identified as anonymous transaction without correlation id need*/ null, definition,
                 /* none prior command to reference*/ null,
                 /* None pre-identified organization because new creation */ null);
