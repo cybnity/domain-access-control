@@ -9,7 +9,6 @@ import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractAccessControlChannelWorker;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
 import org.cybnity.framework.domain.*;
-import org.cybnity.framework.domain.event.ConcreteDomainChangeEvent;
 import org.cybnity.framework.domain.event.DomainEventFactory;
 import org.cybnity.framework.domain.model.DomainEntity;
 
@@ -112,7 +111,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
                     tenantDefinition, /* prior as command event entity reference */ null
                     , null);
 
-            ConcreteDomainChangeEvent changeEvent = (ConcreteDomainChangeEvent) DomainEventFactory.create(DomainEventType.ORGANIZATION_REGISTERED.name(),
+            DomainEvent changeEvent = DomainEventFactory.create(DomainEventType.ORGANIZATION_REGISTERED.name(),
                     /* Identifier of the event to prepare */ null, changeEventDefinition,
                     /* Prior command cause of change*/ createdTenantEvent.getIdentifiedBy().reference(),
                     /* None pre-identified organization because new creation */ null);
