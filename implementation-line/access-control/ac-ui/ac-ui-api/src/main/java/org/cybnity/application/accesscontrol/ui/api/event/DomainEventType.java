@@ -23,5 +23,15 @@ public enum DomainEventType {
     /**
      * Event about refused registration that include a cause (e;g existing tenant already used by other owner).
      */
-    ORGANIZATION_REGISTRATION_REJECTED;
+    ORGANIZATION_REGISTRATION_REJECTED,
+
+    /**
+     * Event about a user account registered for usage into an organization perimeter.
+     */
+    ACCOUNT_REGISTERED,
+
+    /**
+     * Event about a user account that is active and is usable by its owner.
+     */
+    ACCOUNT_ACTIVATED;
 }

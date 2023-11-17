@@ -8,5 +8,15 @@ public enum CommandName {
     /**
      * Registration command of an organization eligible to become a tenant as perimeter of access control.
      */
-    REGISTER_ORGANIZATION;
+    REGISTER_ORGANIZATION,
+
+    /**
+     * Registration command of a user account for an existing organization.
+     */
+    REGISTER_ACCOUNT,
+
+    /**
+     * Activate an existing pre-registered account that become usable by a person into a tenant perimeter.
+     */
+    ACTIVATE_REGISTERED_ACCOUNT;
 }
