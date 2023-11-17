@@ -33,7 +33,7 @@ sequenceDiagram
   actor Person
   participant OrganizationRegistrationWebUI as <<Javascript View>><br>Organization Registration UI
   participant AccessControlJSAdapter as <<JS Library>><br>AccessControlJSAdapter
-  participant ACBackendServer as <<Reactive Backend Server>><br>ACBackendServer
+  participant ACBackendServer as <<Access Control Messaging Gateway>><br>ACBackendServer
   participant UsersInteractionsSpace as <<UIS System>><br>UsersInteractionsSpace
   participant ACDomainGatewayServer as <<Access Control Process Module>><br>ACDomainGatewayServer
   participant AccessControlJavaAdapter as <<Keycloak Connector>><br>AccessControlJavaAdapter
