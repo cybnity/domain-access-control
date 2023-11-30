@@ -9,7 +9,7 @@ public enum UICapabilityChannel {
     /**
      * Boundary regarding the capabilities of Access Control domain.
      */
-    access_control("ac"),
+    access_control("ac")
     ;
 
     private final String acronym;

@@ -8,9 +8,14 @@ import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractAccessControlChannelWorker;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
+import org.cybnity.framework.Context;
+import org.cybnity.framework.IContext;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.event.DomainEventFactory;
 import org.cybnity.framework.domain.model.DomainEntity;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
 import java.util.*;
 
@@ -19,6 +24,26 @@ import java.util.*;
  * This public exposed service does not apply access control rules and is integrated with Users Interactions Space to deliver the response to the caller over the Event bus.
  */
 public class PublicOrganizationRegistrationWorker extends AbstractAccessControlChannelWorker {
+
+    /**
+     * Current context of adapter runtime.
+     */
+    private final IContext context = new Context();
+
+    /**
+     * Client managing interactions with Users Interactions Space.
+     */
+    private UISAdapter uisClient;
+
+    /**
+     * Default constructor.
+     *
+     * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
+     */
+    public PublicOrganizationRegistrationWorker() throws UnoperationalStateException {
+        // Prepare client configured for interactions with the UIS
+        uisClient = new UISAdapterImpl(context);
+    }
 
     /**
      * Start event bus channel as provided api service entre-point.
@@ -57,18 +82,20 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
      *
      * @param message Message to process. Do nothing when null.
      */
-    protected <T> void onMessage(Message<T> message) {
+    private <T> void onMessage(Message<T> message) {
         if (message != null) {
             JsonObject messageBody = (JsonObject) message.body();
 
             // Make long-time running process with call to UIS capabilities layer
+
 
             // Identify eventual existing reply address
             // and/or optional original values (e.g correlation id) to forward over UIS
             String replyAddress = message.replyAddress();
             String originEntrypointChannelAddress = message.address();
 
-            // TODO replace mocked response for execution since observer of UIS layer
+            // TODO replace mocked response for execution since observer of UIS layer over REDIS adapter library
+
 
             DeliveryOptions options = getDeliveryOptions(message.headers().entries());
             // Temp mocked response to replace by result build from consumer when received response from redis

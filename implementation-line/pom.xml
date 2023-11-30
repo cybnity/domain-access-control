@@ -65,6 +65,13 @@
 				<scope>compile</scope>
 				<version>${foundation.compatibility.version}</version>
 			</dependency>
+			<dependency>
+				<!-- Integration with Users Interactions Space middleware -->
+				<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
+				<artifactId>redis-impl</artifactId>
+				<scope>compile</scope>
+				<version>${foundation.compatibility.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
