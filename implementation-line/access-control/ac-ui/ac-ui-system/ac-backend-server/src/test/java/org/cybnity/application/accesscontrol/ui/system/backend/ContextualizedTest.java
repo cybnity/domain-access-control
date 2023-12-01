@@ -37,14 +37,12 @@ public class ContextualizedTest {
     @SystemStub
     protected EnvironmentVariables environmentVariables;
 
-    protected String apiRootURL;
-    protected Integer httpServerPort;
-    protected String whiteListOriginServerURLs;
-    protected String serverHost;
-    protected String apiRootPath;
-    protected int workerInstances;
-    protected int workerThreadPool;
-
+    static String API_ROOT_URL = "/api/access-control";
+    static Integer HTTP_SERVER_PORT = 8080;
+    static String WHITE_LIST_ORIGIN_SERVER_URLS = "http://localhost:8080,http://localhost:3000";
+    static String API_ROOT_PATH = "ac";
+    static int WORKER_INSTANCES = 3;
+    static int WORKER_THREAD_POOL = 3;
 
     private RedisServer redisServer;
 
@@ -84,21 +82,12 @@ public class ContextualizedTest {
         context.addResource(CONNECTION_USER_ACCOUNT, "connectionUserAccount", false);
         context.addResource(DEFAULT_AUTH_PASSWORD, "connectionPassword", false);
 
-        apiRootURL = "/api/access-control";
-        apiRootPath = "ac";
-        httpServerPort = 8080;
-        serverHost = "localhost";
-        whiteListOriginServerURLs = "http://localhost:8080,http://localhost:3000";
-        workerInstances = 3;
-        workerThreadPool = 3;
-
-        // Build reusable context
-        context.addResource(apiRootURL, "ENDPOINT_HTTP_RESOURCE_API_ROOT_URL", true);
-        context.addResource(apiRootPath, "AppConfigurationVariable.REACTIVE_EVENTBUS_DOMAIN_ROOT_PATH", true);
-        context.addResource(httpServerPort, "REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT", true);
-        context.addResource(whiteListOriginServerURLs, "AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS", true);
-        context.addResource(workerInstances, "DOMAIN_WORKER_INSTANCES", true);
-        context.addResource(workerThreadPool, "DOMAIN_WORKER_THREAD_POOL_SIZE", true);
+        context.addResource(API_ROOT_URL, "ENDPOINT_HTTP_RESOURCE_API_ROOT_URL", true);
+        context.addResource(API_ROOT_PATH, "AppConfigurationVariable.REACTIVE_EVENTBUS_DOMAIN_ROOT_PATH", true);
+        context.addResource(HTTP_SERVER_PORT, "REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT", true);
+        context.addResource(WHITE_LIST_ORIGIN_SERVER_URLS, "AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS", true);
+        context.addResource(WORKER_INSTANCES, "DOMAIN_WORKER_INSTANCES", true);
+        context.addResource(WORKER_THREAD_POOL, "DOMAIN_WORKER_THREAD_POOL_SIZE", true);
         // Synchronize environment variables test values
         initEnvVariables();
 
@@ -115,7 +104,6 @@ public class ContextualizedTest {
                 //.setting("maxmemory 128M")
                 .build();
         redisServer.start();
-        //System.out.println("Redis test server started");
     }
 
     /**
@@ -145,23 +133,46 @@ public class ContextualizedTest {
         environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_HOST.getName(), SERVER_HOST);
         environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_PORT.getName(), Integer.toString(SERVER_PORT));
 
-        // Define additional environment variables
+        // Define additional environment variables regarding backend gateway
         environmentVariables.set(
                 AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT.getName(),
-                httpServerPort);
+                HTTP_SERVER_PORT);
         environmentVariables.set(
                 AppConfigurationVariable.AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS.getName(),
-                whiteListOriginServerURLs);
+                WHITE_LIST_ORIGIN_SERVER_URLS);
         environmentVariables.set(AppConfigurationVariable.REACTIVE_EVENTBUS_DOMAIN_ROOT_PATH.getName(),
-                apiRootPath);
-        environmentVariables.set(AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE.getName(), workerThreadPool);
-        environmentVariables.set(AppConfigurationVariable.DOMAIN_WORKER_INSTANCES.getName(), workerInstances);
+                API_ROOT_PATH);
+        environmentVariables.set(AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE.getName(), WORKER_THREAD_POOL);
+        environmentVariables.set(AppConfigurationVariable.DOMAIN_WORKER_INSTANCES.getName(), WORKER_INSTANCES);
     }
 
     /**
      * Clean all defined variables.
      */
     protected void removeAllEnvVariables() {
+        // Variables regarding write model
+        environmentVariables.set(
+                WriteModelConfigurationVariable.REDIS_WRITEMODEL_CONNECTION_DEFAULT_AUTH_PASSWORD.getName(),
+                null);
+        environmentVariables.set(
+                WriteModelConfigurationVariable.REDIS_WRITEMODEL_CONNECTION_DEFAULT_USERACCOUNT.getName(),
+                null);
+        environmentVariables.set(WriteModelConfigurationVariable.REDIS_WRITEMODEL_DATABASE_NUMBER.getName(),
+                null);
+        environmentVariables.set(WriteModelConfigurationVariable.REDIS_WRITEMODEL_SERVER_HOST.getName(), null);
+        environmentVariables.set(WriteModelConfigurationVariable.REDIS_WRITEMODEL_SERVER_PORT.getName(), null);
+        // Variables regarding read model
+        environmentVariables.set(
+                ReadModelConfigurationVariable.REDIS_READMODEL_CONNECTION_DEFAULT_AUTH_PASSWORD.getName(),
+                null);
+        environmentVariables.set(
+                ReadModelConfigurationVariable.REDIS_READMODEL_CONNECTION_DEFAULT_USERACCOUNT.getName(),
+                null);
+        environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_DATABASE_NUMBER.getName(),
+                null);
+        environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_HOST.getName(), null);
+        environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_PORT.getName(), null);
+        // Variables regarding backend gateway
         environmentVariables.set(
                 AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT.getName(),
                 null);
@@ -181,7 +192,6 @@ public class ContextualizedTest {
     @AfterEach
     public void cleanValues() {
         redisServer.stop();
-        //System.out.println("Redis test server stopped");
         removeAllEnvVariables();
         context = null;
         logger = null;

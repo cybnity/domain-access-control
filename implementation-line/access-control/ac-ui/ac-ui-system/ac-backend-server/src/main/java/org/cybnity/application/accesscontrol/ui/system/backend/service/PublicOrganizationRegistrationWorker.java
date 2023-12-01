@@ -1,7 +1,6 @@
 package org.cybnity.application.accesscontrol.ui.system.backend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.vertx.core.Promise;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -19,6 +18,8 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Public API service managing the registration of an organization as tenant.
@@ -35,6 +36,11 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
      * Client managing interactions with Users Interactions Space.
      */
     private UISAdapter uisClient;
+
+    /**
+     * Technical logging
+     */
+    private static final Logger logger = Logger.getLogger(PublicOrganizationRegistrationWorker.class.getName());
 
     /**
      * Default constructor.
@@ -152,8 +158,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
             // Transform event into vertx supported JsonObject type allowing binding
             return new JsonObject(mapper.writeValueAsString(changeEvent));
         } catch (Exception e) {
-            // TODO change for logging tool usage
-            e.printStackTrace();
+            logger.log(Level.FINE, e.toString());
         }
         return null;
     }

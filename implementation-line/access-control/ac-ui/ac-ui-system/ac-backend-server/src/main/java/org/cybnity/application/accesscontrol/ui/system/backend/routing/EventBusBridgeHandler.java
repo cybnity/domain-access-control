@@ -8,6 +8,8 @@ import io.vertx.core.shareddata.SharedData;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 
+import java.util.logging.Logger;
+
 /**
  * Handler of bus events exposed between frontend and backend as integration
  * layer.
@@ -15,6 +17,11 @@ import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 public abstract class EventBusBridgeHandler implements Handler<BridgeEvent> {
     private final EventBus bus;
     private final SharedData sessionStore;
+
+    /**
+     * Technical logging
+     */
+    private static final Logger logger = Logger.getLogger(EventBusBridgeHandler.class.getName());
 
     public EventBusBridgeHandler(EventBus eventBus, SharedData sessionStore) {
         this.bus = eventBus;
@@ -63,16 +70,16 @@ public abstract class EventBusBridgeHandler implements Handler<BridgeEvent> {
             if (event.type() == BridgeEventType.SOCKET_IDLE) {
                 // This even will occur when SockJS socket is on idle for longer period of time
                 // than initially configured
-                System.out.println("Socket IDLE occurred");
+                logger.fine("Socket IDLE occurred");
             } else if (event.type() == BridgeEventType.SOCKET_CREATED) {
                 // This event will occur when a SockJS socket is created
-                System.out.println("Socket is created");
+                logger.fine("Socket is created");
             } else if (event.type() == BridgeEventType.SOCKET_CLOSED) {
                 // This event will occur when a SockJS socket is closed
-                System.out.println("Socket is closed");
+                logger.fine("Socket is closed");
             } else if (event.type() == BridgeEventType.SOCKET_ERROR) {
                 // This event will occur when an underlying transport errors
-                System.out.println("Socket error occurred: " + event.getRawMessage().encode());
+                logger.fine("Socket error occurred: " + event.getRawMessage().encode());
             }
 
             // --- CHECK THE CONFORMITY OF THE EVENT STRUCTURE ---
@@ -82,14 +89,14 @@ public abstract class EventBusBridgeHandler implements Handler<BridgeEvent> {
                 if (message.getString("body") != null && message.getString("body").contentEquals("violation")) {
                     // Reject event where a specific word exist in body (e.g security, conformity
                     // violation)
-                    System.out.println("Event rejected caused by content violation");
+                    logger.fine("Event rejected caused by content violation");
                     event.complete(false);
                     return;
                 }
                 if (event.type() == BridgeEventType.RECEIVE) {
                     // a message is attempted to be delivered from the server to the client
                     // Add security tracking about event transmitted to client side
-                    System.out.println("Event delivered from server to client side");
+                    logger.fine("Event delivered from server to client side");
                 }
             }
 
@@ -111,12 +118,12 @@ public abstract class EventBusBridgeHandler implements Handler<BridgeEvent> {
                                     System.out.println(e);
                                 }
                             } else {
-                                System.out.println("Event rejected caused by unauthorized resource access");
+                                logger.fine("Event rejected caused by unauthorized resource access");
                             }
                         }
                     });
                 } catch (Exception ee) {
-                    System.out.println(ee);
+                    logger.fine(ee.getMessage());
                     event.complete(false);
                     return;
                 }

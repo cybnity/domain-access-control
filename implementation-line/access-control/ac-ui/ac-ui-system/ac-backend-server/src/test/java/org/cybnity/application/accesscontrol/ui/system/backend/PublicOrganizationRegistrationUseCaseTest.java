@@ -48,11 +48,11 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
     void prepareGatewayServer(Vertx vertx, VertxTestContext testContext) {
         this.vertx = vertx;
         // Create instance of Http client allowing communication over SockJS server
-        var options = new HttpClientOptions().setDefaultHost(serverHost).setDefaultPort(httpServerPort);
+        var options = new HttpClientOptions().setDefaultHost(SERVER_HOST).setDefaultPort(HTTP_SERVER_PORT);
         vertx.deployVerticle(AccessControlMessagingGateway.class.getName(), testContext.succeeding(id -> {
             this.client = vertx.createHttpClient(options);
             mapper = new ObjectMapperBuilder().dateFormat().enableIndentation().preserveOrder(true).build();
-            System.out.println("Access control messaging gateway server prepared");
+            logger.fine("Access control messaging gateway server prepared");
             testContext.completeNow();
         }));
     }

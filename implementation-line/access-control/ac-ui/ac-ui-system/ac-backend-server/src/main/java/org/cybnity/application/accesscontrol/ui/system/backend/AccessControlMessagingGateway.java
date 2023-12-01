@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Gateway ensuring deployment of supervision http routing (e.g supporting health control) and workers pool of domain capabilities handlers.
@@ -41,6 +42,11 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
     private static final String DOMAIN_POOL_NAME = "access-control-workers";
 
     /**
+     * Technical logging
+     */
+    private static final Logger logger = Logger.getLogger(AccessControlMessagingGateway.class.getName());
+
+    /**
      * Default start method regarding the server.
      *
      * @param args None pre-required.
@@ -50,9 +56,9 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
         // Deploy health check support over http
         vertx.deployVerticle(new AccessControlMessagingGateway()).onComplete(res -> {
             if (res.succeeded()) {
-                System.out.println("Access control Messaging Gateway deployed (id: " + res.result() + ")");
+                logger.info("Access control Messaging Gateway deployed (id: " + res.result() + ")");
             } else {
-                System.out.println("Access control Messaging Gateway deployment failed!");
+                logger.info("Access control Messaging Gateway deployment failed!");
             }
         });
     }
@@ -72,9 +78,9 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
                         if (res.succeeded()) {
                             // Save undeployable verticle identifier
                             deploymentIDs.add(res.result());
-                            System.out.println(entry.getValue().getInstances() + " access control worker instances deployed (type: " + entry.getKey() + ", id: " + res.result() + ")");
+                            logger.info(entry.getValue().getInstances() + " access control worker instances deployed (type: " + entry.getKey() + ", id: " + res.result() + ")");
                         } else {
-                            System.out.println("Access control work deployment failed!");
+                            logger.info("Access control work deployment failed!");
                         }
                     });
         }
@@ -95,10 +101,10 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
                         .parseInt(context.get(AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT)))
                 // Print the port
                 .onSuccess(server -> {
-                    System.out.println("Access control backend server started (port: " + server.actualPort() + ")");
+                    logger.info("Access control backend server started (port: " + server.actualPort() + ")");
                     startPromise.complete();
                 }).onFailure(error -> {
-                    System.out.println("Access control backend server start failure: " + error.getCause());
+                    logger.info("Access control backend server start failure: " + error.getCause());
                     startPromise.fail(error.getCause());
                 });
     }
