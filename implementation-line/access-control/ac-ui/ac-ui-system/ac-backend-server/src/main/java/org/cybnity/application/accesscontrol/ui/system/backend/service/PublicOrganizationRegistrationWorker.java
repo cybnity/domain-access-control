@@ -1,6 +1,7 @@
 package org.cybnity.application.accesscontrol.ui.system.backend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -41,8 +42,13 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
      */
     public PublicOrganizationRegistrationWorker() throws UnoperationalStateException {
-        // Prepare client configured for interactions with the UIS
-        uisClient = new UISAdapterImpl(context);
+        try {
+            // Prepare client configured for interactions with the UIS
+            uisClient = new UISAdapterImpl(context);
+        } catch (IllegalArgumentException iae) {
+            // Problem of context read
+            throw new UnoperationalStateException(iae);
+        }
     }
 
     /**

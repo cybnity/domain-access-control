@@ -23,9 +23,13 @@
 			<artifactId>domain</artifactId>
 			<scope>compile</scope>
 			<version>${revision}</version>
-		</dependency>
-		 END OF DEPENDENCY TO REMOVE -->
+		</dependency>END OF DEPENDENCY TO REMOVE -->
 
+		<dependency>
+			<!-- Integration with Users Interactions Space middleware -->
+			<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
+			<artifactId>redis-impl</artifactId>
+		</dependency>
 		<dependency>
 			<!-- UI Experience API specification implemented by the backend -->
 			<groupId>org.cybnity.application.access-control.ui</groupId>
@@ -38,11 +42,6 @@
 			<artifactId>ui-api</artifactId>
 			<version>${revision}</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<!-- Integration with Users Interactions Space middleware -->
-			<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
-			<artifactId>redis-impl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
