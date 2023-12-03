@@ -50,6 +50,8 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
     public PublicOrganizationRegistrationWorker() throws UnoperationalStateException {
         try {
             // Prepare client configured for interactions with the UIS
+            // according to the defined environment variables (autonomous connection from worker to UIS)
+            // defined on the runtime server executing this worker
             uisClient = new UISAdapterImpl(context);
         } catch (IllegalArgumentException iae) {
             // Problem of context read
@@ -67,8 +69,26 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
         startUISConsumers();
         // Create each entrypoint channel observed by this worker
         vertx.eventBus().consumer(CollaborationChannel.ac_in_public_organization_registration.label(), this::onMessage);
+        logger.fine(this.getClass().getName() + " event bus channels listening started");
     }
 
+    @Override
+    protected void stopChannelConsumers() {
+        // Stop the UIS observers
+        stopUISConsumers();
+        // TODO Stop each entrypoint channel previously observed by this worker
+
+        logger.info(this.getClass().getName() + " event bus channels consumers stopped");
+    }
+
+    /**
+     * Stop the handlers that monitored the User Interactions Space.
+     */
+    private void stopUISConsumers() {
+        // TODO créer desabonnement aux topics redis
+
+        logger.fine(this.getClass().getName() + " UIS consumers stopped");
+    }
     /**
      * Start the handlers that monitor the User Interactions Space and forward observed events to the event bus.
      */
@@ -86,6 +106,9 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
         // - output channel dedicated to a correlation id
         // - output channel specific to the domain
         // - public output channel
+
+        logger.fine(this.getClass().getName() + " UIS consumers started");
+
     }
 
     /**
@@ -99,14 +122,14 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
             JsonObject messageBody = (JsonObject) message.body();
 
             // Make long-time running process with call to UIS capabilities layer
-
+// TODO ajouter usage de uiclient
 
             // Identify eventual existing reply address
             // and/or optional original values (e.g correlation id) to forward over UIS
             String replyAddress = message.replyAddress();
             String originEntrypointChannelAddress = message.address();
 
-            // TODO replace mocked response for execution since observer of UIS layer over REDIS adapter library
+            // TODO replace mocked response (and vertx.redis usage if none required) for execution since observer of UIS layer over REDIS adapter library
 
 
             DeliveryOptions options = getDeliveryOptions(message.headers().entries());

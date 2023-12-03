@@ -70,12 +70,14 @@ public class ExecutableBackendCheckerUseCaseTest extends ContextualizedTest {
     @Test
     void givenUndefinedHttpPortEnvironmentVariable_whenHealthyStateChecked_thenMissingConfigurationException() {
         // None http port defined in environment variable
-        removeAllEnvVariables();
+        this.environmentVariables.remove(AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT.getName());
 
         Vertx vertx = Vertx.vertx();
 
         // Try backend module (Verticle deployment) start
-        vertx.deployVerticle(AccessControlMessagingGateway.class.getName(),
-                event -> assertTrue(event.failed(), "Start shall have been not executed for cause of undefined environment variable!"));
+        vertx.deployVerticle(new AccessControlMessagingGateway())
+                .onComplete(res -> {
+                    assertFalse(res.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
+                });
     }
 }

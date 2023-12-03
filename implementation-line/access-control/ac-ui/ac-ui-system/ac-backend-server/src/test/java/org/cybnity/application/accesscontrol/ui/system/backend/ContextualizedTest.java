@@ -75,19 +75,6 @@ public class ContextualizedTest {
         // Build reusable context
         this.context = new Context();
 
-        context.addResource(DEFAULT_AUTH_PASSWORD, "defaultAuthPassword", false);
-        context.addResource(SERVER_HOST, "serverHost", false);
-        context.addResource(Integer.toString(SERVER_PORT), "serverPort", false);
-        context.addResource(DATABASE_NUMBER, "databaseNumber", false);
-        context.addResource(CONNECTION_USER_ACCOUNT, "connectionUserAccount", false);
-        context.addResource(DEFAULT_AUTH_PASSWORD, "connectionPassword", false);
-
-        context.addResource(API_ROOT_URL, "ENDPOINT_HTTP_RESOURCE_API_ROOT_URL", true);
-        context.addResource(API_ROOT_PATH, "AppConfigurationVariable.REACTIVE_EVENTBUS_DOMAIN_ROOT_PATH", true);
-        context.addResource(HTTP_SERVER_PORT, "REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT", true);
-        context.addResource(WHITE_LIST_ORIGIN_SERVER_URLS, "AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS", true);
-        context.addResource(WORKER_INSTANCES, "DOMAIN_WORKER_INSTANCES", true);
-        context.addResource(WORKER_THREAD_POOL, "DOMAIN_WORKER_THREAD_POOL_SIZE", true);
         // Synchronize environment variables test values
         initEnvVariables();
 
@@ -146,53 +133,11 @@ public class ContextualizedTest {
         environmentVariables.set(AppConfigurationVariable.DOMAIN_WORKER_INSTANCES.getName(), WORKER_INSTANCES);
     }
 
-    /**
-     * Clean all defined variables.
-     */
-    protected void removeAllEnvVariables() {
-        // Variables regarding write model
-        environmentVariables.set(
-                WriteModelConfigurationVariable.REDIS_WRITEMODEL_CONNECTION_DEFAULT_AUTH_PASSWORD.getName(),
-                null);
-        environmentVariables.set(
-                WriteModelConfigurationVariable.REDIS_WRITEMODEL_CONNECTION_DEFAULT_USERACCOUNT.getName(),
-                null);
-        environmentVariables.set(WriteModelConfigurationVariable.REDIS_WRITEMODEL_DATABASE_NUMBER.getName(),
-                null);
-        environmentVariables.set(WriteModelConfigurationVariable.REDIS_WRITEMODEL_SERVER_HOST.getName(), null);
-        environmentVariables.set(WriteModelConfigurationVariable.REDIS_WRITEMODEL_SERVER_PORT.getName(), null);
-        // Variables regarding read model
-        environmentVariables.set(
-                ReadModelConfigurationVariable.REDIS_READMODEL_CONNECTION_DEFAULT_AUTH_PASSWORD.getName(),
-                null);
-        environmentVariables.set(
-                ReadModelConfigurationVariable.REDIS_READMODEL_CONNECTION_DEFAULT_USERACCOUNT.getName(),
-                null);
-        environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_DATABASE_NUMBER.getName(),
-                null);
-        environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_HOST.getName(), null);
-        environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_PORT.getName(), null);
-        // Variables regarding backend gateway
-        environmentVariables.set(
-                AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT.getName(),
-                null);
-        environmentVariables.set(
-                AppConfigurationVariable.AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS.getName(),
-                null);
-        environmentVariables.set(AppConfigurationVariable.REACTIVE_EVENTBUS_DOMAIN_ROOT_PATH.getName(),
-                null);
-        environmentVariables.set(
-                AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE.getName(),
-                null);
-        environmentVariables.set(
-                AppConfigurationVariable.DOMAIN_WORKER_INSTANCES.getName(),
-                null);
-    }
 
     @AfterEach
     public void cleanValues() {
         redisServer.stop();
-        removeAllEnvVariables();
+        this.environmentVariables = null;
         context = null;
         logger = null;
     }

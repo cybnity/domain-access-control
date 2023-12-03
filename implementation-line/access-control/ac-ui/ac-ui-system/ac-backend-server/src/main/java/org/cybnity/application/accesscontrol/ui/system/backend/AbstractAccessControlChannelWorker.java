@@ -1,7 +1,6 @@
 package org.cybnity.application.accesscontrol.ui.system.backend;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
 
 /**
  * Verticle supporting public channels exposed by the domain from an event bus entry point.
@@ -11,30 +10,29 @@ public abstract class AbstractAccessControlChannelWorker extends AbstractVerticl
 
     /**
      * This default implementation method start the observed channels (as entry points) and start this worker instance including the execution of the complete() action on the startPromise parameter.
-     *
-     * @param startPromise Mandatory promise.
      */
     @Override
-    public void start(Promise<Void> startPromise) {
+    public void start() {
         // Start consumers listening th observed channels (as entry points) by this worker
         startChannelConsumers();
-        startPromise.complete();
     }
 
     /**
      * Resource freedom (e.g undeployment of all verticles).
-     *
-     * @param stopPromise To complete.
      */
     @Override
-    public void stop(Promise<Void> stopPromise) throws Exception {
-        System.out.println(this.getClass().getName() + " undeployed");
-        super.stop(stopPromise);
+    public void stop() {
+        // Stop the channel consumers listening
+        stopChannelConsumers();
     }
 
     /**
-     * Start consumers managed by this worker instance and their observation of entrypoint(s).
+     * Start consumers managed by this worker instance and their observation points.
      */
     abstract protected void startChannelConsumers();
 
+    /**
+     * Stop listeners managed by this worker instance and their observation points.
+     */
+    abstract protected void stopChannelConsumers();
 }

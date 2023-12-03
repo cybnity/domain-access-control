@@ -65,6 +65,8 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
+        // Check the minimum required data allowing operating
+        checkHealthyState();
         // Define the public api to start
         Map<String, DeploymentOptions> deployed = publicAPIWorkers();
         // Define the secure api to start
@@ -85,8 +87,6 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
                     });
         }
 
-        // Check the minimum required data allowing operating
-        checkHealthyState();
 
         // HTTP specific request handler
         // Create a Router initialized to support routes
@@ -101,26 +101,24 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
                         .parseInt(context.get(AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT)))
                 // Print the port
                 .onSuccess(server -> {
-                    logger.info("Access control backend server started (port: " + server.actualPort() + ")");
+                    logger.info("Access control messaging gateway server started (port: " + server.actualPort() + ")");
                     startPromise.complete();
                 }).onFailure(error -> {
-                    logger.info("Access control backend server start failure: " + error.getCause());
-                    startPromise.fail(error.getCause());
+                    logger.info("Access control messaging gateway server start failure: " + error.toString());
+                    startPromise.fail(error);
                 });
     }
 
     /**
      * Resource freedom (e.g undeployment of all verticles).
      *
-     * @param stopPromise To complete.
      */
     @Override
-    public void stop(Promise<Void> stopPromise) throws Exception {
+    public void stop() {
         // Undeploy each worker
         for (String deploymentId : deploymentIDs) {
             vertx.undeploy(deploymentId);
         }
-        super.stop(stopPromise);
     }
 
     public void checkHealthyState() throws UnoperationalStateException {
