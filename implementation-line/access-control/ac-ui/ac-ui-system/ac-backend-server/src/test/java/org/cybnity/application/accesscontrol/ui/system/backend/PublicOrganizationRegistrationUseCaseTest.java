@@ -49,7 +49,7 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
         this.vertx = vertx;
         // Create instance of Http client allowing communication over SockJS server
         var options = new HttpClientOptions().setDefaultHost(SERVER_HOST).setDefaultPort(HTTP_SERVER_PORT);
-        vertx.deployVerticle(AccessControlMessagingGateway.class.getName(), testContext.succeeding(id -> {
+        vertx.deployVerticle(DomainBackendMessagingGateway.class.getName(), testContext.succeeding(id -> {
             this.client = vertx.createHttpClient(options);
             mapper = new ObjectMapperBuilder().dateFormat().enableIndentation().preserveOrder(true).build();
             logger.fine("Access control messaging gateway server prepared");
@@ -93,6 +93,9 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
         String requestCmd = mapper.writeValueAsString(requestEvent);
         // Transform command event into vertx supported JsonObject type allowing binding
         JsonObject message = new JsonObject(requestCmd);
+
+        // Start redis server usable by worker
+        redisServer.start();
 
         // Send command it to access control public worker
         eb.request(CollaborationChannel.ac_in_public_organization_registration.label(), message, options, reply -> {
@@ -140,8 +143,12 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
                     testContext.completeNow();
                 } catch (Exception me) {
                     testContext.failNow(me);
+                } finally {
+                    // Stop redis server used by worker
+                    redisServer.stop();
                 }
             } else {
+                redisServer.stop();
                 testContext.failNow(reply.cause());
             }
         });

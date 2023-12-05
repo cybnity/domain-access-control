@@ -19,8 +19,10 @@ import java.util.logging.Logger;
 
 /**
  * Gateway ensuring deployment of supervision http routing (e.g supporting health control) and workers pool of domain capabilities handlers.
+ * This component implement the Access Control Layer (ACL) regarding the domain UI capabilities (as UI API) over protocol supported as domain's entry points.
  */
-public class AccessControlMessagingGateway extends AbstractVerticle {
+public class DomainBackendMessagingGateway extends AbstractVerticle {
+
     /**
      * List of identifiers regarding deployers verticles.
      */
@@ -44,7 +46,7 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
     /**
      * Technical logging
      */
-    private static final Logger logger = Logger.getLogger(AccessControlMessagingGateway.class.getName());
+    private static final Logger logger = Logger.getLogger(DomainBackendMessagingGateway.class.getName());
 
     /**
      * Default start method regarding the server.
@@ -54,7 +56,7 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
         // Deploy health check support over http
-        vertx.deployVerticle(new AccessControlMessagingGateway()).onComplete(res -> {
+        vertx.deployVerticle(new DomainBackendMessagingGateway()).onComplete(res -> {
             if (res.succeeded()) {
                 logger.info("Access control Messaging Gateway deployed (id: " + res.result() + ")");
             } else {
@@ -149,7 +151,7 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
         if (!"".equalsIgnoreCase(poolSizeEntValue))
             options.setWorkerPoolSize(Integer.parseInt(poolSizeEntValue));
 
-        // Define the set of workers serving public UI API without access control check
+        // Add worker to the set of workers serving public UI API without access control check
         deployedPublicWorkers.put(PublicOrganizationRegistrationWorker.class.getName(), options);
 
         return deployedPublicWorkers;
@@ -161,8 +163,8 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
      * @return A option set.
      */
     private DeploymentOptions baseDeploymentOptions() {
-        // A worker verticle is just like a standard verticle, but it’s executed using a thread from the Vert.x worker thread pool, rather than using an event loop.
-        // Worker verticles are designed for calling blocking code, as they won’t block any event loops
+        // A worker is just like a standard Verticle, but it’s executed using a thread from the Vert.x worker thread pool, rather than using an event loop.
+        // Workers are designed for calling blocking code, as they won’t block any event loops
         DeploymentOptions options = new DeploymentOptions().setWorker(true);
         options.setWorkerPoolName(DOMAIN_POOL_NAME);
         return options;
@@ -189,7 +191,7 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
         if (!"".equalsIgnoreCase(poolSizeEntValue))
             options.setWorkerPoolSize(Integer.parseInt(poolSizeEntValue));
 
-        // Define the set of workers serving secure UI API with access control check
+        // Add worker to set of workers serving secure UI API with access control check
 
         return deployedSecureWorkers;
     }

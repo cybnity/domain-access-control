@@ -3,8 +3,8 @@ package org.cybnity.application.accesscontrol.ui.system.backend;
 import io.vertx.core.AbstractVerticle;
 
 /**
- * Verticle supporting public channels exposed by the domain from an event bus entry point.
- * This abstract class can be redefined by sub-class providing public service or secured tasks with automatic access control check.
+ * Verticle supporting channels exposed by the domain from an event bus entry point.
+ * This abstract class can be redefined by subclass providing public service or secured tasks with automatic access control check.
  */
 public abstract class AbstractAccessControlChannelWorker extends AbstractVerticle {
 

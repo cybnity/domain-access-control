@@ -75,7 +75,7 @@ public class ExecutableBackendCheckerUseCaseTest extends ContextualizedTest {
         Vertx vertx = Vertx.vertx();
 
         // Try backend module (Verticle deployment) start
-        vertx.deployVerticle(new AccessControlMessagingGateway())
+        vertx.deployVerticle(new DomainBackendMessagingGateway())
                 .onComplete(res -> {
                     assertFalse(res.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
                 });

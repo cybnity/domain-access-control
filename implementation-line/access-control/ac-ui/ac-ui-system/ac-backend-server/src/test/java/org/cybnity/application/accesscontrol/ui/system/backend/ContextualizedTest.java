@@ -29,6 +29,9 @@ public class ContextualizedTest {
      */
     protected Logger logger;
 
+    /**
+     * Test context.
+     */
     protected IContext context;
 
     /**
@@ -44,7 +47,10 @@ public class ContextualizedTest {
     static int WORKER_INSTANCES = 3;
     static int WORKER_THREAD_POOL = 3;
 
-    private RedisServer redisServer;
+    /**
+     * Start and stop of the server shall be manually managed by child test class.
+     */
+    protected RedisServer redisServer;
 
     /**
      * Redis server auth password.
@@ -90,7 +96,6 @@ public class ContextualizedTest {
                 //.setting("appendonly no")
                 //.setting("maxmemory 128M")
                 .build();
-        redisServer.start();
     }
 
     /**
@@ -136,8 +141,8 @@ public class ContextualizedTest {
 
     @AfterEach
     public void cleanValues() {
-        redisServer.stop();
         this.environmentVariables = null;
+        this.redisServer = null;
         context = null;
         logger = null;
     }

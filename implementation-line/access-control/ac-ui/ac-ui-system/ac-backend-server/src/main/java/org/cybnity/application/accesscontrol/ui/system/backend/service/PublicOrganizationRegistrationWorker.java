@@ -1,19 +1,25 @@
 package org.cybnity.application.accesscontrol.ui.system.backend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
+import org.cybnity.application.accesscontrol.ui.api.ConformityViolation;
+import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractAccessControlChannelWorker;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
+import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISDynamicDestinationList;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.event.DomainEventFactory;
+import org.cybnity.framework.domain.infrastructure.MessageHeader;
 import org.cybnity.framework.domain.model.DomainEntity;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
@@ -43,6 +49,11 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
     private static final Logger logger = Logger.getLogger(PublicOrganizationRegistrationWorker.class.getName());
 
     /**
+     * Routing map between Event bus path and UIS channels
+     */
+    private final UISDynamicDestinationList destinationMap = new UISDynamicDestinationList();
+
+    /**
      * Default constructor.
      *
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
@@ -60,6 +71,11 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
     }
 
     /**
+     * Event bus channel monitored by this worker.
+     */
+    private CollaborationChannel consumedChannel = CollaborationChannel.ac_in_public_organization_registration;
+
+    /**
      * Start event bus channel as provided api service entre-point.
      * This method start also the observed User Interactions Space channels allowing to deliver answers of delegated works to the capabilities layer.
      */
@@ -68,7 +84,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
         // Create UIS observed allowing async response treatment to forward at the service callers
         startUISConsumers();
         // Create each entrypoint channel observed by this worker
-        vertx.eventBus().consumer(CollaborationChannel.ac_in_public_organization_registration.label(), this::onMessage);
+        vertx.eventBus().consumer(consumedChannel.label(), this::onMessage);
         logger.fine(this.getClass().getName() + " event bus channels listening started");
     }
 
@@ -78,7 +94,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
         stopUISConsumers();
         // TODO Stop each entrypoint channel previously observed by this worker
 
-        logger.info(this.getClass().getName() + " event bus channels consumers stopped");
+        logger.fine(this.getClass().getName() + " event bus channels consumers stopped");
     }
 
     /**
@@ -89,6 +105,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
 
         logger.fine(this.getClass().getName() + " UIS consumers stopped");
     }
+
     /**
      * Start the handlers that monitor the User Interactions Space and forward observed events to the event bus.
      */
@@ -119,24 +136,96 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
      */
     private <T> void onMessage(Message<T> message) {
         if (message != null) {
+            // Identify fact event to append on space topic
             JsonObject messageBody = (JsonObject) message.body();
+            if (messageBody != null && !messageBody.isEmpty()) {
+                try {
+                    // Identify received command
+                    ObjectMapper mapper = new ObjectMapperBuilder().dateFormat().enableIndentation().preserveOrder(true).build();
+                    Command factEvent = mapper.readValue(messageBody.encode(), Command.class);
 
-            // Make long-time running process with call to UIS capabilities layer
-// TODO ajouter usage de uiclient
+                    // Identify eventual existing reply address to forward as event's additional header
+                    String replyAddress = message.replyAddress();
+                    // Define specific additional header regarding reply address specifically listener
+                    if (replyAddress != null && !replyAddress.isEmpty()) {
+                        factEvent.appendSpecification(new Attribute(MessageHeader.REPLY_ADDRESS_HEADER.name(), replyAddress));
+                    }
 
-            // Identify eventual existing reply address
-            // and/or optional original values (e.g correlation id) to forward over UIS
-            String replyAddress = message.replyAddress();
-            String originEntrypointChannelAddress = message.address();
+                    // Identify eventual correlation identifier
+                    String correlationId = (factEvent.correlationId() != null) ? factEvent.correlationId().value() : null;
+                    if (correlationId == null || correlationId.isEmpty()) {
+                        // Search eventual existing correlation id defined into the headers
+                        DeliveryOptions options = getDeliveryOptions(message.headers().entries());
+                        correlationId = options.getHeaders().get("Correlation-ID");
+                        if (correlationId != null && !correlationId.isEmpty()) {
+                            // Set correlation id on the fact event
+                            factEvent.assignCorrelationId(correlationId);
+                        }
+                    }
 
-            // TODO replace mocked response (and vertx.redis usage if none required) for execution since observer of UIS layer over REDIS adapter library
+                    // Identify event type to support by a capability domain delegation
+                    Attribute eventType = factEvent.type();
+                    String factEventTypeName = (eventType != null) ? eventType.value() : null;
+                    if (factEventTypeName != null && !factEventTypeName.isEmpty()) {
+                        // Detect capability domain path (UIS entrypoint of domain) supporting the identified fact event type
+
+                        // --- Make long-time running process with call to capability domains layer over space ---
+                        // Execute command via adapter (WITH AUTO-DETECTION OF STREAM RECIPIENT FROM REQUEST EVENT)
+                        Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ destinationMap.recipient(factEventTypeName).acronym());
+
+                        String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */);
+                        logger.log(Level.INFO, "Organization registration command (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
+                        // --- process delegated to capability domain and eventual response managed by the UIS consumers ---
 
 
-            DeliveryOptions options = getDeliveryOptions(message.headers().entries());
-            // Temp mocked response to replace by result build from consumer when received response from redis
-            JsonObject registeredOrganizationEvent = mockedResponse(options.getHeaders().get("Correlation-ID"));
+                        // TODO replace mocked response (and vertx.redis usage if none required) for execution since observer of UIS layer over REDIS adapter library
 
-            message.reply(registeredOrganizationEvent, options);
+
+                        DeliveryOptions options = getDeliveryOptions(message.headers().entries());
+                        // Temp mocked response to replace by result build from consumer when received response from redis
+                        JsonObject registeredOrganizationEvent = mockedResponse(options.getHeaders().get("Correlation-ID"), messageId);
+
+                        message.reply(registeredOrganizationEvent, options);
+                    } else {
+                        // Invalid fact event type received from the ACL channel
+                        // Several potential cause can be managed regarding thi situation in terms of security violation
+                        // For example:
+                        // - development error of command transmission to the right channel
+                        // - security attack attempt with bad command send test through any channel for test of entry by any api entry point
+                        managedInvalidChannelEntry(factEvent, ConformityViolation.UNIDENTIFIED_EVENT_TYPE, consumedChannel.label());
+                    }
+                } catch (JsonProcessingException jpe) {
+                    // Problem of data structure detected regarding the received event which can be binded
+                    managedInvalidChannelEntry(messageBody.toString(), ConformityViolation.UNSUPPORTED_MESSAGE_STRUCTURE, consumedChannel.label());
+                } catch (Exception ex) {
+                    logger.log(Level.WARNING, ex.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Execute security control defined for analysis and remediation of a technical problem detected in terms of invalid fact received from the event bus's channels supported by this worker.
+     *
+     * @param received    Origin received event.
+     * @param rejectCause Pre-identified cause of invalidity.
+     * @param entrypoint  Entrypoint of received command.
+     */
+    private void managedInvalidChannelEntry(Command received, ConformityViolation rejectCause, String entrypoint) {
+        managedInvalidChannelEntry(received.toString(), rejectCause, entrypoint);
+    }
+
+    /**
+     * Execute security control defined for analysis and remediation of a technical problem detected in terms of invalid data received from the event bus's channels supported by this worker.
+     *
+     * @param receivedData Origin received data.
+     * @param rejectCause  Pre-identified cause of invalidity.
+     * @param entrypoint   Entrypoint of received command.
+     */
+    private void managedInvalidChannelEntry(String receivedData, ConformityViolation rejectCause, String entrypoint) {
+        if (receivedData != null && rejectCause != null) {
+            // Log error for technical analysis by operator and remediation execution
+            logger.log(Level.SEVERE, rejectCause.name());
         }
     }
 
@@ -144,10 +233,11 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
      * Prepare a mocked answer to the service caller.
      * TODO TEMPORARY MOCK CODE BEFORE REAL RESPONSE BUILD AND RECEIVED FROM UIS
      *
-     * @param originCorrelationId transaction identifier.
+     * @param originCorrelationId  transaction identifier.
+     * @param transmittedMessageId message identifier that have been sent to UIS.
      * @return A response event shareable with the caller.
      */
-    private JsonObject mockedResponse(String originCorrelationId) {
+    private JsonObject mockedResponse(String originCorrelationId, String transmittedMessageId) {
         try {
             ObjectMapper mapper = new ObjectMapperBuilder().dateFormat().enableIndentation().preserveOrder(true).build();
 
