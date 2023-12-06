@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
@@ -11,7 +12,6 @@ import org.cybnity.application.accesscontrol.ui.system.backend.AbstractAccessCon
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISDynamicDestinationList;
 import org.cybnity.framework.Context;
-import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.event.DomainEventFactory;
@@ -54,6 +54,11 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
     private final CollaborationChannel consumedChannel = CollaborationChannel.ac_in_public_organization_registration;
 
     /**
+     * Collection of channels consumers (observing Event bus entry items) managed by this worker.
+     */
+    private final Collection<MessageConsumer<Object>> entryPointChannelConsumers = new ArrayList<>();
+
+    /**
      * Default constructor.
      *
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
@@ -63,7 +68,6 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
             // Prepare client configured for interactions with the UIS
             // according to the defined environment variables (autonomous connection from worker to UIS)
             // defined on the runtime server executing this worker
-            IContext context = new Context();
             uisClient = new UISAdapterImpl(new Context() /* Current context of adapter runtime*/);
         } catch (IllegalArgumentException iae) {
             // Problem of context read
@@ -79,18 +83,27 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
     protected void startChannelConsumers() {
         // Create UIS observed allowing async response treatment to forward at the service callers
         startUISConsumers();
+
         // Create each entrypoint channel observed by this worker
-        vertx.eventBus().consumer(consumedChannel.label(), this::onMessage);
-        logger.fine(this.getClass().getName() + " event bus channels listening started");
+        entryPointChannelConsumers.add(vertx.eventBus().consumer(consumedChannel.label(), this::onMessage));
+        logger.fine("Event bus channels consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
 
     @Override
     protected void stopChannelConsumers() {
         // Stop the UIS observers
         stopUISConsumers();
-        // TODO Stop each entrypoint channel previously observed by this worker
 
-        logger.fine(this.getClass().getName() + " event bus channels consumers stopped");
+        // Stop each entrypoint channel previously observed by this worker
+        for (MessageConsumer<Object> consumer : entryPointChannelConsumers) {
+            consumer.unregister().onComplete(res -> {
+                if (res.failed()) {
+                    logger.warning("Event bus channel consumer un-registration failed by worker (workerDeploymentId: " + this.deploymentID() + ")!");
+                }
+            });
+        }
+        // Clean consumers set
+        entryPointChannelConsumers.clear();
     }
 
     /**
