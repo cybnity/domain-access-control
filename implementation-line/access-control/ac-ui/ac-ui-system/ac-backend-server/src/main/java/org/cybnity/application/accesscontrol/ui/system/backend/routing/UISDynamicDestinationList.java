@@ -38,7 +38,7 @@ public class UISDynamicDestinationList {
         routingMap = new HashMap<String, Enum<?>>();
 
         // Set each destination path
-        routingMap.put(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control);// Entrypoint supporting organization registration command
+        routingMap.put(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_in);// Global entrypoint supporting organization registration command
     }
 
     /**

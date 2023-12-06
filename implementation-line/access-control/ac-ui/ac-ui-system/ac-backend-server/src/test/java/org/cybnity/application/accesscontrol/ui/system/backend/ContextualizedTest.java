@@ -96,6 +96,8 @@ public class ContextualizedTest {
                 //.setting("appendonly no")
                 //.setting("maxmemory 128M")
                 .build();
+        // Start redis server usable by worker
+        redisServer.start();
     }
 
     /**
@@ -141,6 +143,8 @@ public class ContextualizedTest {
 
     @AfterEach
     public void cleanValues() {
+        // Stop redis server used by worker
+        redisServer.stop();
         this.environmentVariables = null;
         this.redisServer = null;
         context = null;

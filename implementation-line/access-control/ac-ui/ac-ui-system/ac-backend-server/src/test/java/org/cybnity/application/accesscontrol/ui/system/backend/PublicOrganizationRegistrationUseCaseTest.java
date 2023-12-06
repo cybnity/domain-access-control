@@ -94,9 +94,6 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
         // Transform command event into vertx supported JsonObject type allowing binding
         JsonObject message = new JsonObject(requestCmd);
 
-        // Start redis server usable by worker
-        redisServer.start();
-
         // Send command it to access control public worker
         eb.request(CollaborationChannel.ac_in_public_organization_registration.label(), message, options, reply -> {
             if (reply.succeeded()) {
@@ -143,9 +140,6 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
                     testContext.completeNow();
                 } catch (Exception me) {
                     testContext.failNow(me);
-                } finally {
-                    // Stop redis server used by worker
-                    redisServer.stop();
                 }
             } else {
                 redisServer.stop();

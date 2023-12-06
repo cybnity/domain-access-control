@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 /**
  * Gateway ensuring deployment of supervision http routing (e.g supporting health control) and workers pool of domain capabilities handlers.
- * This component implement the Access Control Layer (ACL) regarding the domain UI capabilities (as UI API) over protocol supported as domain's entry points.
+ * This component implement the Access Control Layer (ACL) regarding the domain UI capabilities (as UI API) over event bus protocol supported as domain's entry points.
  */
 public class DomainBackendMessagingGateway extends AbstractVerticle {
 

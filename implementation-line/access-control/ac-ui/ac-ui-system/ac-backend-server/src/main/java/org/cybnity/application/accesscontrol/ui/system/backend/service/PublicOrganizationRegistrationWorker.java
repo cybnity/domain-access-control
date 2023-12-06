@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
-import org.cybnity.application.accesscontrol.ui.api.ConformityViolation;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractAccessControlChannelWorker;
@@ -30,18 +28,15 @@ import java.util.logging.Logger;
 /**
  * Public API service managing the registration of an organization as tenant.
  * This public exposed service does not apply access control rules and is integrated with Users Interactions Space to deliver the response to the caller over the Event bus.
+ * This component life cycle is based on Vert.x loop executed by this thread context.
+ * This component ensure control of any message structure before to be delegated to the UI capability domain.
  */
 public class PublicOrganizationRegistrationWorker extends AbstractAccessControlChannelWorker {
 
     /**
-     * Current context of adapter runtime.
-     */
-    private final IContext context = new Context();
-
-    /**
      * Client managing interactions with Users Interactions Space.
      */
-    private UISAdapter uisClient;
+    private final UISAdapter uisClient;
 
     /**
      * Technical logging
@@ -54,6 +49,11 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
     private final UISDynamicDestinationList destinationMap = new UISDynamicDestinationList();
 
     /**
+     * Event bus channel monitored by this worker.
+     */
+    private final CollaborationChannel consumedChannel = CollaborationChannel.ac_in_public_organization_registration;
+
+    /**
      * Default constructor.
      *
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
@@ -63,17 +63,13 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
             // Prepare client configured for interactions with the UIS
             // according to the defined environment variables (autonomous connection from worker to UIS)
             // defined on the runtime server executing this worker
-            uisClient = new UISAdapterImpl(context);
+            IContext context = new Context();
+            uisClient = new UISAdapterImpl(new Context() /* Current context of adapter runtime*/);
         } catch (IllegalArgumentException iae) {
             // Problem of context read
             throw new UnoperationalStateException(iae);
         }
     }
-
-    /**
-     * Event bus channel monitored by this worker.
-     */
-    private CollaborationChannel consumedChannel = CollaborationChannel.ac_in_public_organization_registration;
 
     /**
      * Start event bus channel as provided api service entre-point.
@@ -171,7 +167,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
 
                         // --- Make long-time running process with call to capability domains layer over space ---
                         // Execute command via adapter (WITH AUTO-DETECTION OF STREAM RECIPIENT FROM REQUEST EVENT)
-                        Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ destinationMap.recipient(factEventTypeName).acronym());
+                        Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ destinationMap.recipient(factEventTypeName).shortName());
 
                         String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */);
                         logger.log(Level.INFO, "Organization registration command (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
@@ -192,11 +188,12 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
                         // For example:
                         // - development error of command transmission to the right channel
                         // - security attack attempt with bad command send test through any channel for test of entry by any api entry point
-                        managedInvalidChannelEntry(factEvent, ConformityViolation.UNIDENTIFIED_EVENT_TYPE, consumedChannel.label());
+                        onInvalidChannelEntry(factEvent, ConformityViolation.UNIDENTIFIED_EVENT_TYPE, consumedChannel.label());
                     }
                 } catch (JsonProcessingException jpe) {
-                    // Problem of data structure detected regarding the received event which can be binded
-                    managedInvalidChannelEntry(messageBody.toString(), ConformityViolation.UNSUPPORTED_MESSAGE_STRUCTURE, consumedChannel.label());
+                    // Problem of data structure detected regarding the received event which can be bound
+                    // Cause: message structure conformity violation
+                    onInvalidChannelEntry(messageBody.toString(), ConformityViolation.UNSUPPORTED_MESSAGE_STRUCTURE, consumedChannel.label());
                 } catch (Exception ex) {
                     logger.log(Level.WARNING, ex.getMessage());
                 }
@@ -211,8 +208,8 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
      * @param rejectCause Pre-identified cause of invalidity.
      * @param entrypoint  Entrypoint of received command.
      */
-    private void managedInvalidChannelEntry(Command received, ConformityViolation rejectCause, String entrypoint) {
-        managedInvalidChannelEntry(received.toString(), rejectCause, entrypoint);
+    private void onInvalidChannelEntry(Command received, ConformityViolation rejectCause, String entrypoint) {
+        onInvalidChannelEntry(received.toString(), rejectCause, entrypoint);
     }
 
     /**
@@ -222,7 +219,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
      * @param rejectCause  Pre-identified cause of invalidity.
      * @param entrypoint   Entrypoint of received command.
      */
-    private void managedInvalidChannelEntry(String receivedData, ConformityViolation rejectCause, String entrypoint) {
+    private void onInvalidChannelEntry(String receivedData, ConformityViolation rejectCause, String entrypoint) {
         if (receivedData != null && rejectCause != null) {
             // Log error for technical analysis by operator and remediation execution
             logger.log(Level.SEVERE, rejectCause.name());
