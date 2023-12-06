@@ -91,9 +91,6 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
 
     @Override
     protected void stopChannelConsumers() {
-        // Stop the UIS observers
-        stopUISConsumers();
-
         // Stop each entrypoint channel previously observed by this worker
         for (MessageConsumer<Object> consumer : entryPointChannelConsumers) {
             consumer.unregister().onComplete(res -> {
@@ -104,6 +101,10 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
         }
         // Clean consumers set
         entryPointChannelConsumers.clear();
+
+        // Stop the UIS observers
+        stopUISConsumers();
+        logger.fine("Event bus channels consumers un-registered with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
 
     /**
@@ -183,7 +184,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
                         Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ destinationMap.recipient(factEventTypeName).shortName());
 
                         String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */);
-                        logger.log(Level.INFO, "Organization registration command (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
+                        logger.log(Level.FINE, factEventTypeName + " command (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
                         // --- process delegated to capability domain and eventual response managed by the UIS consumers ---
 
 
