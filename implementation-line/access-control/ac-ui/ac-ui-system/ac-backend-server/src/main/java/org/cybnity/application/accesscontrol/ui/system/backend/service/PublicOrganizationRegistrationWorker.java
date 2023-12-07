@@ -113,7 +113,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
     private void stopUISConsumers() {
         // TODO créer desabonnement aux topics redis
 
-        logger.fine(this.getClass().getName() + " UIS consumers stopped");
+        logger.fine("UIS consumers stopped with success");
     }
 
     /**
@@ -134,7 +134,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
         // - output channel specific to the domain
         // - public output channel
 
-        logger.fine(this.getClass().getName() + " UIS consumers started");
+        logger.fine("UIS consumers started with success");
 
     }
 
@@ -189,7 +189,8 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
 
 
                         // TODO replace mocked response (and vertx.redis usage if none required) for execution since observer of UIS layer over REDIS adapter library
-
+                        // Positionner en mocked feature unit (vertx indépendant) répondant dans le topic replyAddress car existant
+                        // puis écouté par un observer de topic du domaine ac pour forward vers event bus
 
                         DeliveryOptions options = getDeliveryOptions(message.headers().entries());
                         // Temp mocked response to replace by result build from consumer when received response from redis
