@@ -12,8 +12,8 @@
 	<packaging>jar</packaging>
 	<name>--- AC UI web backend impl module</name>
 	<properties>
-		<main.verticle>org.cybnity.application.accesscontrol.ui.system.backend.AccessControlMessagingGateway</main.verticle>
-		<module.system.image.name>access-control-domain-backend</module.system.image.name>
+		<main.verticle>org.cybnity.application.accesscontrol.ui.system.backend.AccessControlReactiveMessagingGateway</main.verticle>
+		<module.system.image.name>access-control-ui-backend</module.system.image.name>
 	</properties>
 
 	<dependencies>

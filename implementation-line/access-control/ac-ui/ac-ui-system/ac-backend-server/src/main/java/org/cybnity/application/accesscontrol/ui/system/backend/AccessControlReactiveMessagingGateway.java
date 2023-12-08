@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * Gateway ensuring deployment of supervision http routing (e.g supporting health control) and workers pool of domain capabilities handlers.
  * This component implement the Access Control Layer (ACL) regarding the domain UI capabilities (as UI API) over event bus protocol supported as domain's entry points.
  */
-public class AccessControlMessagingGateway extends AbstractVerticle {
+public class AccessControlReactiveMessagingGateway extends AbstractVerticle {
 
     /**
      * List of identifiers regarding deployed verticles.
@@ -46,7 +46,7 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
     /**
      * Technical logging
      */
-    private static final Logger logger = Logger.getLogger(AccessControlMessagingGateway.class.getName());
+    private static final Logger logger = Logger.getLogger(AccessControlReactiveMessagingGateway.class.getName());
 
     /**
      * Default start method regarding the server.
@@ -56,7 +56,7 @@ public class AccessControlMessagingGateway extends AbstractVerticle {
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
         // Deploy health check support over http
-        vertx.deployVerticle(new AccessControlMessagingGateway()).onComplete(res -> {
+        vertx.deployVerticle(new AccessControlReactiveMessagingGateway()).onComplete(res -> {
             if (res.succeeded()) {
                 logger.info("Access control (AC) Messaging Gateway deployed (id: " + res.result() + ")");
             } else {
