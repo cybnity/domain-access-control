@@ -6,7 +6,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CapabilityRouter;
-import org.cybnity.application.accesscontrol.ui.system.backend.service.PublicOrganizationRegistrationWorker;
+import org.cybnity.application.accesscontrol.ui.system.backend.service.DomainPublicAPIMessagesRouter;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
@@ -21,10 +21,10 @@ import java.util.logging.Logger;
  * Gateway ensuring deployment of supervision http routing (e.g supporting health control) and workers pool of domain capabilities handlers.
  * This component implement the Access Control Layer (ACL) regarding the domain UI capabilities (as UI API) over event bus protocol supported as domain's entry points.
  */
-public class DomainBackendMessagingGateway extends AbstractVerticle {
+public class AccessControlMessagingGateway extends AbstractVerticle {
 
     /**
-     * List of identifiers regarding deployers verticles.
+     * List of identifiers regarding deployed verticles.
      */
     private final List<String> deploymentIDs = new LinkedList<>();
 
@@ -46,7 +46,7 @@ public class DomainBackendMessagingGateway extends AbstractVerticle {
     /**
      * Technical logging
      */
-    private static final Logger logger = Logger.getLogger(DomainBackendMessagingGateway.class.getName());
+    private static final Logger logger = Logger.getLogger(AccessControlMessagingGateway.class.getName());
 
     /**
      * Default start method regarding the server.
@@ -56,11 +56,11 @@ public class DomainBackendMessagingGateway extends AbstractVerticle {
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
         // Deploy health check support over http
-        vertx.deployVerticle(new DomainBackendMessagingGateway()).onComplete(res -> {
+        vertx.deployVerticle(new AccessControlMessagingGateway()).onComplete(res -> {
             if (res.succeeded()) {
-                logger.info("Access control Messaging Gateway deployed (id: " + res.result() + ")");
+                logger.info("Access control (AC) Messaging Gateway deployed (id: " + res.result() + ")");
             } else {
-                logger.info("Access control Messaging Gateway deployment failed!");
+                logger.info("Access control (AC) Messaging Gateway deployment failed!");
             }
         });
     }
@@ -82,9 +82,9 @@ public class DomainBackendMessagingGateway extends AbstractVerticle {
                         if (res.succeeded()) {
                             // Save undeployable verticle identifier
                             deploymentIDs.add(res.result());
-                            logger.info(entry.getValue().getInstances() + " access control worker instances deployed (type: " + entry.getKey() + ", id: " + res.result() + ")");
+                            logger.info(entry.getValue().getInstances() + " AC worker instances deployed (type: " + entry.getKey() + ", id: " + res.result() + ")");
                         } else {
-                            logger.info("Access control work deployment failed!");
+                            logger.info("AC worker instances deployment failed!");
                         }
                     });
         }
@@ -103,17 +103,16 @@ public class DomainBackendMessagingGateway extends AbstractVerticle {
                         .parseInt(context.get(AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT)))
                 // Print the port
                 .onSuccess(server -> {
-                    logger.info("Access control messaging gateway server started (port: " + server.actualPort() + ")");
+                    logger.info("AC Messaging Gateway server started (port: " + server.actualPort() + ")");
                     startPromise.complete();
                 }).onFailure(error -> {
-                    logger.info("Access control messaging gateway server start failure: " + error.toString());
+                    logger.info("AC Messaging Gateway server start failure: " + error.toString());
                     startPromise.fail(error);
                 });
     }
 
     /**
      * Resource freedom (e.g undeployment of all verticles).
-     *
      */
     @Override
     public void stop() {
@@ -131,6 +130,36 @@ public class DomainBackendMessagingGateway extends AbstractVerticle {
     }
 
     /**
+     * Define instances quantity for this worker type according to existing AppConfigurationVariable.DOMAIN_WORKER_INSTANCES environment variable, and add configuration to the deployment options set.
+     * When environment variable is not defined, none configuration about instances quantity is configured.
+     *
+     * @param options Mandatory options to enhance. This method make nothing if null parameter.
+     */
+    private void configureWorkerInstances(DeploymentOptions options) {
+        if (options != null) {
+            // Define instances quantity per worker type
+            String workerInstances = context.get(AppConfigurationVariable.DOMAIN_WORKER_INSTANCES);
+            if (!"".equalsIgnoreCase(workerInstances))
+                options.setInstances(Integer.parseInt(workerInstances));
+        }
+    }
+
+    /**
+     * Define instances quantity for this worker type according to existing AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE environment variable, and add configuration to the deployment options set.
+     * When environment variable is not defined, none configuration about instances quantity is configured.
+     *
+     * @param options Mandatory options to enhance. This method make nothing if null parameter.
+     */
+    private void configureWorkerThreadsPoolSize(DeploymentOptions options) {
+        if (options != null) {
+            // Define worker threads pool size
+            String workerInstances = context.get(AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE);
+            if (!"".equalsIgnoreCase(workerInstances))
+                options.setInstances(Integer.parseInt(workerInstances));
+        }
+    }
+
+    /**
      * Prepare and get the set of public api workers managed by this gateway.
      *
      * @return Map of workers ensuring a public api of services, or empty map.
@@ -141,18 +170,14 @@ public class DomainBackendMessagingGateway extends AbstractVerticle {
         // Set each domain worker verticle at workers pool
         DeploymentOptions options = baseDeploymentOptions();
 
-        // Define instances quantity per worker type
-        String workerInstances = context.get(AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE);
-        if (!"".equalsIgnoreCase(workerInstances))
-            options.setInstances(Integer.parseInt(workerInstances));
+        // Define instances quantity for this worker type
+        configureWorkerInstances(options);
 
         // Define worker threads pool size
-        String poolSizeEntValue = context.get(AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE);
-        if (!"".equalsIgnoreCase(poolSizeEntValue))
-            options.setWorkerPoolSize(Integer.parseInt(poolSizeEntValue));
+        configureWorkerThreadsPoolSize(options);
 
         // Add worker to the set of workers serving public UI API without access control check
-        deployedPublicWorkers.put(PublicOrganizationRegistrationWorker.class.getName(), options);
+        deployedPublicWorkers.put(DomainPublicAPIMessagesRouter.class.getName(), options);
 
         return deployedPublicWorkers;
     }
@@ -178,18 +203,14 @@ public class DomainBackendMessagingGateway extends AbstractVerticle {
     private Map<String, DeploymentOptions> secureAPIWorkers() {
         Map<String, DeploymentOptions> deployedSecureWorkers = new HashMap<>();
 
-        // Set each domain worker verticle at workers pool
+        // Set each domain worker Verticle at workers pool
         DeploymentOptions options = baseDeploymentOptions();
 
-        // Define instances quantity per worker type
-        String workerInstances = context.get(AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE);
-        if (!"".equalsIgnoreCase(workerInstances))
-            options.setInstances(Integer.parseInt(workerInstances));
+        // Define instances quantity for this worker type
+        configureWorkerInstances(options);
 
         // Define worker threads pool size
-        String poolSizeEntValue = context.get(AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE);
-        if (!"".equalsIgnoreCase(poolSizeEntValue))
-            options.setWorkerPoolSize(Integer.parseInt(poolSizeEntValue));
+        configureWorkerThreadsPoolSize(options);
 
         // Add worker to set of workers serving secure UI API with access control check
 

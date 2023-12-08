@@ -8,9 +8,9 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
-import org.cybnity.application.accesscontrol.ui.system.backend.AbstractAccessControlChannelWorker;
+import org.cybnity.application.accesscontrol.ui.system.backend.AbstractChannelMessageRouter;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
-import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISDynamicDestinationList;
+import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISDynamicMessageFilter;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
@@ -26,12 +26,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Public API service managing the registration of an organization as tenant.
- * This public exposed service does not apply access control rules and is integrated with Users Interactions Space to deliver the response to the caller over the Event bus.
+ * Public API service managing the message supported by a domain.
+ * This public exposed service does not apply security control rules and is integrated with Users Interactions Space to deliver the response to the caller of the Event bus.
  * This component life cycle is based on Vert.x loop executed by this thread context.
  * This component ensure control of any message structure before to be delegated to the UI capability domain.
  */
-public class PublicOrganizationRegistrationWorker extends AbstractAccessControlChannelWorker {
+public class DomainPublicAPIMessagesRouter extends AbstractChannelMessageRouter {
 
     /**
      * Client managing interactions with Users Interactions Space.
@@ -41,12 +41,12 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
     /**
      * Technical logging
      */
-    private static final Logger logger = Logger.getLogger(PublicOrganizationRegistrationWorker.class.getName());
+    private static final Logger logger = Logger.getLogger(DomainPublicAPIMessagesRouter.class.getName());
 
     /**
      * Routing map between Event bus path and UIS channels
      */
-    private final UISDynamicDestinationList destinationMap = new UISDynamicDestinationList();
+    private final UISDynamicMessageFilter destinationMap = new UISDynamicMessageFilter();
 
     /**
      * Event bus channel monitored by this worker.
@@ -63,7 +63,7 @@ public class PublicOrganizationRegistrationWorker extends AbstractAccessControlC
      *
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
      */
-    public PublicOrganizationRegistrationWorker() throws UnoperationalStateException {
+    public DomainPublicAPIMessagesRouter() throws UnoperationalStateException {
         try {
             // Prepare client configured for interactions with the UIS
             // according to the defined environment variables (autonomous connection from worker to UIS)

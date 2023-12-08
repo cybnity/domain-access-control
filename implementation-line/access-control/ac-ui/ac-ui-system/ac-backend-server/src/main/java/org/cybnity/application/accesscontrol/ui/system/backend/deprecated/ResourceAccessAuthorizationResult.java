@@ -1,4 +1,4 @@
-package org.cybnity.application.accesscontrol.ui.system.backend.routing;
+package org.cybnity.application.accesscontrol.ui.system.backend.deprecated;
 
 import io.vertx.core.AsyncResult;
 

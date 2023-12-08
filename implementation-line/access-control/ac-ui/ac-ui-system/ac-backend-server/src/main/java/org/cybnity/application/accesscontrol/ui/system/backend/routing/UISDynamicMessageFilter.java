@@ -7,17 +7,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utility class allowing to map some fact event bus types names, with the names of
- * the UI capability entry points (redis stream channels) allowing to bridge the
+ * Message filter allowing to identify some fact event bus types names, with the names of
+ * the UI domain capability entry point (e.g redis stream channel ensuring main entrypoint of a capability domain) allowing to bridge the
  * events forwarding. This implementation helps to implement the Content-Based
  * Router pattern where the recipient channel is identified from the message
- * content to forward. The goal of the recipients list identification allowed by
+ * content to forward. The goal of the recipients list (e.g defining domain UI capability entrypoint channel for type of message) used by this message filter allowed by
  * this mapper is to manage (on server-side and hidden from the client side
  * source code's url and/or javascript) the routing in a generic way based on
  * the capabilities api supporting the event naming between the event bus
  * and the Redis space.
+ * <p>
+ * It's an implementation of architectural pattern named "Message Filter".
  */
-public class UISDynamicDestinationList {
+public class UISDynamicMessageFilter {
 
     /**
      * Referential of routes dedicated to specific event types which can be managed by Users Interactions Space's channels.
@@ -32,12 +34,12 @@ public class UISDynamicDestinationList {
      * supported) with settings hosted by the domains-interactions-broker module (e.g
      * as configuration api).
      */
-    public UISDynamicDestinationList() {
+    public UISDynamicMessageFilter() {
         // Initialize the routing destination tables that link an event bus channel with
         // a redis channel
-        routingMap = new HashMap<String, Enum<?>>();
+        routingMap = new HashMap<>();
 
-        // Set each destination path
+        // Set each domain destination path supporting each type of authorized message
         routingMap.put(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_in);// Global entrypoint supporting organization registration command
     }
 

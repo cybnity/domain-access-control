@@ -1,13 +1,10 @@
 package org.cybnity.application.accesscontrol.ui.system.backend.routing;
 
-import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.AllowForwardHeaders;
-import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.StaticHandler;
@@ -166,27 +163,5 @@ public class UICapabilitiesHTTPRouterImpl extends RouterImpl {
             // End the response
             response.end();
         }
-    }
-
-    /**
-     * Simulate a JSON answer provided on HTTP protocol by the API service.
-     *
-     * @param context            Mandatory context of the original call.
-     * @param calledResourceName Mandatory resource name which have been called.
-     */
-    static public void sendJSONUICapabilityResponse(RoutingContext context, String calledResourceName) {
-        // Get the address of the request
-        String address = context.request().connection().remoteAddress().toString();
-        // Get the query parameter "name"
-        MultiMap queryParams = context.queryParams();
-        String name = queryParams.contains("name") ? queryParams.get("name") : "unknown";
-        // Write a json response (returns a JSON object containing the address of
-        // the request, the query parameter name, and a greeting message)
-        String json = new JsonObject().put("name", name).put("address", address).put("message",
-                "Hello " + name + " (connected from " + address) + "), welcome on the called resource ("
-                + calledResourceName + ")";
-        HttpServerResponse response = context.response();
-        response.putHeader("Content-Type", "application/json");
-        response.end(json);
     }
 }
