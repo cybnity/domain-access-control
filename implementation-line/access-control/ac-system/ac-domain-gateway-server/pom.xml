@@ -17,6 +17,17 @@
 		<module.system.image.name>access-control-io-gateway</module.system.image.name>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<!-- Integration with Users Interactions Space middleware -->
+			<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
+			<artifactId>redis-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.cybnity.application.access-control.translator</groupId>
+			<artifactId>ui-api</artifactId>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>

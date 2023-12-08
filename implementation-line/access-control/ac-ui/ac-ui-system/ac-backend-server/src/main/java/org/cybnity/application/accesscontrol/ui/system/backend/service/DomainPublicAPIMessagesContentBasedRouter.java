@@ -10,7 +10,7 @@ import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractChannelMessageRouter;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
-import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISDynamicMessageFilter;
+import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISRecipientList;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
@@ -30,8 +30,13 @@ import java.util.logging.Logger;
  * This public exposed service does not apply security control rules and is integrated with Users Interactions Space to deliver the response to the caller of the Event bus.
  * This component life cycle is based on Vert.x loop executed by this thread context.
  * This component ensure control of any message structure before to be delegated to the UI capability domain.
+ * <p>
+ * This implements the Content-Based Router pattern where the recipient channel is identified from the message
+ * content to forward. It's an implementation of architectural pattern named "Content-Based Router".
+ * <p>
+ * Including the use of a RecipientList helper, this implementation inspect incoming message, determine a list of desired recipients (one or several), and forward the message to all channels associated with the recipients list.
  */
-public class DomainPublicAPIMessagesRouter extends AbstractChannelMessageRouter {
+public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMessageRouter {
 
     /**
      * Client managing interactions with Users Interactions Space.
@@ -41,17 +46,17 @@ public class DomainPublicAPIMessagesRouter extends AbstractChannelMessageRouter 
     /**
      * Technical logging
      */
-    private static final Logger logger = Logger.getLogger(DomainPublicAPIMessagesRouter.class.getName());
+    private static final Logger logger = Logger.getLogger(DomainPublicAPIMessagesContentBasedRouter.class.getName());
 
     /**
      * Routing map between Event bus path and UIS channels
      */
-    private final UISDynamicMessageFilter destinationMap = new UISDynamicMessageFilter();
+    private final UISRecipientList destinationMap = new UISRecipientList();
 
     /**
      * Event bus channel monitored by this worker.
      */
-    private final CollaborationChannel consumedChannel = CollaborationChannel.ac_in_public_organization_registration;
+    private final CollaborationChannel consumedChannel = CollaborationChannel.ac_in;
 
     /**
      * Collection of channels consumers (observing Event bus entry items) managed by this worker.
@@ -63,7 +68,7 @@ public class DomainPublicAPIMessagesRouter extends AbstractChannelMessageRouter 
      *
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
      */
-    public DomainPublicAPIMessagesRouter() throws UnoperationalStateException {
+    public DomainPublicAPIMessagesContentBasedRouter() throws UnoperationalStateException {
         try {
             // Prepare client configured for interactions with the UIS
             // according to the defined environment variables (autonomous connection from worker to UIS)

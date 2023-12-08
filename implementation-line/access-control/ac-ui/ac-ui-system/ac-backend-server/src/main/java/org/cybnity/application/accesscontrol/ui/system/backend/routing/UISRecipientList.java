@@ -7,19 +7,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Message filter allowing to identify some fact event bus types names, with the names of
- * the UI domain capability entry point (e.g redis stream channel ensuring main entrypoint of a capability domain) allowing to bridge the
- * events forwarding. This implementation helps to implement the Content-Based
- * Router pattern where the recipient channel is identified from the message
- * content to forward. The goal of the recipients list (e.g defining domain UI capability entrypoint channel for type of message) used by this message filter allowed by
- * this mapper is to manage (on server-side and hidden from the client side
- * source code's url and/or javascript) the routing in a generic way based on
- * the capabilities api supporting the event naming between the event bus
- * and the Redis space.
+ * Identify the correct recipient based on a message's content.
+ * A recipient channel is defined for each event type supported by the domain.
+ * Identify each fact event bus type name, with the name of the UI domain capability entry point (e.g redis stream channel ensuring main entrypoint of a capability domain) allowing to bridge the
+ * event forwarding. The goal of a recipients list (e.g defining domain UI capability entrypoint channel for type of message) is to define (on server-side and hidden from the client side
+ * source code's url and/or javascript) the routing path in a generic way based on the capabilities api supporting the event naming between the event bus and the Redis space.
  * <p>
- * It's an implementation of architectural pattern named "Message Filter".
+ * It's an implementation of architectural pattern named "Recipient List".
+ * Generally, one common recipient channel (Redis entrypoint materializing domain capability API) is supporting several event types.
  */
-public class UISDynamicMessageFilter {
+public class UISRecipientList {
 
     /**
      * Referential of routes dedicated to specific event types which can be managed by Users Interactions Space's channels.
@@ -34,7 +31,7 @@ public class UISDynamicMessageFilter {
      * supported) with settings hosted by the domains-interactions-broker module (e.g
      * as configuration api).
      */
-    public UISDynamicMessageFilter() {
+    public UISRecipientList() {
         // Initialize the routing destination tables that link an event bus channel with
         // a redis channel
         routingMap = new HashMap<>();

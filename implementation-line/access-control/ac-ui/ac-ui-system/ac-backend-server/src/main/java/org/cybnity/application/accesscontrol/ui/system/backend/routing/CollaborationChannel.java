@@ -16,20 +16,14 @@ public enum CollaborationChannel {
     ac("ac"),
 
     /**
-     * Entry point of capabilities domain regarding access control
-     * client->server
+     * Public API entry point of capabilities domain regarding access control client->server
      */
     ac_in(ac.label() + ".in"),
 
     /**
-     * Public entry point of public capabilities regarding access control client->server
+     * Reserved API entry point of capabilities domain regarding access control client -> server
      */
-    ac_in_public(ac_in.label() + ".public"),
-
-    /**
-     * Public entry point allowing organization registration as tenant
-     */
-    ac_in_public_organization_registration(ac_in_public.label() + ".organization-registration"),
+    ac_in_secure(ac_in.label() + ".secure"),
 
     /**
      * Output point of capabilities domain regarding access control

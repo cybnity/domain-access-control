@@ -94,8 +94,8 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
         // Transform command event into vertx supported JsonObject type allowing binding
         JsonObject message = new JsonObject(requestCmd);
 
-        // Send command it to access control public worker
-        eb.request(CollaborationChannel.ac_in_public_organization_registration.label(), message, options, reply -> {
+        // Send command it to access control worker
+        eb.request(CollaborationChannel.ac_in.label(), message, options, reply -> {
             if (reply.succeeded()) {
                 try {
                     List<Map.Entry<String, String>> headers = reply.result().headers().entries();

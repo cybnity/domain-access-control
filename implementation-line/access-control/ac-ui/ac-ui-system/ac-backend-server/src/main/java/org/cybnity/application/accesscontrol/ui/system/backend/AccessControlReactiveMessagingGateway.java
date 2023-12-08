@@ -6,7 +6,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CapabilityRouter;
-import org.cybnity.application.accesscontrol.ui.system.backend.service.DomainPublicAPIMessagesRouter;
+import org.cybnity.application.accesscontrol.ui.system.backend.service.DomainPublicAPIMessagesContentBasedRouter;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
@@ -177,7 +177,7 @@ public class AccessControlReactiveMessagingGateway extends AbstractVerticle {
         configureWorkerThreadsPoolSize(options);
 
         // Add worker to the set of workers serving public UI API without access control check
-        deployedPublicWorkers.put(DomainPublicAPIMessagesRouter.class.getName(), options);
+        deployedPublicWorkers.put(DomainPublicAPIMessagesContentBasedRouter.class.getName(), options);
 
         return deployedPublicWorkers;
     }

@@ -2,6 +2,7 @@ package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
+import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 
 /**
  * Start a composition of gateway Verticle supporting the identification of command supported by this domain and distribution to processing units (e.g UI capability)
@@ -26,7 +27,7 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
 					}
 				});
 				*/
-
+        // TODO listening of Domain capabilities API entry point UICapabilityChannel.access_control_in;
         System.out.println("Access Control domain IO Gateway module is started");
         startPromise.complete();
     }

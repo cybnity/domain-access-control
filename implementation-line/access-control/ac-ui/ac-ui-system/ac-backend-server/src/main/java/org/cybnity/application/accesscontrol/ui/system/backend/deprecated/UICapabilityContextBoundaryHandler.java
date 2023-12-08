@@ -9,7 +9,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.SharedData;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
-import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISDynamicMessageFilter;
+import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISRecipientList;
 
 /**
  * Handler of UI events and interactions regarding one boundary of cockpit
@@ -20,14 +20,14 @@ public class UICapabilityContextBoundaryHandler extends EventBusBridgeHandler {
 	private final String cqrsResponseChannel;
 	private final Vertx context;
 	//private final RedisOptions redisOpts;
-	private final UISDynamicMessageFilter destinationMap;
+	private final UISRecipientList destinationMap;
 
 	public UICapabilityContextBoundaryHandler(EventBus eventBus, SharedData sessionStore, String cqrsResponseChannel,
 			Vertx vertx) {
 		super(eventBus, sessionStore);
 		this.cqrsResponseChannel = cqrsResponseChannel;
 		this.context = vertx;
-		this.destinationMap = new UISDynamicMessageFilter();
+		this.destinationMap = new UISRecipientList();
 		// Define Redis options allowing capabilities to discuss with users interactions
 		// space (don't use pool that avoid possible usable of channels subscription by
 		// handlers)
