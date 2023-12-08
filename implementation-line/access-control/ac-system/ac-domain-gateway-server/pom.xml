@@ -10,11 +10,11 @@
 	<artifactId>domain-gateway-server</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
-	<name>-- AC domain gateway impl module</name>
+	<name>-- AC domain IO gateway impl module</name>
 
 	<properties>
 		<main.verticle>org.cybnity.application.accesscontrol.domain.system.gateway.AccessControlDomainIOGateway</main.verticle>
-		<module.system.image.name>access-control-domain-gateway</module.system.image.name>
+		<module.system.image.name>access-control-io-gateway</module.system.image.name>
 	</properties>
 
 	<build>

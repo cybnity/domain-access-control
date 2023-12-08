@@ -17,8 +17,8 @@
 		<module>ac-translator</module>
 		<module>ac-adapter</module>
 		<module>ac-service</module>
-		<module>ac-ui</module>
 		<module>ac-system</module>
+		<module>ac-ui</module>
 	</modules>
 	
 </project>

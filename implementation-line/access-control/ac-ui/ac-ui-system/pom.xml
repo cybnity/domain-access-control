@@ -13,7 +13,8 @@
 	<name>-- AC UI systems</name>
 	<modules>
 		<module>ac-backend-server</module>
-		<module>ac-frontend-server</module>
+		<!--
+		<module>ac-frontend-server</module>-->
 	</modules>
 
 	<properties>

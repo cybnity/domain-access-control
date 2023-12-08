@@ -83,6 +83,13 @@
 			<groupId>org.signal</groupId>
 			<artifactId>embedded-redis</artifactId>
 		</dependency>
+		<dependency>
+			<!-- Access Control domain Application module required during tests campaign execution for end-to-end integration Unit Testing of message treatment -->
+			<groupId>org.cybnity.application.access-control.system</groupId>
+			<artifactId>domain-gateway-server</artifactId>
+			<version>${revision}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

@@ -4,13 +4,13 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 
 /**
- * Start a composition of gateway Verticle supporting the Application security
- * services provided by the processing units of the domain.
+ * Start a composition of gateway Verticle supporting the identification of command supported by this domain and distribution to processing units (e.g UI capability)
+ * and ensuring the forwarding of domain events to UI layer (e.g domain reactive messaging gateway).
  */
 public class AccessControlDomainIOGateway extends AbstractVerticle {
 
-	@Override
-	public void start(Promise<Void> startPromise) throws Exception {
+    @Override
+    public void start(Promise<Void> startPromise) throws Exception {
 		/*vertx.deployVerticle(
 				/* Set the routing manager regarding this domain api */
 				/*AccessControlSecurityFeaturesDispatcher.class.getName(), event -> {
@@ -27,7 +27,7 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
 				});
 				*/
 
-			System.out.println("Access Control domain IO Gateway module is started");
-			startPromise.complete();
-	}
+        System.out.println("Access Control domain IO Gateway module is started");
+        startPromise.complete();
+    }
 }
