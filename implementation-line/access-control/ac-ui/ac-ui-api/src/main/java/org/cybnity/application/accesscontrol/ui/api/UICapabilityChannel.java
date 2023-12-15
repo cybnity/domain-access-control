@@ -10,9 +10,14 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.NamingConven
 public enum UICapabilityChannel {
 
     /**
-     * Boundary regarding the capabilities of Access Control domain.
+     * Boundary regarding the capabilities of Access Control domain IO entrypoint.
      */
-    access_control_in("ac" + NamingConventions.CHANNEL_NAME_SEPARATOR + "in");
+    access_control_in("ac" + NamingConventions.CHANNEL_NAME_SEPARATOR + "in"),
+
+    /**
+     * Boundary regarding the feature managing an organization registration.
+     */
+    access_control_organization_registration("ac" + NamingConventions.CHANNEL_NAME_SEPARATOR + "organization_registration");
 
     private final String shortName;
 

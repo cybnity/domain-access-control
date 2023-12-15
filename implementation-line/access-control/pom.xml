@@ -29,6 +29,30 @@
 				<version>${revision}</version>
 				<scope>compile</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.cybnity.application.access-control.ui</groupId>
+				<artifactId>api</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.application.access-control.system</groupId>
+				<artifactId>domain-gateway-server</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-web-client</artifactId>
+				<version>${vertx.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-rx-java3</artifactId>
+				<version>${vertx.version}</version>
+				<scope>compile</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	

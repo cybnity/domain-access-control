@@ -26,7 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Public API service managing the message supported by a domain.
+ * Public API service managing the messages supported by a domain.
  * This public exposed service does not apply security control rules and is integrated with Users Interactions Space to deliver the response to the caller of the Event bus.
  * This component life cycle is based on Vert.x loop executed by this thread context.
  * This component ensure control of any message structure before to be delegated to the UI capability domain.
@@ -81,7 +81,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
     }
 
     /**
-     * Start event bus channel as provided api service entre-point.
+     * Start event bus channel as provided api service entrypoint.
      * This method start also the observed User Interactions Space channels allowing to deliver answers of delegated works to the capabilities layer.
      */
     @Override
@@ -204,7 +204,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
                         message.reply(registeredOrganizationEvent, options);
                     } else {
                         // Invalid fact event type received from the ACL channel
-                        // Several potential cause can be managed regarding thi situation in terms of security violation
+                        // Several potential cause can be managed regarding this situation in terms of security violation
                         // For example:
                         // - development error of command transmission to the right channel
                         // - security attack attempt with bad command send test through any channel for test of entry by any api entry point

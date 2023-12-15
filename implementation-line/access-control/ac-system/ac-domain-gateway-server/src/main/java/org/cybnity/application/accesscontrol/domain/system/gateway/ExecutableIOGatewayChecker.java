@@ -1,4 +1,4 @@
-package org.cybnity.application.accesscontrol.ui.system.backend;
+package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.IReadableConfiguration;
@@ -13,26 +13,26 @@ import java.util.Set;
 
 /**
  * Implementation class regarding the verification of minimum required
- * configuration and contents allowing runnable backend.
+ * configuration and contents allowing runnable gateway.
  *
  * @author olivier
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_8370_CM6")
-public class ExecutableBackendChecker extends ExecutableComponentChecker {
+public class ExecutableIOGatewayChecker extends ExecutableComponentChecker {
 
     /**
      * Constructor with dedicated context to use by this checker.
      *
      * @param ctx A context or null.
      */
-    public ExecutableBackendChecker(IContext ctx) {
+    public ExecutableIOGatewayChecker(IContext ctx) {
         super(ctx);
     }
 
     /**
      * Default constructor.
      */
-    public ExecutableBackendChecker() {
+    public ExecutableIOGatewayChecker() {
         super();
     }
 
@@ -54,9 +54,8 @@ public class ExecutableBackendChecker extends ExecutableComponentChecker {
      * @return A set of optional variables.
      */
     public Set<IReadableConfiguration> optionalEnvironmentVariables() {
-        // Define the optional environment variables for backend running
+        // Define the optional environment variables for gateway running
         HashSet<IReadableConfiguration> variables = new HashSet<>();
-        variables.add(AppConfigurationVariable.AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS);
         return variables;
     }
 

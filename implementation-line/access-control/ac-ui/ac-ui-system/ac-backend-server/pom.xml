@@ -32,13 +32,10 @@
 		<dependency>
 			<groupId>org.cybnity.application.access-control.translator</groupId>
 			<artifactId>ui-api</artifactId>
-			<version>${revision}</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-rx-java3</artifactId>
-			<version>${vertx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
@@ -87,16 +84,11 @@
 			<!-- Access Control domain Application module required during tests campaign execution for end-to-end integration Unit Testing of message treatment -->
 			<groupId>org.cybnity.application.access-control.system</groupId>
 			<artifactId>domain-gateway-server</artifactId>
-			<version>${revision}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-			</plugin>
 			<plugin>
 				<artifactId>maven-shade-plugin</artifactId>
 			</plugin>

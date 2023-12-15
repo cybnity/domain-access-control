@@ -2,7 +2,6 @@ package org.cybnity.application.accesscontrol.ui.system.backend.routing;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.AllowForwardHeaders;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -38,23 +37,6 @@ public class UICapabilitiesHTTPRouterImpl extends RouterImpl {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         this.context = ctx;
         createRoutes(vertx);
-    }
-
-    /**
-     * Add headers to response according to existing requirements from original request.
-     *
-     * @param toEnhance       Mandatory response to coplete.
-     * @param originalRequest Mandatory request.
-     */
-    private void enhanceResponse(HttpServerResponse toEnhance, HttpServerRequest originalRequest) {
-        if (toEnhance != null && originalRequest != null) {
-            // Set correlation identifier when existing on the response
-            String correlationId = originalRequest.getHeader("Correlation-ID");
-            if (!"".equals(correlationId)) {
-                /* X-Request-ID, X-Correlation-ID or Correlation-ID common non-standard response fields */
-                toEnhance.putHeader("Correlation-ID", correlationId);
-            }
-        }
     }
 
     /**

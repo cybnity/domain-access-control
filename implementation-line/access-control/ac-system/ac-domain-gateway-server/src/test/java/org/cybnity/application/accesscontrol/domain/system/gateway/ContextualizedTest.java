@@ -1,4 +1,4 @@
-package org.cybnity.application.accesscontrol.ui.system.backend;
+package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 /**
  * Generic helped about unit test contextualized with environment variables.
  * <p>
- * Auto configuration and start of Redis container usable during a test execution.
+ * Auto-configuration and start of Redis container usable during a test execution.
  * Each unit test requiring a redis container started shall extend this class.
  * EmbeddedRedisExtension.class for Redis 6.0.5 used by default
  */
@@ -40,11 +40,9 @@ public class ContextualizedTest {
     @SystemStub
     protected EnvironmentVariables environmentVariables;
 
-    static Integer HTTP_SERVER_PORT = 8080;
-    static String WHITE_LIST_ORIGIN_SERVER_URLS = "http://localhost:8080,http://localhost:3000";
-    static String API_ROOT_PATH = "ac";
-    static int WORKER_INSTANCES = 3;
-    static int WORKER_THREAD_POOL = 3;
+    static protected Integer HTTP_SERVER_PORT = 8080;
+    static protected int WORKER_INSTANCES = 3;
+    static protected int WORKER_THREAD_POOL = 3;
 
     /**
      * Start and stop of the server shall be manually managed by child test class.
@@ -55,23 +53,23 @@ public class ContextualizedTest {
      * Redis server auth password.
      * Read Redis Kubernetes configuration's REDISCLI_AUTH environment variable
      */
-    static String DEFAULT_AUTH_PASSWORD = "1gEGHneiLT";
+    static protected String DEFAULT_AUTH_PASSWORD = "1gEGHneiLT";
     /**
      * System address
      */
-    static String SERVER_HOST = "localhost";
+    static protected String SERVER_HOST = "localhost";
     /**
      * Default port
      */
-    static int SERVER_PORT = 6379;
+    static protected int SERVER_PORT = 6379;
     /**
      * Default user account declared on Redis server.
      */
-    static String CONNECTION_USER_ACCOUNT = "default";
+    static protected String CONNECTION_USER_ACCOUNT = "default";
     /**
      * Default first db number
      */
-    static String DATABASE_NUMBER = "1";
+    static protected String DATABASE_NUMBER = "1";
 
     @BeforeEach
     public void initRedisConnectionChainValues() {
@@ -126,15 +124,10 @@ public class ContextualizedTest {
         environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_HOST.getName(), SERVER_HOST);
         environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_PORT.getName(), Integer.toString(SERVER_PORT));
 
-        // Define additional environment variables regarding backend gateway
+        // Define additional environment variables regarding gateway
         environmentVariables.set(
-                AppConfigurationVariable.REACTIVE_BACKEND_ENDPOINT_HTTP_SERVER_PORT.getName(),
+                AppConfigurationVariable.ENDPOINT_HTTP_SERVER_PORT.getName(),
                 HTTP_SERVER_PORT);
-        environmentVariables.set(
-                AppConfigurationVariable.AUTHORIZED_WHITE_LIST_ORIGIN_SERVER_URLS.getName(),
-                WHITE_LIST_ORIGIN_SERVER_URLS);
-        environmentVariables.set(AppConfigurationVariable.REACTIVE_EVENTBUS_DOMAIN_ROOT_PATH.getName(),
-                API_ROOT_PATH);
         environmentVariables.set(AppConfigurationVariable.DOMAIN_WORKER_THREAD_POOL_SIZE.getName(), WORKER_THREAD_POOL);
         environmentVariables.set(AppConfigurationVariable.DOMAIN_WORKER_INSTANCES.getName(), WORKER_INSTANCES);
     }

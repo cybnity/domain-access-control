@@ -176,7 +176,7 @@ public class AccessControlReactiveMessagingGateway extends AbstractVerticle {
         // Define worker threads pool size
         configureWorkerThreadsPoolSize(options);
 
-        // Add worker to the set of workers serving public UI API without access control check
+        // Add workers to the set of workers serving public UI API without access control check
         deployedPublicWorkers.put(DomainPublicAPIMessagesContentBasedRouter.class.getName(), options);
 
         return deployedPublicWorkers;
@@ -212,7 +212,7 @@ public class AccessControlReactiveMessagingGateway extends AbstractVerticle {
         // Define worker threads pool size
         configureWorkerThreadsPoolSize(options);
 
-        // Add worker to set of workers serving secure UI API with access control check
+        // Add workers to set of workers serving secure UI API with access control check
 
         return deployedSecureWorkers;
     }

@@ -14,7 +14,7 @@ public abstract class AbstractChannelMessageRouter extends AbstractVerticle {
      */
     @Override
     public void start() {
-        // Start consumers listening th observed channels (as entry points) by this router
+        // Start consumers listening the observed channels (as entry points) by this router
         startChannelConsumers();
     }
 

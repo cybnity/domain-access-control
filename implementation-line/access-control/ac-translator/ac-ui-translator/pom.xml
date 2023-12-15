@@ -15,7 +15,6 @@
 		<dependency>
 			<groupId>org.cybnity.application.access-control.ui</groupId>
 			<artifactId>api</artifactId>
-			<version>${revision}</version>
 		</dependency>
 	</dependencies>
 </project>

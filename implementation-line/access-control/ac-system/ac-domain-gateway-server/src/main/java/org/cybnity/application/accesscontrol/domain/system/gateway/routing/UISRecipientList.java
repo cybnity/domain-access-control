@@ -1,20 +1,18 @@
-package org.cybnity.application.accesscontrol.ui.system.backend.routing;
+package org.cybnity.application.accesscontrol.domain.system.gateway.routing;
 
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
-import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Identify the correct recipient based on a message's content.
- * A recipient channel is defined for each event type supported by the domain.
- * Identify each event bus fact type name, with the name of the UI domain capability entry point (e.g redis stream channel ensuring main entrypoint of a capability domain) allowing to bridge the
- * event forwarding. The goal of a recipients list (e.g defining domain UI capability entrypoint channel for type of message) is to define (on server-side and hidden from the client side
- * source code's url and/or javascript) the routing path in a generic way based on the capabilities api supporting the event naming between the event bus and the Redis space.
+ * Identify the correct recipient based on an event's content.
+ * A recipient channel is defined for each event type supported by the capability domain.
+ * Identify each stream fact type name, with the name of the UI domain capability entry point (e.g redis stream channel ensuring main entrypoint of a capability domain) allowing to bridge the
+ * event forwarding. The goal of a recipients list (e.g defining domain UI capability entrypoint channel for type of event) is to define the routing path in a generic way based on the capabilities api supporting the event naming between the API IO endpoint and the UIS space.
  * <p>
  * It's an implementation of architectural pattern named "Recipient List".
- * Generally, one common recipient channel (Redis entrypoint materializing domain capability API) is supporting several event types.
+ * Generally, one common recipient channel (Redis entrypoint materializing domain capability IO) is supporting several event types.
  */
 public class UISRecipientList {
 
@@ -36,8 +34,8 @@ public class UISRecipientList {
         // a redis channel
         routingMap = new HashMap<>();
 
-        // Set each domain destination path supporting each type of authorized message
-        routingMap.put(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_in);// Global entrypoint supporting organization registration command
+        // Set each domain destination path supporting each type of authorized event
+        //routingMap.put(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_organization_registration);// Dedicated feature entrypoint supporting organization registration command
     }
 
     /**
