@@ -11,7 +11,7 @@ public enum CollaborationEventType {
     PROCESSING_UNIT_PRESENCE_ANNOUNCED,
 
     /**
-     * Event about a registered routing path (e.g path to PU entrypoint channel) to a processing unit (e.g considered as eligible to delegation of command events treatment).
+     * Event about a registered routing paths (e.g path to PU entrypoint channel) to a processing unit (e.g considered as eligible to delegation of command events treatment).
      */
-    PROCESSING_UNIT_ROUTING_PATH_REGISTERED;
+    PROCESSING_UNIT_ROUTING_PATHS_REGISTERED;
 }

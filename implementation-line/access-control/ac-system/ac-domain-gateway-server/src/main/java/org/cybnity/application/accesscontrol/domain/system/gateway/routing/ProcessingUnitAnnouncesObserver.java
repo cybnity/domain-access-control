@@ -159,7 +159,7 @@ public class ProcessingUnitAnnouncesObserver implements ChannelObserver, IEventP
                 }
 
                 // Create change event and publish notification on channel(s) potential observed by other domain components (e.g PU which updated the API recipients list about its delegation routing plan)
-                client.publish(DomainEventFactory.create(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATH_REGISTERED.name(), identifiedBy, specification, /* priorCommandRef */ origin.reference(), null /* domain changedModelElementRef */), registeredRoutingPathChange);
+                client.publish(DomainEventFactory.create(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name(), identifiedBy, specification, /* priorCommandRef */ origin.reference(), null /* domain changedModelElementRef */), registeredRoutingPathChange);
             } catch (ImmutabilityException ie) {
                 logger.warning(ie.getMessage());
             } catch (Exception e) {
