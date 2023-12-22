@@ -1,13 +1,16 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
-import org.cybnity.application.accesscontrol.domain.system.gateway.routing.UISRecipientList;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.domain.system.gateway.routing.IEventProcessingManager;
+import org.cybnity.application.accesscontrol.ui.api.routing.UISRecipientList;
 import org.cybnity.framework.domain.Attribute;
+import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.MappingException;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Processor ensuring a transfer of event to process (as a Proxy delegate) the treatment relative to an event.
@@ -15,43 +18,57 @@ import java.util.Collection;
  */
 public class RemoteProcessingUnitExecutor implements ProcessingUnitDelegation {
 
+    private final IEventProcessingManager recipientsProvider;
+    private final UISAdapter uisClient;
+    /**
+     * Technical logging
+     */
+    private static final Logger logger = Logger.getLogger(RemoteProcessingUnitExecutor.class.getName());
+
+    /**
+     * Default constructor.
+     *
+     * @param recipientsProvider Mandatory manager of dynamic or static recipients able to be delegated of event processing.
+     * @param uisClient          Mandatory operational client connected to UIS.
+     * @throws IllegalArgumentException When mandatory parameter is missing.
+     */
+    public RemoteProcessingUnitExecutor(IEventProcessingManager recipientsProvider, UISAdapter uisClient) throws IllegalArgumentException {
+        super();
+        if (recipientsProvider == null) throw new IllegalArgumentException("recipientsProvider parameter is required!");
+        if (uisClient == null) throw new IllegalArgumentException("uisClient parameter is required!");
+        this.recipientsProvider = recipientsProvider;
+        this.uisClient = uisClient;
+    }
+
     @Override
     public void process(IDescribed factEvent) throws IllegalArgumentException {
-        if (factEvent==null) throw new IllegalArgumentException("factEvent parameter is required!");
+        if (factEvent == null) throw new IllegalArgumentException("factEvent parameter is required!");
         // Identify mapping key about supported event type name
         Attribute factType = factEvent.type();
-        if (factType!=null) {
+        if (factType != null) {
             String eventTypeName = factEvent.type().value();
-            // Identify existing path (e.g UIS stream recipient) to the remote service component which is responsible of event treatment
-            // based on RecipientList pattern implementation according to the fact event type name
-            UISRecipientList destinationMap = new UISRecipientList();
-            UICapabilityChannel PUEntrypointChannel = destinationMap.recipient(eventTypeName);
-            if (PUEntrypointChannel!=null) {
-                Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ destinationMap.recipient(eventTypeName).shortName());
-
-                // TODO implement creation of a Proxy element that execute a forwarding action to an external (e.g UI capability feature executed in standalone service) responsible of event treatment
-
+            // Identify existing path (e.g UIS stream recipient dynamically updated according to the started remote IService providers) to the remote service component as able to treat the event
+            // based on DynamicRecipientList pattern implementation according to the fact event type name
+            UISRecipientList destinationMap = recipientsProvider.delegateDestinations();
+            String PUEntrypointChannel = destinationMap.recipient(eventTypeName);
+            if (PUEntrypointChannel != null) {
+                try {
+                    Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ destinationMap.recipient(eventTypeName));
+                    String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */);
+                    logger.log(Level.FINE, eventTypeName + " fact event (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
+                    // --- process delegated to capability domain and eventual response managed by the UIS consumers ---
+                } catch (MappingException jme) {
+                    logger.log(Level.SEVERE, ConformityViolation.UNPROCESSABLE_EVENT_TYPE.name() + ": invalid fact type (" + eventTypeName + ") mapped for processing delegation attempt!");
+                }
             } else {
-                // None remote processing unit is defined as able to perform the event treatment
+                // None processing unit is defined as able to perform the event treatment (e.g non started and announced into the dynamic routing map)
+                logger.log(Level.SEVERE, ConformityViolation.UNPROCESSABLE_EVENT_TYPE.name() + ": none processing unit destination is currently dynamically identified as able to treat the fact event (" + eventTypeName + ")!");
             }
         } else {
             // Impossible to identify the processing unit from undefined/unknown event type
             // Create log about conformity violation
-            // TODO
+            logger.log(Level.SEVERE, ConformityViolation.UNPROCESSABLE_EVENT_TYPE.name() + ": impossible identification of fact type name required for its processing delegation!");
         }
     }
 
-    /**
-     * Get the list of event types that are defined as to be treated according to this delegate.
-     *
-     * @return A collection of event type names, or empty list.
-     */
-    public static Collection<String> supportedEventNames() {
-        Collection<String> managed = new ArrayList<>();
-
-        // Set all the fact event type names of the referential
-        // managed.add(CommandName.XXX.name());
-
-        return managed;
-    }
 }

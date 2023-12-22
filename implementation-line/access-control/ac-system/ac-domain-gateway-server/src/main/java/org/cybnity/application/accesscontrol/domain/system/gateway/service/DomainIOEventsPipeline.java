@@ -1,14 +1,14 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
 import org.cybnity.application.accesscontrol.domain.system.gateway.AbstractStreamEventRouter;
+import org.cybnity.application.accesscontrol.domain.system.gateway.routing.ProcessingUnitAnnouncesObserver;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.ui.api.experience.ExecutionResource;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.DomainEvent;
-import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
-import org.cybnity.infrastructure.technical.message_bus.adapter.api.StreamObserver;
-import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.*;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 /**
  * Public API service managing the events supported by a domain.
+ * It manages execution over in self vertx loop.
  * Use the Pipes and Filters architectural style to divide a larger processing task into a sequence of smaller, independent processing steps (Filters) that are connected by channels (Pipes).
  * Each filter exposes a very simple interface: it receives events on the inbound pipe, processes the message (e.g identify if supported and can be processed by a public or secure performer), and publishes the results to the outbound pipe (e.g delegation to a dedicated capability processor).
  * The pipe connects one filter to the next, sending output messages from one filter to the next.
@@ -25,6 +26,12 @@ import java.util.logging.Logger;
  * We can add new filters, omit existing ones or rearrange them into a new sequence -- all without having to change the filters themselves. The connection between filter and pipe is sometimes called port. In the basic form, each filter component has one input port and one output port.
  */
 public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements StreamObserver {
+
+    /**
+     * Logical name of the component (reusable in service grid for logical identification when exchanged events between the component and others over the UIS).
+     * Optional component name that own the routing service and can be identified in UIS by logical name.
+     */
+    private static final String DYNAMIC_ROUTING_SERVICE_NAME = "ac" + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + "io" + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + ExecutionResource.GATEWAY.name() + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + "pipeline";
 
     /**
      * Client managing interactions with Users Interactions Space.
@@ -39,12 +46,22 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
     /**
      * UIS entrypoint monitored by this worker.
      */
-    private final Channel domainInputChannel = new Channel(UICapabilityChannel.access_control_in.shortName());
+    private final Stream domainInputChannel = new Stream(UICapabilityChannel.access_control_in.shortName());
 
     /**
-     * Collection of fact event consumers (observing DIS entry items) managed by this worker.
+     * Collection of fact event consumers (observing DIS entry items) of streams managed by this worker.
      */
     private final Collection<StreamObserver> entryPointStreamConsumers = new ArrayList<>();
+
+    /**
+     * Collection of fact event consumers of pub/sub topics listened by this worker.
+     */
+    private final Collection<ChannelObserver> topicsConsumers = new ArrayList<>();
+
+    /**
+     * Listener of processing units' entrypoints that can be used by pipeline as delegates for event treatments.
+     */
+    private ProcessingUnitAnnouncesObserver delegatedExecutionRecipientsAnnouncesStreamConsumer;
 
     /**
      * Default constructor.
@@ -70,7 +87,14 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
     protected void startStreamConsumers() {
         // Create each entrypoint stream observed by this worker
         entryPointStreamConsumers.add(this);// Main IO entrypoint observer
+
+        // Create entrypoint of delegates presence announces able to dynamically feed the processing unit recipients list
+        delegatedExecutionRecipientsAnnouncesStreamConsumer = new ProcessingUnitAnnouncesObserver(new Channel(UICapabilityChannel.access_control_pu_presence_announcing.shortName()), DYNAMIC_ROUTING_SERVICE_NAME, uisClient);
+        topicsConsumers.add(delegatedExecutionRecipientsAnnouncesStreamConsumer); // Delegate PU announces observer
+
+        // Register all consumers of observed channels
         uisClient.register(entryPointStreamConsumers);
+
         logger.fine("AC domain IO entrypoint stream consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
 
@@ -86,7 +110,7 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
     }
 
     @Override
-    public Channel observed() {
+    public Stream observed() {
         return domainInputChannel;
     }
 
@@ -126,7 +150,7 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
                 eventTypeFilteringStep.setNext(securityFilteringStep);
 
                 // PROCESSING : identify processor (e.g local capability processor, or remote proxy to dedicated UI capability and/or application processing unit) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
-                EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel);
+                EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient);
                 securityFilteringStep.setNext(processingAssignmentStep);
 
                 // Start pipelined processing from first step

@@ -2,6 +2,7 @@ package org.cybnity.application.accesscontrol.ui.api.event;
 
 /**
  * Type of API command event supported by the AC domain.
+ * Each command name shall be a verb.
  */
 public enum CommandName {
 

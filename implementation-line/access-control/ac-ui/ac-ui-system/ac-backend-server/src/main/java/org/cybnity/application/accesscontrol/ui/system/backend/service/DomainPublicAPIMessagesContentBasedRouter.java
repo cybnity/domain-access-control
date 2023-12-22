@@ -10,7 +10,7 @@ import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractChannelMessageRouter;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
-import org.cybnity.application.accesscontrol.ui.system.backend.routing.UISRecipientList;
+import org.cybnity.application.accesscontrol.ui.system.backend.routing.GatewayRoutingPlan;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
@@ -51,7 +51,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
     /**
      * Routing map between Event bus path and UIS channels
      */
-    private final UISRecipientList destinationMap = new UISRecipientList();
+    private final GatewayRoutingPlan destinationMap = new GatewayRoutingPlan();
 
     /**
      * Event bus channel monitored by this worker.
@@ -186,22 +186,30 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
 
                         // --- Make long-time running process with call to capability domains layer over space ---
                         // Execute command via adapter (WITH AUTO-DETECTION OF STREAM RECIPIENT FROM REQUEST EVENT)
-                        Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ destinationMap.recipient(factEventTypeName).shortName());
+                        String routeRecipientPath = destinationMap.recipient(factEventTypeName);
+                        if (routeRecipientPath != null) {
+                            Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ routeRecipientPath);
 
-                        String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */);
-                        logger.log(Level.FINE, factEventTypeName + " command (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
-                        // --- process delegated to capability domain and eventual response managed by the UIS consumers ---
+                            String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */);
+                            logger.log(Level.FINE, factEventTypeName + " command (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
+                            // --- process delegated to capability domain and eventual response managed by the UIS consumers ---
 
 
-                        // TODO replace mocked response (and vertx.redis usage if none required) for execution since observer of UIS layer over REDIS adapter library
-                        // Positionner en mocked feature unit (vertx indépendant) répondant dans le topic replyAddress car existant
-                        // puis écouté par un observer de topic du domaine ac pour forward vers event bus
+                            // TODO replace mocked response (and vertx.redis usage if none required) for execution since observer of UIS layer over REDIS adapter library
+                            // Positionner en mocked feature unit (vertx indépendant) répondant dans le topic replyAddress car existant
+                            // puis écouté par un observer de topic du domaine ac pour forward vers event bus
 
-                        DeliveryOptions options = getDeliveryOptions(message.headers().entries());
-                        // Temp mocked response to replace by result build from consumer when received response from redis
-                        JsonObject registeredOrganizationEvent = mockedResponse(options.getHeaders().get("Correlation-ID"), messageId);
+                            DeliveryOptions options = getDeliveryOptions(message.headers().entries());
+                            // Temp mocked response to replace by result build from consumer when received response from redis
+                            JsonObject registeredOrganizationEvent = mockedResponse(options.getHeaders().get("Correlation-ID"), messageId);
 
-                        message.reply(registeredOrganizationEvent, options);
+                            message.reply(registeredOrganizationEvent, options);
+                        } else {
+                            // The type of event is not supported by any channel and declared route
+                            // So event type can be considered as un treatable by the domain
+                            // So log shall be notified regarding potential bad usage of public API entrypoint and/or conformity violation
+                            onInvalidChannelEntry(factEvent, ConformityViolation.UNSUPPORTED_EVENT_TYPE, consumedChannel.label());
+                        }
                     } else {
                         // Invalid fact event type received from the ACL channel
                         // Several potential cause can be managed regarding this situation in terms of security violation
@@ -241,7 +249,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
      */
     private void onInvalidChannelEntry(String receivedData, ConformityViolation rejectCause, String entrypoint) {
         if (receivedData != null && rejectCause != null) {
-            // Log error for technical analysis by operator and remediation execution
+            // Log error for technical analysis by operator (e.g potential configuration error), or interpretation by incident event rules (e.g potential security event) for remediation execution
             logger.log(Level.SEVERE, rejectCause.name());
         }
     }

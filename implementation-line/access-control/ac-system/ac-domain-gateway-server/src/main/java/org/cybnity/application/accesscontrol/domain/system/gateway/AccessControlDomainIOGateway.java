@@ -10,6 +10,7 @@ import org.cybnity.application.accesscontrol.domain.system.gateway.service.Domai
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.NamingConventions;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -46,7 +47,7 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
     /**
      * Name of the pool including all the executed workers of this domain.
      */
-    private static final String DOMAIN_POOL_NAME = "access-control-io-workers";
+    private static final String DOMAIN_POOL_NAME = "ac" + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + "io" + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + "workers";
 
     /**
      * Default start method regarding the server.

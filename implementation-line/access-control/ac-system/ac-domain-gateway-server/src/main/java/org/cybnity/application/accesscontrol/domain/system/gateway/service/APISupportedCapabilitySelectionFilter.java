@@ -5,6 +5,7 @@ import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,7 @@ public class APISupportedCapabilitySelectionFilter extends FactBaseHandler {
     /**
      * Origin entrypoint of API under selective pattern.
      */
-    private final Channel receivedFrom;
+    private final Stream receivedFrom;
 
     /**
      * Default constructor.
@@ -37,7 +38,7 @@ public class APISupportedCapabilitySelectionFilter extends FactBaseHandler {
      * @param receivedFrom Mandatory API entrypoint of collecting events to filter.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public APISupportedCapabilitySelectionFilter(Channel receivedFrom) throws IllegalArgumentException {
+    public APISupportedCapabilitySelectionFilter(Stream receivedFrom) throws IllegalArgumentException {
         super();
         if (receivedFrom == null) throw new IllegalArgumentException("ReceivedFrom parameter is required!");
         this.receivedFrom = receivedFrom;

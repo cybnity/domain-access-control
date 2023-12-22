@@ -8,6 +8,7 @@ import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.event.CommandFactory;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
     @Test
     void givenEventsFilterConfiguration_whenHandlingNullFactEvent_thenSelectionRejected() {
         // Create a filter processing unit
-        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Channel(UICapabilityChannel.access_control_in.shortName()));
+        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()));
         // Execute the filter process
         Assertions.assertFalse(filter.process(null));
     }
@@ -38,7 +39,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
     @Test
     void givenEventsFilterConfiguration_whenHandlingUnsupportedFactEvent_thenSelectionRejected() {
         // Create a filter processing unit
-        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Channel(UICapabilityChannel.access_control_in.shortName()));
+        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()));
         // Create an unknown fact sample (e.g other domain fact or security attack data entry) that should not be supported by the filter
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
@@ -58,7 +59,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
     @Test
     void givenEventsFilterConfiguration_whenHandlingSupportedFactEvent_thenSelectionConfirmed() {
         // Create a filter processing unit
-        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Channel(UICapabilityChannel.access_control_in.shortName()));
+        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()));
         // Create valid fact sample that should be supported by the filter
         // Prepare RegisterOrganization command event including organization naming
         Collection<Attribute> definition = new ArrayList<>();

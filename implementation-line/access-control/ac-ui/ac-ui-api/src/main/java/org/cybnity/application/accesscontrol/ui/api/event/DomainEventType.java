@@ -2,6 +2,7 @@ package org.cybnity.application.accesscontrol.ui.api.event;
 
 /**
  * Type of API domain event supported by the AC domain.
+ * Each event name shall be an adjective representing a fact state.
  */
 public enum DomainEventType {
 
@@ -33,5 +34,7 @@ public enum DomainEventType {
     /**
      * Event about a user account that is active and is usable by its owner.
      */
-    ACCOUNT_ACTIVATED;
+    ACCOUNT_ACTIVATED,
+
+    ;
 }

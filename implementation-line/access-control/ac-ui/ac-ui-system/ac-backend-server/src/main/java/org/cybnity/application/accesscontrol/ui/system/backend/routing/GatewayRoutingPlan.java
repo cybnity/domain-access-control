@@ -2,9 +2,7 @@ package org.cybnity.application.accesscontrol.ui.system.backend.routing;
 
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.cybnity.application.accesscontrol.ui.api.routing.UISRecipientList;
 
 /**
  * Identify the correct recipient based on a message's content.
@@ -16,13 +14,7 @@ import java.util.Map;
  * It's an implementation of architectural pattern named "Recipient List".
  * Generally, one common recipient channel (Redis entrypoint materializing domain capability API) is supporting several event types.
  */
-public class UISRecipientList {
-
-    /**
-     * Referential of routes dedicated to specific event types which can be managed by Users Interactions Space's channels.
-     * Each item is defined by an event type name (key) and a UIS recipient path (value identifying a topic/stream name).
-     */
-    private Map<String, Enum<?>> routingMap;
+public class GatewayRoutingPlan extends UISRecipientList {
 
     /**
      * Default constructor initializing the routing table. This configuration
@@ -31,26 +23,11 @@ public class UISRecipientList {
      * supported) with settings hosted by the domains-interactions-broker module (e.g
      * as configuration api).
      */
-    public UISRecipientList() {
-        // Initialize the routing destination tables that link an event bus channel with
-        // a redis channel
-        routingMap = new HashMap<>();
+    public GatewayRoutingPlan() {
+        super();
 
         // Set each domain destination path supporting each type of authorized message
-        routingMap.put(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_in);// Global entrypoint supporting organization registration command
+        addRoute(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_in.shortName());// Global entrypoint supporting organization registration command
     }
 
-    /**
-     * Find a route to Users Interactions Space's channel supporting a type of event.
-     *
-     * @param aFactEventTypeName Name of fact event type which shall be supported by a channel as routing path to find.
-     * @return A recipient channel or null.
-     */
-    public UICapabilityChannel recipient(String aFactEventTypeName) {
-        if (aFactEventTypeName != null && !aFactEventTypeName.isEmpty()) {
-            // Find existing UIS channel routing
-            return (UICapabilityChannel) routingMap.get(aFactEventTypeName);
-        }
-        return null;
-    }
 }

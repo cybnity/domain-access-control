@@ -1,7 +1,7 @@
 package org.cybnity.application.accesscontrol.ui.api.experience;
 
 /**
- * Referential catalog of UI API document path exposed for capabilities execution.
+ * Referential catalog of UI API document paths exposed for capabilities execution.
  * According to the best practices to use nouns (equals to thing instead of referring to an action based on verb) to represent resources, each resource archetype is categorized (e.g as document, collection, and store).
  * This enum identify a resource document based on a consistent naming convention.
  * A document resource is a singular concept that is akin to an object instance or record.

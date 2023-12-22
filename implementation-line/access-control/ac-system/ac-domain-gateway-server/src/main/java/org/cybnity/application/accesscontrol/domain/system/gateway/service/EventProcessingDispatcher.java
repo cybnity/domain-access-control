@@ -1,15 +1,13 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
-import org.cybnity.framework.Context;
-import org.cybnity.framework.UnoperationalStateException;
+import org.cybnity.application.accesscontrol.domain.system.gateway.routing.ProcessingUnitAnnouncesObserver;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
-import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Responsible to dispatch filtered event (e.g from domain capability IO entrypoint) to performers (e.g local or remote UI capability processor, or application domain).
@@ -24,35 +22,37 @@ public class EventProcessingDispatcher extends FactBaseHandler {
     /**
      * Origin entrypoint of API under selective pattern.
      */
-    private final Channel receivedFrom;
+    private final Stream receivedFrom;
+    private final ProcessingUnitAnnouncesObserver dynamicRecipientsListManager;
+    private final UISAdapter uisClient;
 
     /**
      * Default constructor.
      *
-     * @param receivedFrom Mandatory API entrypoint of collecting events to filter.
+     * @param receivedFrom                 Mandatory API entrypoint of collecting events to filter.
+     * @param dynamicRecipientsListManager Mandatory manager of dynamic declared computation units ready for treatment of event types.
+     * @param uisClient                    Mandatory operational client to UIS.
      * @throws IllegalArgumentException When required parameter is missing.
      */
-    public EventProcessingDispatcher(Channel receivedFrom) throws IllegalArgumentException {
+    public EventProcessingDispatcher(Stream receivedFrom, ProcessingUnitAnnouncesObserver dynamicRecipientsListManager, UISAdapter uisClient) throws IllegalArgumentException {
         super();
         if (receivedFrom == null) throw new IllegalArgumentException("ReceivedFrom parameter is required!");
+        if (dynamicRecipientsListManager == null)
+            throw new IllegalArgumentException("dynamicRecipientsListManager parameter is required!");
+        if (uisClient == null) throw new IllegalArgumentException("uisClient parameter is required!");
         this.receivedFrom = receivedFrom;
+        this.dynamicRecipientsListManager = dynamicRecipientsListManager;
+        this.uisClient = uisClient;
     }
 
     @Override
     public boolean process(IDescribed fact) {
         if (canHandle(fact)) {
-            // Find a delegation processing unit able to process the event type
-            ProcessingUnitDelegationFactory factory = ProcessingUnitDelegationFactory.getInstance(fact);
-            if (factory != null) {
-                // Event type able to be processed by a type of PU
-                ProcessingUnitDelegation processingDelegation = factory.createDelegate();
-                // Execute the delegation process supporting the event treatment
-                processingDelegation.process(fact);
-                return true;
-            } else {
-                // None PU identified as able to process the type of event
-                logger().log(Level.WARNING, ConformityViolation.UNPROCESSABLE_EVENT_TYPE.name() + ": none computation unit is referenced as able to manage the processing of fact type (" + fact.type() + ") received from channel (" + receivedFrom.name() + ")!");
-            }
+            // Event type able to be processed by a type of PU
+            ProcessingUnitDelegation processingDelegation = new RemoteProcessingUnitExecutor(dynamicRecipientsListManager, uisClient);
+            // Execute the delegation process supporting the event treatment
+            processingDelegation.process(fact);
+            return true;
         } else {
             // Invalid fact event type received
             // Several potential cause can be managed regarding this situation in terms of security violation

@@ -5,6 +5,7 @@ import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +21,7 @@ public class CapabilityBoundaryAccessControlChecker extends FactBaseHandler {
     /**
      * API entrypoint name under optional access control check.
      */
-    private final Channel receivedFrom;
+    private final Stream receivedFrom;
 
     /**
      * Referential of criteria that allow (e.g by evaluation as filtering pattern) to select or not the event as supported by an API.
@@ -39,7 +40,7 @@ public class CapabilityBoundaryAccessControlChecker extends FactBaseHandler {
      * @param receivedFrom Mandatory API entrypoint of collecting events to filter.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public CapabilityBoundaryAccessControlChecker(Channel receivedFrom) throws IllegalArgumentException {
+    public CapabilityBoundaryAccessControlChecker(Stream receivedFrom) throws IllegalArgumentException {
         super();
         if (receivedFrom == null) throw new IllegalArgumentException("ReceivedFrom parameter is required!");
         this.receivedFrom = receivedFrom;

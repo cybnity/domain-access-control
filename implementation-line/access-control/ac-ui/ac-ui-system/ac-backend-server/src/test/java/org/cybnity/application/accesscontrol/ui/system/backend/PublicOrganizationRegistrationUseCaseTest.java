@@ -21,6 +21,7 @@ import org.cybnity.framework.domain.DomainEvent;
 import org.cybnity.framework.domain.ObjectMapperBuilder;
 import org.cybnity.framework.domain.event.CommandFactory;
 import org.cybnity.framework.domain.event.ConcreteCommandEvent;
+import org.cybnity.framework.domain.event.ConcreteDomainChangeEvent;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -115,7 +116,7 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
 
                     // Test read of JsonNode version
                     JsonNode changeEventNode = mapper.readTree(body.toString());
-                    Assertions.assertEquals("DomainEvent", changeEventNode.get("@class").asText(), "Invalid type of domain event returned by service!");
+                    Assertions.assertEquals(ConcreteDomainChangeEvent.class.getSimpleName(), changeEventNode.get("@class").asText(), "Invalid type of domain event returned by service!");
 
                     // Test read of POJO version
                     DomainEvent changedEvent = mapper.readValue(body.toString(), DomainEvent.class);
