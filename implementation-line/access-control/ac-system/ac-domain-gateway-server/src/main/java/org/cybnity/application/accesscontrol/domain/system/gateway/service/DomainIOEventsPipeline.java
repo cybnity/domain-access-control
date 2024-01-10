@@ -1,15 +1,14 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
 import io.lettuce.core.StreamMessage;
-import org.cybnity.application.accesscontrol.domain.system.gateway.AbstractStreamEventRouter;
 import org.cybnity.application.accesscontrol.domain.system.gateway.routing.ProcessingUnitAnnouncesObserver;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.UnoperationalStateException;
+import org.cybnity.framework.application.vertx.common.AbstractMessageConsumerEndpoint;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.*;
-import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ import java.util.logging.Logger;
  * Because all component use the same external interface they can be composed into different solutions by connecting the components to different pipes.
  * We can add new filters, omit existing ones or rearrange them into a new sequence -- all without having to change the filters themselves. The connection between filter and pipe is sometimes called port. In the basic form, each filter component has one input port and one output port.
  */
-public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements StreamObserver {
+public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint implements StreamObserver {
 
     /**
      * Logical name of the component (reusable in service grid for logical identification when exchanged events between the component and others over the UIS).
@@ -98,11 +97,16 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
         topicsConsumers.add(delegatedExecutionRecipientsAnnouncesStreamConsumer); // Delegate PU announces observer
 
         // Define usable mapper supporting the read of stream message received from the Users Interactions Space and translated into domain event types
-        MessageMapper eventMapper = getDomainMessageMapperProvider().getMapper(StreamMessage.class, IDescribed.class);
+        MessageMapper eventMapper = getMessageMapperProvider().getMapper(StreamMessage.class, IDescribed.class);
         // Register all consumers of observed channels
         uisClient.register(entryPointStreamConsumers, eventMapper);
 
         logger.fine("AC domain IO entrypoint stream consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+    }
+
+    @Override
+    protected void startChannelConsumers() {
+        // None observed
     }
 
     @Override
@@ -117,8 +121,8 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
     }
 
     @Override
-    protected MessageMapperFactory getDomainMessageMapperProvider() {
-        return new ACDomainMessageMapperFactory();
+    protected void stopChannelConsumers() {
+        // None observed
     }
 
     @Override
@@ -157,7 +161,7 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
                 eventTypeFilteringStep.setNext(securityFilteringStep);
 
                 // PROCESSING : identify processor (e.g local capability processor, or remote proxy to dedicated UI capability and/or application processing unit) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
-                EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient, getDomainMessageMapperProvider());
+                EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient, getMessageMapperProvider());
                 securityFilteringStep.setNext(processingAssignmentStep);
 
                 // Start pipelined processing from first step
@@ -168,4 +172,10 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
             }
         }
     }
+
+    @Override
+    public IMessageMapperProvider getMessageMapperProvider() {
+        return new ACDomainMessageMapperFactory();
+    }
+
 }

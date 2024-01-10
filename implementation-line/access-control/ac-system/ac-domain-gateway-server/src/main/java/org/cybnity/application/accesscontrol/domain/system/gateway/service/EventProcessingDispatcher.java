@@ -3,9 +3,9 @@ package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 import org.cybnity.application.accesscontrol.domain.system.gateway.routing.ProcessingUnitAnnouncesObserver;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
-import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
 import java.util.logging.Level;
 
@@ -28,7 +28,7 @@ public class EventProcessingDispatcher extends FactBaseHandler {
     /**
      * Mapper factory allowing translation of domain's event and/or message to recipient.
      */
-    private final MessageMapperFactory mapperFactory;
+    private final IMessageMapperProvider mapperFactory;
 
     /**
      * Default constructor.
@@ -39,7 +39,7 @@ public class EventProcessingDispatcher extends FactBaseHandler {
      * @param mapperFactory                Mandatory mapper factory supporting the serialization/deserialization of event and messages supported by the delegate to transmit.
      * @throws IllegalArgumentException When required parameter is missing.
      */
-    public EventProcessingDispatcher(Stream receivedFrom, ProcessingUnitAnnouncesObserver dynamicRecipientsListManager, UISAdapter uisClient, MessageMapperFactory mapperFactory) throws IllegalArgumentException {
+    public EventProcessingDispatcher(Stream receivedFrom, ProcessingUnitAnnouncesObserver dynamicRecipientsListManager, UISAdapter uisClient, IMessageMapperProvider mapperFactory) throws IllegalArgumentException {
         super();
         if (receivedFrom == null) throw new IllegalArgumentException("ReceivedFrom parameter is required!");
         if (dynamicRecipientsListManager == null)

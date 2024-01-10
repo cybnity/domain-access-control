@@ -60,7 +60,7 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
     public void start(Promise<Void> startPromise) throws Exception {
         // Check the minimum required data allowing operating
         checkHealthyState();
-        // Define the api IO pipeline to start
+        // Define the deployment options per api pipeline type to start
         Map<String, DeploymentOptions> deployed = capabilityAPIIOPipelineWorkers();
 
         // Start all gateway workers
@@ -70,16 +70,15 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
         workersCapability.createHttpServer(getVertx(), logger, startPromise, "AC IO Gateway");
     }
 
-
     /**
-     * Prepare and get the set of domain capability public api workers managed by this gateway.
+     * Prepare and get the set of domain capability api workers managed by this gateway.
      *
-     * @return Map of workers ensuring a capabilities api of services, or empty map.
+     * @return Map of workers exposing the capabilities api of services, or empty map.
      */
     private Map<String, DeploymentOptions> capabilityAPIIOPipelineWorkers() {
         Map<String, DeploymentOptions> deployedWorkers = new HashMap<>();
 
-        // Set each domain worker verticle at workers pool
+        // Set each domain worker verticle as workers pool member
         DeploymentOptions options = workersCapability.baseDeploymentOptions(DOMAIN_POOL_NAME);
 
         // Define instances quantity for this worker type
@@ -88,14 +87,14 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
         // Define worker threads pool size
         workersCapability.configureWorkerThreadsPoolSize(options);
 
-        // Add workers to the set of workers serving public capabilities API without access control check
+        // Add each pipelined IO component type to the set of workers serving capabilities API with or without access control check
         deployedWorkers.put(DomainIOEventsPipeline.class.getName(), options);
 
         return deployedWorkers;
     }
 
     /**
-     * Resource freedom (e.g undeployment of all verticles).
+     * Resource freedom (e.g un deployment of all worker instances).
      */
     @Override
     public void stop() {
@@ -103,6 +102,10 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
         workersCapability.undeployWorkers(vertx);
     }
 
+    /**
+     * Verify the status of health regarding this instance.
+     * @throws UnoperationalStateException When an issue is detected as cause of potential non stability source (e.g missing environment variable required during the runtime).
+     */
     public void checkHealthyState() throws UnoperationalStateException {
         if (healthyChecker == null)
             healthyChecker = new ExecutableIOGatewayChecker(workersCapability.context);

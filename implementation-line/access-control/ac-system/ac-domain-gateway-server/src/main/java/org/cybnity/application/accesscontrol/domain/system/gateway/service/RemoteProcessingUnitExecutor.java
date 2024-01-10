@@ -6,10 +6,10 @@ import org.cybnity.framework.application.vertx.common.routing.UISRecipientList;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.MappingException;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
-import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +30,7 @@ public class RemoteProcessingUnitExecutor implements ProcessingUnitDelegation {
     /**
      * Mapper factory allowing translation of domain's event and/or message to recipient.
      */
-    private MessageMapperFactory mapperFactory;
+    private final IMessageMapperProvider mapperFactory;
 
     /**
      * Default constructor.
@@ -40,7 +40,7 @@ public class RemoteProcessingUnitExecutor implements ProcessingUnitDelegation {
      * @param eventMapperFactory Mandatory mapper factory supporting the serialization/deserialization of event and messages supported by the delegate to transmit.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public RemoteProcessingUnitExecutor(IEventProcessingManager recipientsProvider, UISAdapter uisClient, MessageMapperFactory eventMapperFactory) throws IllegalArgumentException {
+    public RemoteProcessingUnitExecutor(IEventProcessingManager recipientsProvider, UISAdapter uisClient, IMessageMapperProvider eventMapperFactory) throws IllegalArgumentException {
         super();
         if (recipientsProvider == null) throw new IllegalArgumentException("recipientsProvider parameter is required!");
         if (uisClient == null) throw new IllegalArgumentException("uisClient parameter is required!");

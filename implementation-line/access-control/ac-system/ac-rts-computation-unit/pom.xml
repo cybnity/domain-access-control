@@ -7,7 +7,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<groupId>org.cybnity.application.access-control.system</groupId>
-	<artifactId>rts-computation-unit</artifactId>
+	<artifactId>process-module</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<name>-- AC process modules (RTS CU)</name>

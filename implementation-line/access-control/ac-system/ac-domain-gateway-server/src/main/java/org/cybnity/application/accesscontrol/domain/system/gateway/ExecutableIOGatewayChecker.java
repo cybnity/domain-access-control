@@ -40,7 +40,7 @@ public class ExecutableIOGatewayChecker extends ExecutableComponentChecker {
     @Override
     protected Set<IReadableConfiguration> requiredEnvironmentVariables() {
         // Define the mandatory environment variable for backend running
-        // - required for application module
+        // - common variables required for application module
         HashSet<IReadableConfiguration> variables = new HashSet<>(EnumSet.allOf(AppConfigurationVariable.class));
 
         // Remove optional variables
