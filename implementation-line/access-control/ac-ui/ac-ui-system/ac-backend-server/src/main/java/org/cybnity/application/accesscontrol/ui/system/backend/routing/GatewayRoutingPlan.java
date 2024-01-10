@@ -2,7 +2,7 @@ package org.cybnity.application.accesscontrol.ui.system.backend.routing;
 
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
-import org.cybnity.application.accesscontrol.ui.api.routing.UISRecipientList;
+import org.cybnity.framework.application.vertx.common.routing.UISRecipientList;
 
 /**
  * Identify the correct recipient based on a message's content.

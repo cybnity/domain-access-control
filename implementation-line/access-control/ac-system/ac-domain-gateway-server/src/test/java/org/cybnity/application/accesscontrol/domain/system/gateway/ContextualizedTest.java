@@ -2,6 +2,7 @@ package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
+import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.ReadModelConfigurationVariable;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.WriteModelConfigurationVariable;
 import org.junit.jupiter.api.AfterEach;

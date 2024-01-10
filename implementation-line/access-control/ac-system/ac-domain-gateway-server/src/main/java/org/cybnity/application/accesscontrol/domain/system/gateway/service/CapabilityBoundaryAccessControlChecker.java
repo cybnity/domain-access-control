@@ -4,7 +4,6 @@ import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
-import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 
 import java.util.ArrayList;

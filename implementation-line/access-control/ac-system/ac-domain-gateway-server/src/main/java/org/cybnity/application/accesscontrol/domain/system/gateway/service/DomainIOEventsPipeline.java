@@ -1,14 +1,15 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
+import io.lettuce.core.StreamMessage;
 import org.cybnity.application.accesscontrol.domain.system.gateway.AbstractStreamEventRouter;
 import org.cybnity.application.accesscontrol.domain.system.gateway.routing.ProcessingUnitAnnouncesObserver;
+import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
-import org.cybnity.application.accesscontrol.ui.api.experience.ExecutionResource;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.UnoperationalStateException;
-import org.cybnity.framework.domain.Command;
-import org.cybnity.framework.domain.DomainEvent;
+import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.*;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
 import java.util.ArrayList;
@@ -31,8 +32,7 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
      * Logical name of the component (reusable in service grid for logical identification when exchanged events between the component and others over the UIS).
      * Optional component name that own the routing service and can be identified in UIS by logical name.
      */
-    private static final String DYNAMIC_ROUTING_SERVICE_NAME = "ac" + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + "io" + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + ExecutionResource.GATEWAY.name() + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + "pipeline";
-
+    private static final String DYNAMIC_ROUTING_SERVICE_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.GATEWAY, /* domainName */ "ac", /* componentMainFunction */"io",/* resourceType */ null, /* segregationLabel */ null);
     /**
      * Client managing interactions with Users Interactions Space.
      */
@@ -47,6 +47,11 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
      * UIS entrypoint monitored by this worker.
      */
     private final Stream domainInputChannel = new Stream(UICapabilityChannel.access_control_in.shortName());
+
+    /**
+     * Name of the consumers group relative to this pipelined entry points channel.
+     */
+    private static final String CONSUMERS_GROUP_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.PIPELINE, /* domainName */ "ac", /* componentMainFunction */"io",/* resourceType */ null, /* segregationLabel */ "consumers");
 
     /**
      * Collection of fact event consumers (observing DIS entry items) of streams managed by this worker.
@@ -92,8 +97,10 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
         delegatedExecutionRecipientsAnnouncesStreamConsumer = new ProcessingUnitAnnouncesObserver(new Channel(UICapabilityChannel.access_control_pu_presence_announcing.shortName()), DYNAMIC_ROUTING_SERVICE_NAME, uisClient);
         topicsConsumers.add(delegatedExecutionRecipientsAnnouncesStreamConsumer); // Delegate PU announces observer
 
+        // Define usable mapper supporting the read of stream message received from the Users Interactions Space and translated into domain event types
+        MessageMapper eventMapper = getDomainMessageMapperProvider().getMapper(StreamMessage.class, IDescribed.class);
         // Register all consumers of observed channels
-        uisClient.register(entryPointStreamConsumers);
+        uisClient.register(entryPointStreamConsumers, eventMapper);
 
         logger.fine("AC domain IO entrypoint stream consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
@@ -110,23 +117,23 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
     }
 
     @Override
+    protected MessageMapperFactory getDomainMessageMapperProvider() {
+        return new ACDomainMessageMapperFactory();
+    }
+
+    @Override
     public Stream observed() {
         return domainInputChannel;
     }
 
     @Override
     public String observationPattern() {
-        return null;
+        return StreamObserver.DEFAULT_OBSERVATION_PATTERN;
     }
 
-    /**
-     * Define and execute the pipelined commands according to a responsibility chain pattern.
-     *
-     * @param domainEvent To process.
-     */
     @Override
-    public void notify(DomainEvent domainEvent) {
-        logger.log(Level.SEVERE, "Received domain event is supported by the AC domain IO entrypoint!");
+    public String consumerGroupName() {
+        return CONSUMERS_GROUP_NAME;
     }
 
     /**
@@ -134,11 +141,11 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
      * Default entrypoint processing chain executed for each fact event received via the service stream.
      * This implementation is a long-time running process executed into the current thread.
      *
-     * @param command To process.
+     * @param event To process.
      */
     @Override
-    public void notify(Command command) {
-        if (command != null) {
+    public void notify(IDescribed event) {
+        if (event != null) {
             try {
                 // Build responsibility chain ensuring the command treatment according to the fact conformity
 
@@ -150,11 +157,11 @@ public class DomainIOEventsPipeline extends AbstractStreamEventRouter implements
                 eventTypeFilteringStep.setNext(securityFilteringStep);
 
                 // PROCESSING : identify processor (e.g local capability processor, or remote proxy to dedicated UI capability and/or application processing unit) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
-                EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient);
+                EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient, getDomainMessageMapperProvider());
                 securityFilteringStep.setNext(processingAssignmentStep);
 
                 // Start pipelined processing from first step
-                eventTypeFilteringStep.handle(command);
+                eventTypeFilteringStep.handle(event);
             } catch (Exception e) {
                 // UnoperationalStateException or IllegalArgumentException thrown by responsibility chain members
                 logger.log(Level.SEVERE, e.getMessage());

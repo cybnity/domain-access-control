@@ -1,4 +1,4 @@
-package org.cybnity.application.accesscontrol.domain.system.gateway;
+package org.cybnity.feature.accesscontrol.domain.system;
 
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.IReadableConfiguration;
@@ -14,26 +14,26 @@ import java.util.Set;
 
 /**
  * Implementation class regarding the verification of minimum required
- * configuration and contents allowing runnable gateway.
+ * configuration and contents allowing runnable AC process module.
  *
  * @author olivier
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_8370_CM6")
-public class ExecutableIOGatewayChecker extends ExecutableComponentChecker {
+public class ExecutableACProcessModuleChecker extends ExecutableComponentChecker {
 
     /**
      * Constructor with dedicated context to use by this checker.
      *
      * @param ctx A context or null.
      */
-    public ExecutableIOGatewayChecker(IContext ctx) {
+    public ExecutableACProcessModuleChecker(IContext ctx) {
         super(ctx);
     }
 
     /**
      * Default constructor.
      */
-    public ExecutableIOGatewayChecker() {
+    public ExecutableACProcessModuleChecker() {
         super();
     }
 
@@ -55,7 +55,7 @@ public class ExecutableIOGatewayChecker extends ExecutableComponentChecker {
      * @return A set of optional variables.
      */
     public Set<IReadableConfiguration> optionalEnvironmentVariables() {
-        // Define the optional environment variables for gateway running
+        // Define the optional environment variables for process module running
         HashSet<IReadableConfiguration> variables = new HashSet<>();
         return variables;
     }

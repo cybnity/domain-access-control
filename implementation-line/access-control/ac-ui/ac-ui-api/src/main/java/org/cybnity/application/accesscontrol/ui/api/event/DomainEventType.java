@@ -1,10 +1,12 @@
 package org.cybnity.application.accesscontrol.ui.api.event;
 
+import org.cybnity.framework.domain.event.IEventType;
+
 /**
  * Type of API domain event supported by the AC domain.
  * Each event name shall be an adjective representing a fact state.
  */
-public enum DomainEventType {
+public enum DomainEventType implements IEventType {
 
     /**
      * Event about a requested organization registration
@@ -34,7 +36,6 @@ public enum DomainEventType {
     /**
      * Event about a user account that is active and is usable by its owner.
      */
-    ACCOUNT_ACTIVATED,
+    ACCOUNT_ACTIVATED;
 
-    ;
 }

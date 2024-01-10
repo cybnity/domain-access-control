@@ -1,6 +1,7 @@
 package org.cybnity.application.accesscontrol.ui.api;
 
 
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.ICapabilityChannel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.NamingConventions;
 
 /**
@@ -8,7 +9,7 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.NamingConven
  * User Interactions Space.
  * Each channel name shall be a action capability (e.g registration, deletion).
  */
-public enum UICapabilityChannel {
+public enum UICapabilityChannel implements ICapabilityChannel {
 
     /**
      * Boundary regarding the capabilities of Access Control domain IO entrypoint.
@@ -44,6 +45,7 @@ public enum UICapabilityChannel {
      *
      * @return An acronym or null.
      */
+    @Override
     public String shortName() {
         return this.shortName;
     }

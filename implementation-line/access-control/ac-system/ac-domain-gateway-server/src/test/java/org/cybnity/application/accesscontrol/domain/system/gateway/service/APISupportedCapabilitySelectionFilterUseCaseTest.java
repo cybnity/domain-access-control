@@ -7,7 +7,6 @@ import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.event.CommandFactory;
-import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

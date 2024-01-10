@@ -1,6 +1,7 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import io.vertx.core.AbstractVerticle;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
 /**
  * Verticle supporting stream exposed by the domain from Users Interactions Space entry point.
@@ -36,4 +37,11 @@ public abstract class AbstractStreamEventRouter extends AbstractVerticle {
      * Stop listeners managed by this worker instance and their observation points.
      */
     abstract protected void stopStreamConsumers();
+
+    /**
+     * Get a factory of message mapper that support the common message and event types supported by the domain, and/or the custom types specific to the domain only.
+     *
+     * @return A message mapper provider supporting custom and/or common event types of fact and messages.
+     */
+    abstract protected MessageMapperFactory getDomainMessageMapperProvider();
 }

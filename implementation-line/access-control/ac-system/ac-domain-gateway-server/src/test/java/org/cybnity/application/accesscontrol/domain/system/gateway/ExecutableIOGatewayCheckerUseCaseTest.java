@@ -2,6 +2,7 @@ package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import io.vertx.core.Vertx;
 import org.cybnity.framework.IReadableConfiguration;
+import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 

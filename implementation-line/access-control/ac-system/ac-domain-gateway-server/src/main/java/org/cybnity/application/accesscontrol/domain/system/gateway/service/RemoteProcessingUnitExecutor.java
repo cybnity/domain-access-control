@@ -1,13 +1,15 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
-import org.cybnity.application.accesscontrol.domain.system.gateway.routing.IEventProcessingManager;
-import org.cybnity.application.accesscontrol.ui.api.routing.UISRecipientList;
+import io.lettuce.core.StreamMessage;
+import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
+import org.cybnity.framework.application.vertx.common.routing.UISRecipientList;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.MappingException;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,18 +28,26 @@ public class RemoteProcessingUnitExecutor implements ProcessingUnitDelegation {
     private static final Logger logger = Logger.getLogger(RemoteProcessingUnitExecutor.class.getName());
 
     /**
+     * Mapper factory allowing translation of domain's event and/or message to recipient.
+     */
+    private MessageMapperFactory mapperFactory;
+
+    /**
      * Default constructor.
      *
      * @param recipientsProvider Mandatory manager of dynamic or static recipients able to be delegated of event processing.
      * @param uisClient          Mandatory operational client connected to UIS.
+     * @param eventMapperFactory Mandatory mapper factory supporting the serialization/deserialization of event and messages supported by the delegate to transmit.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public RemoteProcessingUnitExecutor(IEventProcessingManager recipientsProvider, UISAdapter uisClient) throws IllegalArgumentException {
+    public RemoteProcessingUnitExecutor(IEventProcessingManager recipientsProvider, UISAdapter uisClient, MessageMapperFactory eventMapperFactory) throws IllegalArgumentException {
         super();
         if (recipientsProvider == null) throw new IllegalArgumentException("recipientsProvider parameter is required!");
         if (uisClient == null) throw new IllegalArgumentException("uisClient parameter is required!");
+        if (eventMapperFactory == null) throw new IllegalArgumentException("eventMapperFactory parameter is required!");
         this.recipientsProvider = recipientsProvider;
         this.uisClient = uisClient;
+        this.mapperFactory = eventMapperFactory;
     }
 
     @Override
@@ -54,7 +64,8 @@ public class RemoteProcessingUnitExecutor implements ProcessingUnitDelegation {
             if (PUEntrypointChannel != null) {
                 try {
                     Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ destinationMap.recipient(eventTypeName));
-                    String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */);
+
+                    String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */, /* Get a mapper supporting the event type and message */ mapperFactory.getMapper(factEvent.getClass(), StreamMessage.class));
                     logger.log(Level.FINE, eventTypeName + " fact event (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
                     // --- process delegated to capability domain and eventual response managed by the UIS consumers ---
                 } catch (MappingException jme) {

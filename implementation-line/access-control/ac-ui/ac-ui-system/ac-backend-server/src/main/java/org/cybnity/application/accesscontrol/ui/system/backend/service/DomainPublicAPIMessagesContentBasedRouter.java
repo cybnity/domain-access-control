@@ -2,6 +2,7 @@ package org.cybnity.application.accesscontrol.ui.system.backend.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.lettuce.core.StreamMessage;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
@@ -17,8 +18,10 @@ import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.event.DomainEventFactory;
 import org.cybnity.framework.domain.infrastructure.MessageHeader;
 import org.cybnity.framework.domain.model.DomainEntity;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.MessageMapper;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
 import java.util.*;
@@ -189,8 +192,8 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
                         String routeRecipientPath = destinationMap.recipient(factEventTypeName);
                         if (routeRecipientPath != null) {
                             Stream domainEndpoint = new Stream(/* Detected capability domain path based on entrypoint supported fact event type */ routeRecipientPath);
-
-                            String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */);
+                            MessageMapper msgMapper = new MessageMapperFactory().getMapper(factEvent.getClass(), StreamMessage.class);
+                            String messageId = uisClient.append(factEvent, domainEndpoint /* Specific stream to feed */, msgMapper);
                             logger.log(Level.FINE, factEventTypeName + " command (messageId: " + messageId + ") appended to '" + domainEndpoint.name() + "' capability domain entrypoint");
                             // --- process delegated to capability domain and eventual response managed by the UIS consumers ---
 

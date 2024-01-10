@@ -10,6 +10,6 @@ import org.junit.platform.suite.api.Suite;
  * @author olivier
  */
 @Suite
-@SelectClasses({})
+@SelectClasses({JSONToPUPresenceAnnouncedTransformUseCaseTest.class})
 public class AllUseCaseTests {
 }

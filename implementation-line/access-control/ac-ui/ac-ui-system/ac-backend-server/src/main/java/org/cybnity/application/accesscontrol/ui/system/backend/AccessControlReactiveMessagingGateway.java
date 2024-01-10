@@ -10,6 +10,7 @@ import org.cybnity.application.accesscontrol.ui.system.backend.service.DomainPub
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.NamingConventionHelper;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,7 +42,7 @@ public class AccessControlReactiveMessagingGateway extends AbstractVerticle {
     /**
      * Name of the pool including all the executed workers of this domain.
      */
-    private static final String DOMAIN_POOL_NAME = "access-control-workers";
+    private static final String DOMAIN_POOL_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.GATEWAY, /* domainName */ "ac", /* componentMainFunction */"messaging",/* resourceType */ null, /* segregationLabel */ "workers");
 
     /**
      * Technical logging

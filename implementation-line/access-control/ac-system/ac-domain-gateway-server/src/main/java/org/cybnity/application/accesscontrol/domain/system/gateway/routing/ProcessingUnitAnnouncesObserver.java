@@ -2,9 +2,13 @@ package org.cybnity.application.accesscontrol.domain.system.gateway.routing;
 
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
-import org.cybnity.application.accesscontrol.ui.api.event.CollaborationEventType;
-import org.cybnity.application.accesscontrol.ui.api.routing.UISRecipientList;
-import org.cybnity.framework.domain.*;
+import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
+import org.cybnity.framework.application.vertx.common.routing.UISRecipientList;
+import org.cybnity.framework.domain.Attribute;
+import org.cybnity.framework.domain.DomainEvent;
+import org.cybnity.framework.domain.IDescribed;
+import org.cybnity.framework.domain.IdentifierStringBased;
+import org.cybnity.framework.domain.event.CollaborationEventType;
 import org.cybnity.framework.domain.event.DomainEventFactory;
 import org.cybnity.framework.domain.event.EventSpecification;
 import org.cybnity.framework.domain.event.ProcessingUnitPresenceAnnounced;
@@ -15,6 +19,7 @@ import org.cybnity.framework.immutable.ImmutabilityException;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.ChannelObserver;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +27,9 @@ import java.util.LinkedHashSet;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+/**
+ * Listener of processing unit announces implementing the recipients list pattern for dynamic routes registration.
+ */
 public class ProcessingUnitAnnouncesObserver implements ChannelObserver, IEventProcessingManager {
 
     /**
@@ -93,11 +101,11 @@ public class ProcessingUnitAnnouncesObserver implements ChannelObserver, IEventP
     }
 
     @Override
-    public void notify(DomainEvent domainEvent) {
-        if (domainEvent instanceof ProcessingUnitPresenceAnnounced) {
-            ProcessingUnitPresenceAnnounced event = (ProcessingUnitPresenceAnnounced) domainEvent;
+    public void notify(IDescribed event) {
+        if (event instanceof ProcessingUnitPresenceAnnounced) {
+            ProcessingUnitPresenceAnnounced puEvent = (ProcessingUnitPresenceAnnounced) event;
             // It's an event promoted by a processing unit regarding its presence and availability for delegation of event treatment
-            Collection<Attribute> eventsRoutingPathsCollection = event.eventsRoutingPaths();
+            Collection<Attribute> eventsRoutingPathsCollection = puEvent.eventsRoutingPaths();
 
             // Register the paths per supported event type into the dynamic controlled recipients list
             String recipientPath;
@@ -116,7 +124,7 @@ public class ProcessingUnitAnnouncesObserver implements ChannelObserver, IEventP
             }
 
             // Notify confirmed dynamic recipients list changes
-            if (changedRecipientsContainer) notifyDynamicRecipientListChanged(domainEvent, uisClient);
+            if (changedRecipientsContainer) notifyDynamicRecipientListChanged(puEvent, uisClient);
         } else {
             // Invalid type of notification event received into the control channel
             logger.severe("Reception of invalid event type into the control channel (" + observed().name() + ") which shall only receive " + ProcessingUnitPresenceAnnounced.class.getSimpleName() + " supported event!");
@@ -158,20 +166,14 @@ public class ProcessingUnitAnnouncesObserver implements ChannelObserver, IEventP
                     EventSpecification.appendSpecification(correlationId, specification);
                 }
 
+                DomainEvent puRegisteredNotification = DomainEventFactory.create(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name(), identifiedBy, specification, /* priorCommandRef */ origin.reference(), null /* domain changedModelElementRef */);
                 // Create change event and publish notification on channel(s) potential observed by other domain components (e.g PU which updated the API recipients list about its delegation routing plan)
-                client.publish(DomainEventFactory.create(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name(), identifiedBy, specification, /* priorCommandRef */ origin.reference(), null /* domain changedModelElementRef */), registeredRoutingPathChange);
+                client.publish(puRegisteredNotification, registeredRoutingPathChange, new MessageMapperFactory().getMapper(IDescribed.class, String.class));
             } catch (ImmutabilityException ie) {
                 logger.warning(ie.getMessage());
             } catch (Exception e) {
                 // Problem during the publishing of change event to UIS channel(s)
             }
-        }
-    }
-
-    @Override
-    public void notify(Command command) {
-        if (command != null) {
-            logger.warning(ConformityViolation.UNSUPPORTED_MESSAGE_STRUCTURE.name() + ": command event shall not be received from the processing unit presence announces channel (" + observed().name() + ")!");
         }
     }
 

@@ -55,7 +55,7 @@ public abstract class FactBaseHandler implements FactHandler {
             }
         } catch (Exception e) {
             logger().log(Level.WARNING, "Fact processing problem", e);
-            // TODO feed errors store according to type of exception (e.g technical, conformity)
+            // TODO feed errors into logs store according to type of exception (e.g technical, conformity)
         }
     }
 

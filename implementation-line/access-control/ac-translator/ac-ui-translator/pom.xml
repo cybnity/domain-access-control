@@ -16,5 +16,10 @@
 			<groupId>org.cybnity.application.access-control.ui</groupId>
 			<artifactId>api</artifactId>
 		</dependency>
+		<dependency>
+			<!-- Integration with Users Interactions Space middleware -->
+			<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
+			<artifactId>redis-impl</artifactId>
+		</dependency>
 	</dependencies>
 </project>
