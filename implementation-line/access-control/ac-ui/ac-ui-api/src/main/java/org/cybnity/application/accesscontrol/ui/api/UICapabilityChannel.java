@@ -17,9 +17,9 @@ public enum UICapabilityChannel implements ICapabilityChannel {
     access_control_in("ac" + NamingConventions.STREAM_NAME_SEPARATOR + "in"),
 
     /**
-     * Boundary regarding the feature managing an organization registration.
+     * Boundary regarding the feature managing a tenant registration.
      */
-    access_control_organization_registration("ac" + NamingConventions.STREAM_NAME_SEPARATOR + "organization_registration"),
+    access_control_tenant_registration("ac" + NamingConventions.STREAM_NAME_SEPARATOR + "tenant_registration"),
 
     /**
      * Boundary regarding the feature managing the processing unit presence announces (e.g input channel for any PU declaration as eligible delegate responsible for treatment of specific event types).

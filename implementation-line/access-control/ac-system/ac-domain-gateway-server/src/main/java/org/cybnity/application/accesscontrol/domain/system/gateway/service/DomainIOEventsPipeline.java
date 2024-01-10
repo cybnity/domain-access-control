@@ -32,6 +32,7 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
      * Optional component name that own the routing service and can be identified in UIS by logical name.
      */
     private static final String DYNAMIC_ROUTING_SERVICE_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.GATEWAY, /* domainName */ "ac", /* componentMainFunction */"io",/* resourceType */ null, /* segregationLabel */ null);
+
     /**
      * Client managing interactions with Users Interactions Space.
      */
@@ -63,7 +64,7 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
     private final Collection<ChannelObserver> topicsConsumers = new ArrayList<>();
 
     /**
-     * Listener of processing units' entrypoints that can be used by pipeline as delegates for event treatments.
+     * Listener of processing units' entry points that can be used by pipeline as delegates for event treatments.
      */
     private ProcessingUnitAnnouncesObserver delegatedExecutionRecipientsAnnouncesStreamConsumer;
 
@@ -92,10 +93,6 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
         // Create each entrypoint stream observed by this worker
         entryPointStreamConsumers.add(this);// Main IO entrypoint observer
 
-        // Create entrypoint of delegates presence announces able to dynamically feed the processing unit recipients list
-        delegatedExecutionRecipientsAnnouncesStreamConsumer = new ProcessingUnitAnnouncesObserver(new Channel(UICapabilityChannel.access_control_pu_presence_announcing.shortName()), DYNAMIC_ROUTING_SERVICE_NAME, uisClient);
-        topicsConsumers.add(delegatedExecutionRecipientsAnnouncesStreamConsumer); // Delegate PU announces observer
-
         // Define usable mapper supporting the read of stream message received from the Users Interactions Space and translated into domain event types
         MessageMapper eventMapper = getMessageMapperProvider().getMapper(StreamMessage.class, IDescribed.class);
         // Register all consumers of observed channels
@@ -106,23 +103,27 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
 
     @Override
     protected void startChannelConsumers() {
-        // None observed
+        // Create entrypoint of delegates presence announces able to dynamically feed the processing unit recipients list
+        delegatedExecutionRecipientsAnnouncesStreamConsumer = new ProcessingUnitAnnouncesObserver(new Channel(UICapabilityChannel.access_control_pu_presence_announcing.shortName()), DYNAMIC_ROUTING_SERVICE_NAME, uisClient);
+        topicsConsumers.add(delegatedExecutionRecipientsAnnouncesStreamConsumer); // Delegate PU announces observer
     }
 
     @Override
     protected void stopStreamConsumers() {
         // Stop each entrypoint stream previously observed by this worker
         uisClient.unregister(entryPointStreamConsumers);
-
         // Clean consumers set
         entryPointStreamConsumers.clear();
-
         logger.fine("AC domain IO entrypoint stream consumers un-registered with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
 
     @Override
     protected void stopChannelConsumers() {
-        // None observed
+        // Stop each observed channel by this worker
+        uisClient.unsubscribe(topicsConsumers);
+        // Clean consumers set
+        topicsConsumers.clear();
+        logger.fine("AC domain IO gateway consumers unsubscribed with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
 
     @Override
@@ -130,6 +131,10 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
         return domainInputChannel;
     }
 
+    /**
+     * Collect and treat all the event received from the entrypoint.
+     * @return StreamObserver.DEFAULT_OBSERVATION_PATTERN.
+     */
     @Override
     public String observationPattern() {
         return StreamObserver.DEFAULT_OBSERVATION_PATTERN;
