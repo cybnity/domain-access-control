@@ -5,10 +5,10 @@ import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMa
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.experience.ExecutionResource;
-import org.cybnity.feature.accesscontrol.domain.system.routing.DomainIOGatewayRecipientsManagerObserver;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.AbstractMessageConsumerEndpoint;
+import org.cybnity.framework.application.vertx.common.routing.DomainIOGatewayRecipientsManagerObserver;
 import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.framework.domain.IPresenceObservability;
