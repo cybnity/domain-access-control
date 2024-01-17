@@ -1,10 +1,12 @@
 package org.cybnity.application.accesscontrol.ui.api.event;
 
+import org.cybnity.framework.domain.event.IEventType;
+
 /**
  * Type of API command event supported by the AC domain.
  * Each command name shall be a verb.
  */
-public enum CommandName {
+public enum CommandName implements IEventType {
 
     /**
      * Registration command of an organization eligible to become a tenant as perimeter of access control.

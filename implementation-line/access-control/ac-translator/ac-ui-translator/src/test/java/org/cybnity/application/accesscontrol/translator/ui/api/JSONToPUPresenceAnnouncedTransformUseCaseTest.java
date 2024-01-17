@@ -3,6 +3,7 @@ package org.cybnity.application.accesscontrol.translator.ui.api;
 import io.lettuce.core.StreamMessage;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
+import org.cybnity.framework.domain.IPresenceObservability;
 import org.cybnity.framework.domain.event.IEventType;
 import org.cybnity.framework.domain.event.ProcessingUnitPresenceAnnounced;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.ICapabilityChannel;
@@ -36,7 +37,7 @@ public class JSONToPUPresenceAnnouncedTransformUseCaseTest {
 
         // Generate domain event sample
         ProcessingUnitPresenceAnnouncedEventFactory evtFactory = new ProcessingUnitPresenceAnnouncedEventFactory();
-        ProcessingUnitPresenceAnnounced evt = evtFactory.create(supportedEventTypesToRoutingPath, puServiceName, null);
+        ProcessingUnitPresenceAnnounced evt = evtFactory.create(supportedEventTypesToRoutingPath, puServiceName, null, IPresenceObservability.PresenceState.AVAILABLE);
 
         // --- STREAM MESSAGE TRANSFORMATION SCENARIO ---
         // Create its JSON version simulating a string version which could be received from a UIS channel (sharing as String message)
@@ -71,7 +72,7 @@ public class JSONToPUPresenceAnnouncedTransformUseCaseTest {
 
         // Generate domain event sample
         ProcessingUnitPresenceAnnouncedEventFactory evtFactory = new ProcessingUnitPresenceAnnouncedEventFactory();
-        ProcessingUnitPresenceAnnounced evt = evtFactory.create(supportedEventTypesToRoutingPath, puServiceName, null);
+        ProcessingUnitPresenceAnnounced evt = evtFactory.create(supportedEventTypesToRoutingPath, puServiceName, null, IPresenceObservability.PresenceState.AVAILABLE);
         Assertions.assertNotNull(evt);
 
         // --- STREAM MESSAGE TRANSFORMATION SCENARIO ---

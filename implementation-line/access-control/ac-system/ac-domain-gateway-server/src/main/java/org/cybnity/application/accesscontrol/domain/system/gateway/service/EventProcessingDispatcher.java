@@ -1,6 +1,7 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
-import org.cybnity.application.accesscontrol.domain.system.gateway.routing.ProcessingUnitAnnouncesObserver;
+import org.cybnity.framework.application.vertx.common.routing.ProcessingUnitAnnouncesObserver;
+import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
