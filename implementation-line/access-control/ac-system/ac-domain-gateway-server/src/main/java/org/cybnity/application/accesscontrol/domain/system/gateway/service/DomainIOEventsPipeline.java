@@ -79,7 +79,7 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
     /**
      * IO events pipeline singleton.
      */
-    private final FactBaseHandler pipelinedProcessSingleton;
+    private FactBaseHandler pipelinedProcessSingleton;
 
     /**
      * Default constructor.
@@ -92,9 +92,6 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
             // according to the defined environment variables (autonomous connection from worker to UIS)
             // defined on the runtime server executing this worker
             uisClient = new UISAdapterImpl(new Context() /* Current context of adapter runtime*/);
-
-            // Initialize the process pipeline singleton instance
-            pipelinedProcessSingleton = pipelinedProcess();
         } catch (IllegalArgumentException iae) {
             // Problem of context read
             throw new UnoperationalStateException(iae);
@@ -204,7 +201,7 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
             // PROCESSING : identify processor (e.g local capability processor, or remote proxy to dedicated UI capability and/or application processing unit) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
             EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient, getMessageMapperProvider());
             securityFilteringStep.setNext(processingAssignmentStep);
-            return eventTypeFilteringStep;
+            pipelinedProcessSingleton = eventTypeFilteringStep;
         }
         return pipelinedProcessSingleton;
     }

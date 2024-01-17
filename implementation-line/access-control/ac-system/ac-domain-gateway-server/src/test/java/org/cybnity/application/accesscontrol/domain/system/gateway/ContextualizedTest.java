@@ -42,8 +42,8 @@ public class ContextualizedTest {
     protected EnvironmentVariables environmentVariables;
 
     static protected Integer HTTP_SERVER_PORT = 8080;
-    static protected int WORKER_INSTANCES = 3;
-    static protected int WORKER_THREAD_POOL = 3;
+    static protected int WORKER_INSTANCES = 1;
+    static protected int WORKER_THREAD_POOL = 1;
 
     /**
      * Start and stop of the server shall be manually managed by child test class.
@@ -72,12 +72,27 @@ public class ContextualizedTest {
      */
     static protected String DATABASE_NUMBER = "1";
 
+    /**
+     * Get test context.
+     *
+     * @return A context instance including environment variable names and values.
+     */
+    protected IContext getContext() {
+        return this.context;
+    }
+
     @BeforeEach
     public void initRedisConnectionChainValues() {
         logger = Logger.getLogger(this.getClass().getName());
 
         // Build reusable context
         this.context = new Context();
+        context.addResource(DEFAULT_AUTH_PASSWORD, "defaultAuthPassword", false);
+        context.addResource(SERVER_HOST, "serverHost", false);
+        context.addResource(Integer.toString(SERVER_PORT), "serverPort", false);
+        context.addResource(DATABASE_NUMBER, "databaseNumber", false);
+        context.addResource(CONNECTION_USER_ACCOUNT, "connectionUserAccount", false);
+        context.addResource(DEFAULT_AUTH_PASSWORD, "connectionPassword", false);
 
         // Synchronize environment variables test values
         initEnvVariables();

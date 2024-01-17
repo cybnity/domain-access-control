@@ -55,6 +55,13 @@
 			<groupId>org.signal</groupId>
 			<artifactId>embedded-redis</artifactId>
 		</dependency>
+		<dependency>
+			<!-- Required for unit test about collaboration processes -->
+			<groupId>org.cybnity.application.access-control.system</groupId>
+			<artifactId>process-module</artifactId>
+			<version>${revision}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

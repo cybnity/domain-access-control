@@ -78,7 +78,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
     /**
      * Entrypoint events treatment pipeline singleton.
      */
-    private final FactBaseHandler pipelinedProcessSingleton;
+    private FactBaseHandler pipelinedProcessSingleton;
 
     /**
      * Default constructor.
@@ -91,9 +91,6 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
             // according to the defined environment variables (autonomous connection from worker to UIS)
             // defined on the runtime server executing this worker
             uisClient = new UISAdapterImpl(new Context() /* Current context of adapter runtime*/);
-
-            // Initialize the feature process pipelined
-            pipelinedProcessSingleton = pipelinedProcess();
         } catch (IllegalArgumentException iae) {
             // Problem of context read
             throw new UnoperationalStateException(iae);
@@ -207,7 +204,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
             // TODO coder le traitement des events entrant depuis le endpoint
             //EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient, getMessageMapperProvider());
             //securityFilteringStep.setNext(processingAssignmentStep);
-            return filteringStep;
+            pipelinedProcessSingleton = filteringStep;
         }
         return pipelinedProcessSingleton;
     }
