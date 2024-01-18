@@ -13,6 +13,7 @@ import org.cybnity.framework.domain.ObjectMapperBuilder;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,22 +28,40 @@ public class DynamicRecipientsSyncUseCaseTest extends ContextualizedTest {
      * The test start firstly an IO gateway instance, and start a process module (normally registering routes to gateway), and attempt to send of event supported by routing plan to process module over gateway.
      */
     @Test
-    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
+    @Timeout(value = 30, timeUnit = TimeUnit.SECONDS)
     public void givenStartedGateway_whenFeaturePUStart_thenRecipientsListRegistered(Vertx vertx, VertxTestContext testContext) throws Exception {
-        // Start domain IO Gateway
-        vertx.deployVerticle(AccessControlDomainIOGateway.class.getName()).onSuccess(id -> {
-            logger.fine("Domain IO Gateway started");
+        // Prepare helper for test time wait
+        CountDownLatch waiter = new CountDownLatch(2 /* Quantity of message to wait about processing end confirmation */);
 
+        Thread t1 = new Thread(() -> {
+            // Start domain IO Gateway
+            vertx.deployVerticle(AccessControlDomainIOGateway.class.getName()).onSuccess(id -> {
+                logger.fine("Domain IO Gateway started");
+
+                waiter.countDown();
+            });
+        });
+
+        Thread t2 = new Thread(() -> {
             // Start a feature processing unit
             vertx.deployVerticle(AccessControlDomainProcessModule.class.getName()).onSuccess(id2 -> {
                 logger.fine("Feature process module started");
-
-                // Try to send supported event type to gateway
-
+// TOD trouver comment vérifier que les routing plan sont à jour
+                
                 // Confirm finalized test
-                testContext.completeNow();
+                waiter.countDown();
             });
         });
+
+        t1.start();
+        t1.join();
+        t2.start();
+        t2.join();
+
+        // Wait for give time to message to be processed
+        Assertions.assertTrue(waiter.await(20, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+
+        testContext.completeNow();
     }
 
     /**

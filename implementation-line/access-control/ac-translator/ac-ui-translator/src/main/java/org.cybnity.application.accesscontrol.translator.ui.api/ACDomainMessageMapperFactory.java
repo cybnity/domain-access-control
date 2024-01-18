@@ -1,9 +1,5 @@
 package org.cybnity.application.accesscontrol.translator.ui.api;
 
-import io.lettuce.core.StreamMessage;
-import org.cybnity.application.accesscontrol.translator.ui.api.mapper.JSONMessageToProcessingUnitPresenceAnnouncedTransformer;
-import org.cybnity.application.accesscontrol.translator.ui.api.mapper.StreamMessageToProcessingUnitPresenceAnnouncedTransformer;
-import org.cybnity.framework.domain.event.ProcessingUnitPresenceAnnounced;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.MessageMapper;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
@@ -27,17 +23,7 @@ public class ACDomainMessageMapperFactory extends MessageMapperFactory {
     public MessageMapper getMapper(Class<?> transformable, Class<?> transformableAs) {
         if (transformable != null && transformableAs != null) {
             // Select the origin type to be transformed that is only specific to the AC domain
-            if (StreamMessage.class.isAssignableFrom(transformable)) {
-                // Select the mapper allowing transformation to targeted type
-                if (ProcessingUnitPresenceAnnounced.class.isAssignableFrom(transformableAs)) {
-                    return new StreamMessageToProcessingUnitPresenceAnnouncedTransformer();
-                }
-            } else if (String.class.isAssignableFrom(transformable)) {
-                // Select the mapper allowing transformation to targeted type
-                if (ProcessingUnitPresenceAnnounced.class.isAssignableFrom(transformableAs)) {
-                    return new JSONMessageToProcessingUnitPresenceAnnouncedTransformer();
-                }
-            }
+
             // Else try to find existing common mapper supported by the UIS space
             return super.getMapper(transformable, transformableAs);
         }

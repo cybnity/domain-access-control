@@ -125,14 +125,6 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
         // Tag the current operational as ended and no active status
         currentPresenceStatus = PresenceState.UNAVAILABLE;
 
-        try {
-            // Notify end of presence regarding this pipeline (e.g ensuring the stop of entrypoint event forward from domain IO Gateway)
-            announcePresence(currentPresenceStatus, /* None previous origin event because it's a voluntary end of life regarding this component stopped */ null);
-        } catch (Exception me) {
-            // Normally shall never arrive; so notify implementation code issue
-            logger.log(Level.SEVERE, me.getMessage(), me);
-        }
-
         // Execute by default the stop operations relative to channels and streams previously observed
         super.stop();
     }
@@ -267,7 +259,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
         ProcessingUnitPresenceAnnounced presenceAnnounce = new ProcessingUnitPresenceAnnouncedEventFactory().create(supportedEventTypesToRoutingPath, FEATURE_SERVICE_NAME, priorEventRef, presenceState);
         Channel domainIOGateway = new Channel(UICapabilityChannel.access_control_pu_presence_announcing.shortName());
         // Publish event to channel
-        uisClient.publish(presenceAnnounce, domainIOGateway, getMessageMapperProvider().getMapper(presenceAnnounce.getClass(), StreamMessage.class));
+        uisClient.publish(presenceAnnounce, domainIOGateway, getMessageMapperProvider().getMapper(presenceAnnounce.getClass(), String.class));
     }
 
     /**
