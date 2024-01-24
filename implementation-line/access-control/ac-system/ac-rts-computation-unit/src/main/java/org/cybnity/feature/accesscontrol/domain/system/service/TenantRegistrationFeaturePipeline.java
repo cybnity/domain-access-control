@@ -155,6 +155,8 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
         // Listening of acknowledges (announced presence confirmed registration) able to dynamically manage the eventual need retry to perform about the feature unit registration into the domain IO Gateway's recipients list
         DomainIOGatewayRecipientsManagerObserver recipientsManagerOutputsObserver = new DomainIOGatewayRecipientsManagerObserver(new Channel(UICapabilityChannel.access_control_io_gateway_dynamic_routing_plan_evolution.shortName()), this);
         topicsConsumers.add(recipientsManagerOutputsObserver);
+        // Register observers on space
+        uisClient.subscribe(topicsConsumers, getMessageMapperProvider().getMapper(String.class, IDescribed.class));
     }
 
     @Override
@@ -264,6 +266,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
 
     /**
      * This implementation make nothing relative to acknowledge interpretation or derived rules.
+     *
      * @param presenceDeclarationResultEvent Result of declared presence.
      */
     @Override

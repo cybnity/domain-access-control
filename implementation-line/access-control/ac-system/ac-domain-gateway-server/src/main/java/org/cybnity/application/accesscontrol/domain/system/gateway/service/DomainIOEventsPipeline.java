@@ -142,6 +142,9 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
         // Create entrypoint of delegates presence announces able to dynamically feed the processing unit recipients list
         delegatedExecutionRecipientsAnnouncesStreamConsumer = new ProcessingUnitAnnouncesObserver(/* Where new routes declaration to manage shall be listened */new Channel(UICapabilityChannel.access_control_pu_presence_announcing.shortName()), DYNAMIC_ROUTING_SERVICE_NAME, uisClient,/* Where recipients list changes shall be notified */ new Channel(UICapabilityChannel.access_control_io_gateway_dynamic_routing_plan_evolution.shortName()));
         topicsConsumers.add(delegatedExecutionRecipientsAnnouncesStreamConsumer); // Delegate PU announces observer
+
+        // Register observers on space
+        uisClient.subscribe(topicsConsumers, getMessageMapperProvider().getMapper(String.class, IDescribed.class));
     }
 
     @Override
@@ -247,6 +250,7 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
 
     /**
      * This implementation make nothing relative to acknowledge interpretation or derived rules.
+     *
      * @param presenceDeclarationResultEvent Result of declared presence.
      */
     @Override
