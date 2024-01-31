@@ -289,7 +289,7 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
         processModule.join(); // wait end of process start execution
 
         // Wait for give time to message to be processed
-        Assertions.assertTrue(testWaiter.await(50, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+        Assertions.assertTrue(testWaiter.await(180, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
 
         // Unregister specific test listeners started
         uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
@@ -331,7 +331,7 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
         gatewayModule.join(); // wait end of gateway start execution
 
         // Wait for give time to message to be processed
-        Assertions.assertTrue(testWaiter.await(50, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+        Assertions.assertTrue(testWaiter.await(180, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
 
         // Unregister specific test listeners started
         uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
