@@ -7,6 +7,7 @@ import org.cybnity.framework.domain.IDescribed;
  * Execute the application feature in a pipelined way
  */
 public class TenantRegistrationProcessor extends FactBaseHandler {
+
     @Override
     public boolean process(IDescribed iDescribed) {
         return false;

@@ -31,7 +31,8 @@ public enum UICapabilityChannel implements ICapabilityChannel {
      * Boundary regarding the promotion of the dynamic recipients list changes that are managed by a domain IO Gateway about registered routing paths.
      * Pub/sub channel allowing listening by multiple consumers.
      */
-    access_control_io_gateway_dynamic_routing_plan_evolution("ac" + NamingConventions.CHANNEL_NAME_SEPARATOR + "io_gateway_routing_plan_evolution"),
+    access_control_io_gateway_dynamic_routing_plan_evolution("ac" + NamingConventions.CHANNEL_NAME_SEPARATOR + "io_gateway_routing_plan_evolution")
+
     ;
 
     private final String shortName;

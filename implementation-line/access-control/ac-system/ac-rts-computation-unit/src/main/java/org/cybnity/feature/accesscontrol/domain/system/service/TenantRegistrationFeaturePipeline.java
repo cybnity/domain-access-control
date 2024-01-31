@@ -221,7 +221,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
             // TODO coder le processus métier pipeliné répondant aux scénarios de supportés par la feature/exigences
             // Build responsibility chain ensuring the command treatment according to the fact conformity
 
-            // FILTER : identify received command as supported by the capability domain
+            // FILTER : identify received command (CommandName.REGISTER_ORGANIZATION) as supported by the capability domain
             TenantRegistrationProcessor filteringStep = new TenantRegistrationProcessor();
 
             // PROCESSING : ...
