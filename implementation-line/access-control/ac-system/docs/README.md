@@ -16,22 +16,24 @@ The decision of system combination as integrated or distributed is taken accordi
 This system is packaged as an integrated and standalone module which collaborate with the domain features modules. It acts as a Domain Gateway Server of the Access Control application layer.
 It is responsible of the input events (e.g received from the ac-backend-server module) coming from the Users Interfaces Area and it manage control, distribution to feature modules.
 
-Named AccessControlDomainIOGateway (ac-io-gateway logical name) this module is in charge to manage the routing plan of events to feature modules, through an input/output pipeline which ensure the collaboration with the features module.
+Named `AccessControlDomainIOGateway` (ac-io-gateway logical name) this module is in charge to manage the routing plan of events to feature modules, through an input/output pipeline which ensure the collaboration with the features module.
 
-The developed pipeline is DomainIOEventsPipeline (identified by logical name ac-io-gateway-pipeline).
+The developed pipeline is `DomainIOEventsPipeline` (identified by logical name ac-io-gateway-pipeline).
 
 ## AC-RTS-COMPUTATION-UNIT
 This system is a Processing Unit (PU) that is a combination of features pipelines (as functional process modules) assembled in terms of deployable executable component.
 
-Named AccessControlDomainProcessModule, this module is in charge to start and support the configuration of the runtime relative to each feature pipeline of the Access Control application layer.
+Named `AccessControlDomainProcessModule`, this module is in charge to start and support the configuration of the runtime relative to each feature pipeline of the Access Control application layer.
 
 The developed pipelines are:
-- TenantRegistrationFeaturePipeline (identified by logical name ac-tenant_registration-processing_unit-pipeline).
+- `TenantRegistrationFeaturePipeline` (identified by logical name ac-tenant_registration-processing_unit-pipeline).
 
 ## STREAMS & CHANNELS OVERVIEW
-Several Redis Streams or Redis Topics are defining a routing plan between the domain features in a dynamic way. The Recipient List pattern is implemented that allow real-time instantiation and change or the transport relative to the events exchanged by the components into the application layer.
+Several Redis streams (persistent) or topics (not persistent) are contributor of a routing plan between the domain features in a dynamic way.
 
-All the channels naming conventions are defined by static Java enum provided by API components and separator used in short name are defined by the NamingConvention enum.
+The Dynamic Router pattern supported by Recipient List utility (list of dynamically specified recipients) is implemented that allow real-time instantiation and change of the events transport which are exchanged by the components into the application layer.
+
+All the channels naming conventions are defined by static Java enum provided by API components and separator used in short name are defined by the `NamingConvention` enum.
 
 |Usage Category|Channel Name|Short Name|Channel Type|Supported Event Types|Ownership|
 |:--|:--|:--|:--|:--|:--|
