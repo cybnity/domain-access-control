@@ -35,10 +35,10 @@ All the channels naming conventions are defined by static Java enum provided by 
 
 |Usage Category|Channel Name|Short Name|Channel Type|Supported Event Types|Ownership|
 |:--|:--|:--|:--|:--|:--|
-|UICapabilityChannel|access_control_in|ac-in|Redis Stream|Command|ac-io-gateway-pipeline|
+|UICapabilityChannel|access_control_in|ac-in|Redis Stream|Command(CommandName.REGISTER_ORGANIZATION)|ac-io-gateway-pipeline|
 |UICapabilityChannel|access_control_pu_presence_announcing|ac.pu_presence_announcing|Redis Topic|DomainEvent(ProcessingUnitPresenceAnnounced)|ac-io-gateway-pipeline|
 |UICapabilityChannel|access_control_io_gateway_dynamic_routing_plan_evolution|ac.io_gateway_routing_plan_evolution|Redis Topic|Command(CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED), DomainEvent(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED)|ac-io-gateway-pipeline|
-|UICapabilityChannel|access_control_tenant_registration|ac-tenant_registration|Redis Stream| |ac-tenant_registration-processing_unit-pipeline|
+|UICapabilityChannel|access_control_tenant_registration|ac-tenant_registration|Redis Stream|Command(CommandName.REGISTER_ORGANIZATION)|ac-tenant_registration-processing_unit-pipeline|
 
 ## DYNAMIC ROUTING MAP
 The routing map here presented is dynamically build and updated by the components during the runtime.
@@ -76,15 +76,25 @@ The routing map here presented is dynamically build and updated by the component
 flowchart LR
   subgraph global
     direction LR
-    id1(ac-io-gateway-pipeline)
-    id1 -. publish .-> id3(("pres_ann_req"))
-    id3 .-> id2(ac.io_gateway_routing_plan_evolution)
+    id1(ac-io-gateway-pipeline) -. publish ..- id3>pres_ann_req]
+    id3 .-> id2([ac.io_gateway_routing_plan_evolution])
+    id1 -. publish ..- id4>rout_path_reg]
+    id4 .-> id2
+    id5(ac-tenant_registration-processing_unit-pipeline) -. publish ..- id6>pres_ann]
+    id6 .-> id7([ac.pu_presence_announcing])
+    id7 .-> id1
+    id12((" ")) -. append ..- id8>regist_organ]
+    id8 .-> id11([ac-in])
+    id11 .-> id1
+    id1 -. append ..- id13>regist_organ]
+    id13 .-> id9([ac-tenant_registration])
+    id9 .-> id5
     
   end
   classDef component fill:#0e2a43, color:#fff
   classDef event fill:#e5302a, stroke:#e5302a, color:#fff
-  class id1 component;
-  class id3 event;
+  class id1,id5,id12 component;
+  class id3,id4,id6,id8,id13 event;
 
 ```
 
@@ -92,6 +102,9 @@ flowchart LR
 |Element Label|Element Type|
 |:--|:--|
 |pres_ann_req|CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED|
+|rout_path_reg|CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED|
+|pres_ann|ProcessingUnitPresenceAnnounced|
+|regist_organ|CommandName.REGISTER_ORGANIZATION|
 
 #
 [Back To Home](/README.md)
