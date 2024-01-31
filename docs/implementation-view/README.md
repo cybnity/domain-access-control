@@ -5,8 +5,8 @@ The space presents the implementation view of the developed components.
 Presentation of dynamic aspects regarding interactions between components, diagrams regarding statemachines and/or processed activities.
 ## COMPONENTS COLLABORATION
 Presentation of the strategy of integration developed between the implementation components to ensure their collaboration via standardized patterns at:
-- User Interface Layer integration models
-- [Application Layer integration models](/implementation-line/access-control/ac-system/docs)
+- User systems integration models
+- [Application systems integration models](/implementation-line/access-control/ac-system/docs)
 
 
 ## SECURITY FEATURES & CONTROLS
