@@ -69,7 +69,7 @@ The managed source files are stored in the [implementation-view](docs/implementa
 - Static aspects (structural diagrams): components, packages;
 - Dynamic aspects (behavioral diagrams): interactions, statecharts, activities.
 - Model sub-packages:
-  - [Implementation principles & models](docs/implementation-view)
+  - Implementation principles & models
   - Configuration-management
   - System-assembly
 
