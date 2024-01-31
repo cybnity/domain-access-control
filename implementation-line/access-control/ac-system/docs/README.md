@@ -40,5 +40,58 @@ All the channels naming conventions are defined by static Java enum provided by 
 |UICapabilityChannel|access_control_io_gateway_dynamic_routing_plan_evolution|ac.io_gateway_routing_plan_evolution|Redis Topic|Command(CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED), DomainEvent(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED)|ac-io-gateway-pipeline|
 |UICapabilityChannel|access_control_tenant_registration|ac-tenant_registration|Redis Stream| |ac-tenant_registration-processing_unit-pipeline|
 
+## DYNAMIC ROUTING MAP
+The routing map here presented is dynamically build and updated by the components during the runtime.
+
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+        'background': '#ffffff',
+        'fontFamily': 'arial',
+        'fontSize': '10px',
+        'primaryColor': '#fff',
+        'primaryTextColor': '#0e2a43',
+        'primaryBorderColor': '#0e2a43',
+        'secondaryColor': '#fff',
+        'secondaryTextColor': '#fff',
+        'secondaryBorderColor': '#fff',
+        'tertiaryColor': '#fff',
+        'tertiaryTextColor': '#fff',
+        'tertiaryBorderColor': '#fff',
+        'edgeLabelBackground':'#fff',
+        'lineColor': '#0e2a43',
+        'titleColor': '#fff',
+        'textColor': '#fff',
+        'lineColor': '#0e2a43',
+        'nodeTextColor': '#fff',
+        'nodeBorder': '#0e2a43',
+        'noteTextColor': '#fff',
+        'noteBorderColor': '#fff'
+    },
+    'flowchart': { 'curve': 'monotoneX' }
+  }
+}%%
+flowchart LR
+  subgraph global
+    direction LR
+    id1(ac-io-gateway-pipeline)
+    id1 -. publish .-> id3(("pres_ann_req"))
+    id3 .-> id2(ac.io_gateway_routing_plan_evolution)
+    
+  end
+  classDef component fill:#0e2a43, color:#fff
+  classDef event fill:#e5302a, stroke:#e5302a, color:#fff
+  class id1 component;
+  class id3 event;
+
+```
+
+#### Legend
+|Element Label|Element Type|
+|:--|:--|
+|pres_ann_req|CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED|
+
 #
 [Back To Home](/README.md)
