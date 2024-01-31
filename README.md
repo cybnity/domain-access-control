@@ -4,9 +4,9 @@ Discover here the Access Control Management application domain project, that hav
 The CYBNITY Access Control domain technical documentation includes many types of support deliverables produced during the software development life cycle.
 
 You can find informations relative to software maintenance like:
-- Design diagrams regarding software developed concepts and source codes;
-- Support to software build process and packaging;
-- Systems configuration and deployment procedures.
+- Design diagrams regarding software developed concepts and source codes
+- Support to software build process and packaging
+- Systems configuration and deployment procedures
 
 # FUNCTIONAL VIEW (Use Cases)
 ## PURPOSE
@@ -42,32 +42,32 @@ The managed source files are stored in the design-view sub-folder like:
 
 # PROCESS VIEW (Executions)
 ## PURPOSE
-- Show the concurrency of the system(s);
-- Encompasses the threads and processes that form the system's concurrency and synchronization mechanisms.
+- Show the concurrency of the system(s)
+- Encompasses the threads and processes that form the system's concurrency and synchronization mechanisms
 
 ### Usage
 Describes execution models and synchronization rules, identified during the technical design phase and implementation rules definition.
 
 ### Artifacts
 The managed source files are stored in the process-view sub-folder like:
-- Static aspects: equals to design view's diagrams, with focus on the active classes that represent theses threads and processes.
+- Static aspects: equals to design view's diagrams, with focus on the active classes that represent theses threads and processes
 - Model sub-packages:
   - Performance
   - Scalability
 
 # IMPLEMENTATION VIEW (Packaged Components)
 ## PURPOSE
-- Show the organization of the core components and files (e.g source code, setting files);
-- Packaging models and dependencies distribution;
-- Addresses the configuration management of the system's releases.
+- Show the organization of the core components and files (e.g source code, setting files)
+- Packaging models and dependencies distribution
+- Addresses the configuration management of the system's releases
 
 ### Usage
 Formalizes the maintenance documentation aligned with source codes developed, including specificities regarding technologies (e.g language requirements) and frameworks (e.g implementation templates, protocols) used for implementation of the software.
 
 ### Artifacts
 The managed source files are stored in the [implementation-view](docs/implementation-view) sub-folder like:
-- Static aspects (structural diagrams): components, packages;
-- Dynamic aspects (behavioral diagrams): interactions, statecharts, activities.
+- Static aspects (structural diagrams): components, packages
+- Dynamic aspects (behavioral diagrams): interactions, statecharts, activities
 - Model sub-packages:
   - Implementation principles & models
   - Configuration-management
@@ -111,7 +111,7 @@ Describes the environment(s), infrastructure and operating conditions required t
 
 ### Artifacts
 The managed source files are stored in the deployment-view sub-folder like:
-- Static aspects (structural diagrams): components, deployment.
+- Static aspects (structural diagrams): components, deployment
 - Model sub-packages:
   - Installation
     - Systems deployment
