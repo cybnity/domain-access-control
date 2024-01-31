@@ -16,7 +16,7 @@ The decision of system combination as integrated or distributed is taken accordi
 This system is packaged as an integrated and standalone module which collaborate with the domain features modules. It acts as a Domain Gateway Server of the Access Control application layer.
 It is responsible of the input events (e.g received from the ac-backend-server module) coming from the Users Interfaces Area and it manage control, distribution to feature modules.
 
-Named AccessControlDomainIOGateway this module is in charge to manage the routing plan of events to feature modules, through an input/output pipeline which ensure the collaboration with the features module.
+Named AccessControlDomainIOGateway (ac-io-gateway logical name) this module is in charge to manage the routing plan of events to feature modules, through an input/output pipeline which ensure the collaboration with the features module.
 
 The developed pipeline is DomainIOEventsPipeline (identified by logical name ac-io-gateway-pipeline).
 
@@ -26,7 +26,7 @@ This system is a Processing Unit (PU) that is a combination of features pipeline
 Named AccessControlDomainProcessModule, this module is in charge to start and support the configuration of the runtime relative to each feature pipeline of the Access Control application layer.
 
 The developed pipelines are:
-- TenantRegistrationFeaturePipeline
+- TenantRegistrationFeaturePipeline (identified by logical name ac-tenant_registration-processing_unit-pipeline).
 
 ## STREAMS & CHANNELS OVERVIEW
 Several Redis Streams or Redis Topics are defining a routing plan between the domain features in a dynamic way. The Recipient List pattern is implemented that allow real-time instantiation and change or the transport relative to the events exchanged by the components into the application layer.
@@ -35,10 +35,10 @@ All the channels naming conventions are defined by static Java enum provided by 
 
 |Usage Category|Channel Name|Short Name|Channel Type|Supported Event Types|Ownership|
 |:--|:--|:--|:--|:--|:--|
-|UICapabilityChannel|access_control_in|ac-in|Redis Stream|Command|DomainIOEventsPipeline|
-|UICapabilityChannel|access_control_pu_presence_announcing|ac.pu_presence_announcing|Redis Topic| |DomainIOEventsPipeline|
-|UICapabilityChannel|access_control_io_gateway_dynamic_routing_plan_evolution|ac.io_gateway_routing_plan_evolution|Redis Topic|Command(CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED), DomainEvent(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED)|DomainIOEventsPipeline|
-|UICapabilityChannel|access_control_tenant_registration|ac-tenant_registration|Redis Stream| |TenantRegistrationFeaturePipeline|
+|UICapabilityChannel|access_control_in|ac-in|Redis Stream|Command|ac-io-gateway-pipeline|
+|UICapabilityChannel|access_control_pu_presence_announcing|ac.pu_presence_announcing|Redis Topic|DomainEvent(ProcessingUnitPresenceAnnounced)|ac-io-gateway-pipeline|
+|UICapabilityChannel|access_control_io_gateway_dynamic_routing_plan_evolution|ac.io_gateway_routing_plan_evolution|Redis Topic|Command(CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED), DomainEvent(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED)|ac-io-gateway-pipeline|
+|UICapabilityChannel|access_control_tenant_registration|ac-tenant_registration|Redis Stream| |ac-tenant_registration-processing_unit-pipeline|
 
 #
 [Back To Home](/README.md)
