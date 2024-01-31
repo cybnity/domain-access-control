@@ -1,7 +1,7 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import org.cybnity.application.accesscontrol.domain.system.gateway.service.APISupportedCapabilitySelectionFilterUseCaseTest;
-import org.cybnity.application.accesscontrol.domain.system.gateway.service.DynamicRecipientsSyncUseCaseTestIntegration;
+import org.cybnity.application.accesscontrol.domain.system.gateway.service.DynamicRecipientsSyncIntegrationTest;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 
@@ -12,6 +12,6 @@ import org.junit.platform.suite.api.Suite;
  * @author olivier
  */
 @Suite
-@SelectClasses({ExecutableIOGatewayCheckerUseCaseTest.class, APISupportedCapabilitySelectionFilterUseCaseTest.class, DynamicRecipientsSyncUseCaseTestIntegration.class})
+@SelectClasses({ExecutableIOGatewayCheckerUseCaseTest.class, APISupportedCapabilitySelectionFilterUseCaseTest.class, DynamicRecipientsSyncIntegrationTest.class})
 public class AllUseCaseTests {
 }

@@ -44,6 +44,16 @@ public class AccessControlDomainProcessModule extends AbstractVerticle {
     private static final String PROCESSING_UNIT_MODULE_POOL_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.PROCESSING_UNIT, /* domainName */ "ac", /* componentMainFunction */"process-module",/* resourceType */ null, /* segregationLabel */ "workers");
 
     /**
+     * Unique logical name of this domain of features.
+     */
+    private static String FEATURES_DOMAIN_NAME = "AC Features";
+
+    /**
+     * Unique logical name of this processing module.
+     */
+    private static String PU_LOGICAL_NAME = FEATURES_DOMAIN_NAME + " Processing Unit";
+
+    /**
      * Default start method regarding the server.
      *
      * @param args None pre-required.
@@ -60,6 +70,9 @@ public class AccessControlDomainProcessModule extends AbstractVerticle {
         });
     }
 
+    /**
+     * Start of workers and HTTP service.
+     */
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
         // Check the minimum required data allowing operating
@@ -68,10 +81,22 @@ public class AccessControlDomainProcessModule extends AbstractVerticle {
         Map<String, DeploymentOptions> deployed = managedFeaturesWorkers();
 
         // Start all process module workers
-        workersCapability.startWorkers(deployed, vertx, logger, "AC Features");
+        workersCapability.startWorkers(deployed, vertx, logger, FEATURES_DOMAIN_NAME);
 
         // Create the HTTP server supporting supervision
-        workersCapability.createHttpServer(getVertx(), logger, startPromise, "AC Features Processing Unit");
+        workersCapability.createHttpServer(getVertx(), logger, startPromise, PU_LOGICAL_NAME);
+    }
+
+    /**
+     * Resource freedom (e.g undeploy all worker instances and stop of HTTP service).
+     */
+    @Override
+    public void stop() {
+        // Stop HTTP server
+        workersCapability.stopHttpServer(logger, null, PU_LOGICAL_NAME);
+
+        // Undeploy each worker instance
+        workersCapability.undeployWorkers(vertx);
     }
 
     /**
@@ -97,15 +122,6 @@ public class AccessControlDomainProcessModule extends AbstractVerticle {
         deployedWorkers.put(TenantRegistrationFeaturePipeline.class.getName(), options);
 
         return deployedWorkers;
-    }
-
-    /**
-     * Resource freedom (e.g un deployment of all worker instances).
-     */
-    @Override
-    public void stop() {
-        // Undeploy each worker
-        workersCapability.undeployWorkers(vertx);
     }
 
     /**

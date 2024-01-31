@@ -1,6 +1,7 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
 import io.lettuce.core.StreamMessage;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
 import org.cybnity.framework.application.vertx.common.routing.UISRecipientList;
 import org.cybnity.framework.domain.Attribute;
@@ -21,7 +22,9 @@ import java.util.logging.Logger;
 public class RemoteProcessingUnitExecutor implements ProcessingUnitDelegation {
 
     private final IEventProcessingManager recipientsProvider;
+
     private final UISAdapter uisClient;
+
     /**
      * Technical logging
      */
@@ -70,6 +73,8 @@ public class RemoteProcessingUnitExecutor implements ProcessingUnitDelegation {
                     // --- process delegated to capability domain and eventual response managed by the UIS consumers ---
                 } catch (MappingException jme) {
                     logger.log(Level.SEVERE, ConformityViolation.UNPROCESSABLE_EVENT_TYPE.name() + ": invalid fact type (" + eventTypeName + ") mapped for processing delegation attempt!");
+                } catch (UnoperationalStateException e) {
+                    logger.log(Level.SEVERE, e.getMessage());
                 }
             } else {
                 // None processing unit is defined as able to perform the event treatment (e.g non started and announced into the dynamic routing map)

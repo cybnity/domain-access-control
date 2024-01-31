@@ -40,6 +40,16 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
     private static final String DOMAIN_POOL_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.GATEWAY, /* domainName */ "ac", /* componentMainFunction */"io",/* resourceType */ null, /* segregationLabel */ "workers");
 
     /**
+     * Unique logical name of this gateway domain.
+     */
+    private static final String GW_DOMAIN_NAME = "AC IO";
+
+    /**
+     * Unique logical name of this processing module.
+     */
+    private static final String PU_LOGICAL_NAME = GW_DOMAIN_NAME + " Gateway";
+
+    /**
      * Default start method regarding the server.
      *
      * @param args None pre-required.
@@ -56,6 +66,9 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
         });
     }
 
+    /**
+     * Start of workers and HTTP service.
+     */
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
         // Check the minimum required data allowing operating
@@ -64,10 +77,21 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
         Map<String, DeploymentOptions> deployed = capabilityAPIIOPipelineWorkers();
 
         // Start all gateway workers
-        workersCapability.startWorkers(deployed, vertx, logger, "AC IO");
+        workersCapability.startWorkers(deployed, vertx, logger, GW_DOMAIN_NAME);
 
         // Create the HTTP server supporting supervision
-        workersCapability.createHttpServer(getVertx(), logger, startPromise, "AC IO Gateway");
+        workersCapability.createHttpServer(getVertx(), logger, startPromise, PU_LOGICAL_NAME);
+    }
+
+    /**
+     * Resource freedom (e.g undeploy all worker instances and stop http service).
+     */
+    @Override
+    public void stop() {
+        // Stop HTTP server
+        workersCapability.stopHttpServer(logger, null, PU_LOGICAL_NAME);
+        // Undeploy each worker
+        workersCapability.undeployWorkers(vertx);
     }
 
     /**
@@ -91,15 +115,6 @@ public class AccessControlDomainIOGateway extends AbstractVerticle {
         deployedWorkers.put(DomainIOEventsPipeline.class.getName(), options);
 
         return deployedWorkers;
-    }
-
-    /**
-     * Resource freedom (e.g un deployment of all worker instances).
-     */
-    @Override
-    public void stop() {
-        // Undeploy each worker
-        workersCapability.undeployWorkers(vertx);
     }
 
     /**

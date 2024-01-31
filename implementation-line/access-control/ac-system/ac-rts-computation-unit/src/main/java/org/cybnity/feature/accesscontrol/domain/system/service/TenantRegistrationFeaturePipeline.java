@@ -38,6 +38,11 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
     private static final Logger logger = Logger.getLogger(TenantRegistrationFeaturePipeline.class.getName());
 
     /**
+     * Logical name of this feature module usable in logs.
+     */
+    private static final String DOMAIN_PIPELINE_LOGICAL_NAME = "AC domain TenantRegistration";
+
+    /**
      * Functional status based on the operational state of all consumers started and active.
      */
     private PresenceState currentPresenceStatus;
@@ -97,15 +102,26 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
         }
     }
 
+    @Override
+    protected void cleanConsumersResources() {
+        // Clean stream consumers set
+        entryPointStreamConsumers.clear();
+        // Clean channel consumers set
+        topicsConsumers.clear();
+        // Clean resource allowed by UIS client
+        uisClient.freeUpResources();
+    }
+
     /**
      * Enhance the default start process relative to observed channels and/or streams, with the send of event announcing the presence of this processing unit to other systems (e.g domain IO Gateway).
      */
     @Override
     public void start() {
-        // Execute by default the start operations relative to channels and streams consumers
-        super.start();
         // Tag the current operational and active status
         currentPresenceStatus = PresenceState.AVAILABLE;
+
+        // Execute by default the start operations relative to channels and streams consumers
+        super.start();
 
         // Notify any other component about the processing unit presence in operational status
         try {
@@ -125,6 +141,15 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
         // Tag the current operational as ended and no active status
         currentPresenceStatus = PresenceState.UNAVAILABLE;
 
+        // Notify any other component about the processing unit presence in end of lifecycle status
+        try {
+            // Promote announce about the supported event types consumption end by this pipeline
+            announcePresence(currentPresenceStatus, null);
+        } catch (Exception me) {
+            // Normally shall never arrive; so notify implementation code issue
+            logger.log(Level.SEVERE, me.getMessage(), me);
+        }
+
         // Execute by default the stop operations relative to channels and streams previously observed
         super.stop();
     }
@@ -139,10 +164,14 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
 
         // Define usable mapper supporting the read of stream message received from the Users Interactions Space and translated into domain event types
         MessageMapper eventMapper = getMessageMapperProvider().getMapper(StreamMessage.class, IDescribed.class);
-        // Register all consumers of observed channels
-        uisClient.register(entryPointStreamConsumers, eventMapper);
 
-        logger.fine("AC domain TenantRegistration entrypoint stream consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        try {
+            // Register all consumers of observed channels
+            uisClient.register(entryPointStreamConsumers, eventMapper);
+            logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME+" entrypoint stream consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        } catch (UnoperationalStateException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     /**
@@ -155,17 +184,21 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
         // Listening of acknowledges (announced presence confirmed registration) able to dynamically manage the eventual need retry to perform about the feature unit registration into the domain IO Gateway's recipients list
         DomainIOGatewayRecipientsManagerObserver recipientsManagerOutputsObserver = new DomainIOGatewayRecipientsManagerObserver(new Channel(UICapabilityChannel.access_control_io_gateway_dynamic_routing_plan_evolution.shortName()), this);
         topicsConsumers.add(recipientsManagerOutputsObserver);
-        // Register observers on space
-        uisClient.subscribe(topicsConsumers, getMessageMapperProvider().getMapper(String.class, IDescribed.class));
+
+        try {
+            // Register observers on space
+            uisClient.subscribe(topicsConsumers, getMessageMapperProvider().getMapper(String.class, IDescribed.class));
+            logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME+" channel consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        } catch (UnoperationalStateException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     @Override
     protected void stopStreamConsumers() {
         // Stop each entrypoint stream previously observed by this worker
         uisClient.unregister(entryPointStreamConsumers);
-        // Clean consumers set
-        entryPointStreamConsumers.clear();
-        logger.fine("AC domain TenantRegistration entrypoint stream consumers un-registered with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME+" entrypoint stream consumers un-registered with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
 
     /**
@@ -175,11 +208,8 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
     protected void stopChannelConsumers() {
         // Stop each observed channel by this worker
         uisClient.unsubscribe(topicsConsumers);
-        // Clean consumers set
-        topicsConsumers.clear();
-        logger.fine("AC domain TenantRegistration consumers unsubscribed with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME+" consumers unsubscribed with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
-
 
     /**
      * Assembly of the events pipeline steps as a singleton responsibility chain and return it.
@@ -239,10 +269,10 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
     }
 
     /**
-     * Prepare and publish a feature processing unit presence event over the Users Interactions Space allowing to other component to collaborate with the feature (e.g Gateway forwarding command events as request of tenant registration).
+     * Prepare and publish a feature processing unit presence event over the Users Interactions Space allowing to other components to collaborate with the feature pipeline (e.g Gateway forwarding command events as request of tenant registration).
      * This method announces the supported entry point event types (CommandName.REGISTER_ORGANIZATION).
      *
-     * @param presenceState Presence current status to announce. When null, this pipeline instance's current status of presence is assigned as default value equals to PresenceState.AVAILABLE.
+     * @param presenceState Optional presence current status to announce. When null, this pipeline instance's current status of presence is assigned as default value equals to PresenceState.AVAILABLE.
      * @param priorEventRef Optional origin event (e.g request of announce renewal received from domain IO Gateway) that was prior to new event to generate and to publish.
      * @throws Exception When problem during the message preparation of build.
      */
@@ -254,7 +284,8 @@ public class TenantRegistrationFeaturePipeline extends AbstractMessageConsumerEn
         }
 
         Map<IEventType, ICapabilityChannel> supportedEventTypesToRoutingPath = new HashMap<>();
-        // Define event type supported by this feature pipeline, and observed from an entrypoint
+
+        // --- Define each event type supported by this feature pipeline, and observed from an entrypoint ---
         supportedEventTypesToRoutingPath.put(CommandName.REGISTER_ORGANIZATION, pipelineInputChannel);
 
         // Prepare event to presence announcing channel

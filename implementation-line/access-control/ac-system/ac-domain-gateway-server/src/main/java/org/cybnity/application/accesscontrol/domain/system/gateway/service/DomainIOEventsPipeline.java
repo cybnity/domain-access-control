@@ -6,16 +6,22 @@ import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.AbstractMessageConsumerEndpoint;
+import org.cybnity.framework.application.vertx.common.event.AttributeName;
 import org.cybnity.framework.application.vertx.common.routing.ProcessingUnitAnnouncesObserver;
 import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
-import org.cybnity.framework.domain.IDescribed;
-import org.cybnity.framework.domain.IPresenceObservability;
-import org.cybnity.framework.immutable.EntityReference;
+import org.cybnity.framework.domain.*;
+import org.cybnity.framework.domain.event.CollaborationEventType;
+import org.cybnity.framework.domain.event.CommandFactory;
+import org.cybnity.framework.domain.event.CorrelationIdFactory;
+import org.cybnity.framework.domain.event.ProcessingUnitPresenceAnnounced;
+import org.cybnity.framework.domain.model.DomainEntity;
+import org.cybnity.framework.immutable.*;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.*;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.event.ProcessingUnitPresenceAnnouncedEventFactory;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,6 +56,11 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
      * Technical logging
      */
     private static final Logger logger = Logger.getLogger(DomainIOEventsPipeline.class.getName());
+
+    /**
+     * Logical name of this feature module usable in logs.
+     */
+    private static final String DOMAIN_PIPELINE_LOGICAL_NAME = "AC domain IO";
 
     /**
      * UIS entrypoint monitored by this worker.
@@ -98,15 +109,35 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
         }
     }
 
+    @Override
+    protected void cleanConsumersResources() {
+        // Clean stream consumers set
+        entryPointStreamConsumers.clear();
+        // Clean channel consumers set
+        topicsConsumers.clear();
+        // Clean resource allowed by UIS client
+        uisClient.freeUpResources();
+    }
+
     /**
      * Enhance the default start process relative to observed channels and/or streams.
      */
     @Override
     public void start() {
-        // Execute by default the start operations relative to channels and streams consumers
-        super.start();
         // Tag the current operational and active status
         currentPresenceStatus = PresenceState.AVAILABLE;
+
+        // Execute by default the start operations relative to channels and streams consumers
+        super.start();
+
+        // Notify any other component about the processing unit presence in operational status
+        try {
+            // Promote announce about the supported event types consumed this pipeline
+            announcePresence(currentPresenceStatus, /* None previous origin event because it's the first start of this component start or restart */ null);
+        } catch (Exception me) {
+            // Normally shall never arrive; so notify implementation code issue
+            logger.log(Level.SEVERE, me.getMessage(), me);
+        }
     }
 
     /**
@@ -116,6 +147,15 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
     public void stop() {
         // Tag the current operational as ended and no active status
         currentPresenceStatus = PresenceState.UNAVAILABLE;
+
+        // Notify any other component about the processing unit presence in end of lifecycle status
+        try {
+            // Promote announce about the supported event types consumption end by this pipeline
+            announcePresence(currentPresenceStatus, null);
+        } catch (Exception me) {
+            // Normally shall never arrive; so notify implementation code issue
+            logger.log(Level.SEVERE, me.getMessage(), me);
+        }
 
         // Execute by default the stop operations relative to channels and streams previously observed
         super.stop();
@@ -131,10 +171,14 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
 
         // Define usable mapper supporting the read of stream message received from the Users Interactions Space and translated into domain event types
         MessageMapper eventMapper = getMessageMapperProvider().getMapper(StreamMessage.class, IDescribed.class);
-        // Register all consumers of observed channels
-        uisClient.register(entryPointStreamConsumers, eventMapper);
 
-        logger.fine("AC domain IO entrypoint stream consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        try {
+            // Register all consumers of observed channels
+            uisClient.register(entryPointStreamConsumers, eventMapper);
+            logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME + " entrypoint stream consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        } catch (UnoperationalStateException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     @Override
@@ -143,26 +187,27 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
         delegatedExecutionRecipientsAnnouncesStreamConsumer = new ProcessingUnitAnnouncesObserver(/* Where new routes declaration to manage shall be listened */new Channel(UICapabilityChannel.access_control_pu_presence_announcing.shortName()), DYNAMIC_ROUTING_SERVICE_NAME, uisClient,/* Where recipients list changes shall be notified */ new Channel(UICapabilityChannel.access_control_io_gateway_dynamic_routing_plan_evolution.shortName()));
         topicsConsumers.add(delegatedExecutionRecipientsAnnouncesStreamConsumer); // Delegate PU announces observer
 
-        // Register observers on space
-        uisClient.subscribe(topicsConsumers, getMessageMapperProvider().getMapper(String.class, IDescribed.class));
+        try {
+            // Register observers on space
+            uisClient.subscribe(topicsConsumers, getMessageMapperProvider().getMapper(String.class, IDescribed.class));
+            logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME + " entrypoint channel consumers started with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        } catch (UnoperationalStateException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     @Override
     protected void stopStreamConsumers() {
         // Stop each entrypoint stream previously observed by this worker
         uisClient.unregister(entryPointStreamConsumers);
-        // Clean consumers set
-        entryPointStreamConsumers.clear();
-        logger.fine("AC domain IO entrypoint stream consumers un-registered with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME + " entrypoint stream consumers un-registered with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
 
     @Override
     protected void stopChannelConsumers() {
         // Stop each observed channel by this worker
         uisClient.unsubscribe(topicsConsumers);
-        // Clean consumers set
-        topicsConsumers.clear();
-        logger.fine("AC domain IO gateway consumers unsubscribed with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME + " gateway consumers unsubscribed with success by worker (workerDeploymentId: " + this.deploymentID() + ")");
     }
 
     @Override
@@ -240,12 +285,67 @@ public class DomainIOEventsPipeline extends AbstractMessageConsumerEndpoint impl
     }
 
     /**
-     * Do nothing because currently none system are involved into the dynamic management of the gateway pipelines.
-     * Potentially could be enhancement in future to be announced to API management system monitoring/controlling the domains IO gateway instances.
+     * Prepare and publish a gateway processing unit command event over the Users Interactions Space allowing to other components to collaborate with the IO pipeline (e.g any Feature module registering routing paths to this DomainIO pipeline for receive future feature command events as routing paths).
+     * This method send command into the UICapabilityChannel.access_control_io_gateway_dynamic_routing_plan_evolution channel (that could be observed by any contributor to the routing plan, interested of routing change/request).
+     * Potentially could be enhanced in future with DomainIO module presence announce send to API management system monitoring/controlling the domains IO gateway instances.
+     *
+     * @param presenceState Optional presence current status to announce. When null, this pipeline instance's current status of presence is assigned as default value equals to PresenceState.AVAILABLE.
+     * @param priorEventRef Optional origin event that was prior to new event to generate and to publish.
+     * @throws Exception When problem during the message preparation of build.
      */
     @Override
-    public void announcePresence(PresenceState presenceState, EntityReference entityReference) throws Exception {
-        // Do nothing
+    public void announcePresence(PresenceState presenceState, EntityReference priorEventRef) throws Exception {
+        if (presenceState == null) {
+            // Define the current status of this pipeline which could be announced as available (because it's running instance)
+            presenceState = PresenceState.AVAILABLE;
+        }
+
+        if (PresenceState.AVAILABLE == presenceState) {
+            // Potential additional announce of presence can be published in complement (e.g to gateways management system's control channel)
+
+            // and send request to domain feature modules regarding need of routing plan feeding (registration of their routing paths as managed by this pipeline)
+            requestRoutingPlansUpdate(presenceState, priorEventRef);
+        } else {
+            // Notification end of presence to other components that are interested by the domain IO pipeline status change
+            logger.fine(DOMAIN_PIPELINE_LOGICAL_NAME + " pipeline presence end detected without published announce by worker (workerDeploymentId: " + this.deploymentID() + ")");
+        }
+    }
+
+    private void requestRoutingPlansUpdate(PresenceState presenceState, EntityReference priorEventRef) throws ImmutabilityException, UnoperationalStateException, MappingException {
+        // Prepare request command of features routing plans registration
+
+        // Prepare command event's unique identifier
+        LinkedHashSet<Identifier> evtUidBasedOn = new LinkedHashSet<>();
+        evtUidBasedOn.add(new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(),
+                /* identifier as performed transaction number */ UUID.randomUUID().toString()));
+        if (priorEventRef != null) {
+            // Add parent uuid as contributor to the event identification value
+            evtUidBasedOn.add(priorEventRef.getEntity().identified());
+        }
+        DomainEntity commandUID = new DomainEntity(evtUidBasedOn);
+
+        // Prepare event specifications
+        Collection<Attribute> definition = new ArrayList<>();
+        // Set the logical name of this pipeline which is sender of the event
+        definition.add(new Attribute(AttributeName.ServiceName.name(), DYNAMIC_ROUTING_SERVICE_NAME));
+        if (presenceState != null) {
+            // Set the current presence status
+            definition.add(new Attribute(ProcessingUnitPresenceAnnounced.SpecificationAttribute.PRESENCE_STATUS.name(), presenceState.name()));
+        }
+
+        // Build command event
+        Command requestEvent = CommandFactory.create(/* event type regarding routing plan registration request */CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED.name(),
+                /* Command event identified by */ commandUID, definition, priorEventRef,
+                /* None changed domain object */ null);
+
+        // Auto-assign correlation identifier relative to the pipeline deployment identifier
+        requestEvent.generateCorrelationId(CorrelationIdFactory.generate(this.deploymentID()));
+
+        // Define the channel normally observed by the domain's feature modules regarding the routing plan changes/demand
+        Channel domainIOGateway = new Channel(UICapabilityChannel.access_control_io_gateway_dynamic_routing_plan_evolution.shortName());
+
+        // Publish event to channel
+        uisClient.publish(requestEvent, domainIOGateway, new MessageMapperFactory().getMapper(IDescribed.class, String.class));
     }
 
     /**
