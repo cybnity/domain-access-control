@@ -46,12 +46,12 @@ public class AccessControlDomainProcessModule extends AbstractVerticle {
     /**
      * Unique logical name of this domain of features.
      */
-    private static String FEATURES_DOMAIN_NAME = "AC Features";
+    private static final String FEATURES_DOMAIN_NAME = "AC Features";
 
     /**
      * Unique logical name of this processing module.
      */
-    private static String PU_LOGICAL_NAME = FEATURES_DOMAIN_NAME + " Processing Unit";
+    private static final String PU_LOGICAL_NAME = FEATURES_DOMAIN_NAME + " Processing Unit";
 
     /**
      * Default start method regarding the server.
