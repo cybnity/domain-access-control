@@ -78,14 +78,14 @@ The routing map here presented is dynamically build and updated by the component
 flowchart LR
   subgraph global
     direction LR
-    id1(ac-io-gateway-pipeline) -. publish ..- id3>pres_ann_req]
+    id1[[ac-io-gateway-pipeline]] -. publish ..- id3>pres_ann_req]
     id3 .-> id2([ac.io_gateway_routing_plan_evolution])
     id1 -. publish ..- id4>rout_path_reg]
     id4 .-> id2
-    id5(ac-tenant_registration-processing_unit-pipeline) -. publish ..- id6>pres_ann]
+    id5[[ac-tenant_registration-processing_unit-pipeline]] -. publish ..- id6>pres_ann]
     id6 .-> id7([ac.pu_presence_announcing])
     id7 .-> id1
-    id12((" ")) -. append ..- id8>regist_organ]
+    id12[[" "]] -. append ..- id8>regist_organ]
     id8 .-> id11([ac-in])
     id11 .-> id1
     id1 -. append ..- id13>regist_organ]
@@ -93,9 +93,7 @@ flowchart LR
     id9 .-> id5
     
   end
-  classDef component fill:#0e2a43, color:#fff
   classDef event fill:#e5302a, stroke:#e5302a, color:#fff
-  class id1,id5,id12 component;
   class id3,id4,id6,id8,id13 event;
 
 ```
