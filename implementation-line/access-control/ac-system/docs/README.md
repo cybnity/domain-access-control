@@ -1,6 +1,6 @@
 ## PURPOSE
 The space presents the implementation view of the developed Access Control systems acting into the application layer.
-The presented implementation view of this section are mainly focused on transversal information involding several implementation components (see sub-packages dedicated documentations for more detail per component and/or module).
+The presented implementation view of this section are mainly focused on transversal information involving several implementation components (see sub-packages dedicated documentations for more detail per component and/or module).
 
 # COMPONENTS INTEGRATION
 Presentation of the coupling models implemented as static or dynamic links between applicative modules (e.g process module, feature module) over interactions spaces (e.g Users Interactions Space; or Domains Interactions Space).
@@ -35,12 +35,12 @@ The Dynamic Router pattern supported by Recipient List utility (list of dynamica
 
 All the channels naming conventions are defined by static Java enum provided by API components and separator used in short name are defined by the `NamingConvention` enum.
 
-|Usage Category|Channel Name|Short Name|Channel Type|Supported Event Types|Ownership|
-|:--|:--|:--|:--|:--|:--|
-|UICapabilityChannel|access_control_in|ac-in|Redis Stream|Command(CommandName.REGISTER_ORGANIZATION)|ac-io-gateway-pipeline|
-|UICapabilityChannel|access_control_pu_presence_announcing|ac.pu_presence_announcing|Redis Topic|DomainEvent(ProcessingUnitPresenceAnnounced)|ac-io-gateway-pipeline|
-|UICapabilityChannel|access_control_io_gateway_dynamic_routing_plan_evolution|ac.io_gateway_routing_plan_evolution|Redis Topic|Command(CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED), DomainEvent(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED)|ac-io-gateway-pipeline|
-|UICapabilityChannel|access_control_tenant_registration|ac-tenant_registration|Redis Stream|Command(CommandName.REGISTER_ORGANIZATION)|ac-tenant_registration-processing_unit-pipeline|
+| Usage Category      | Channel Name                                             | Short Name                           | Channel Type | Supported Event Types                                                                                                                                     | Ownership                                       |
+|:--------------------|:---------------------------------------------------------|:-------------------------------------|:-------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------|
+| UICapabilityChannel | access_control_in                                        | ac-in                                | Redis Stream | Command(CommandName.REGISTER_ORGANIZATION)                                                                                                                | ac-io-gateway-pipeline                          |
+| UICapabilityChannel | access_control_pu_presence_announcing                    | ac.pu_presence_announcing            | Redis Topic  | DomainEvent(ProcessingUnitPresenceAnnounced)                                                                                                              | ac-io-gateway-pipeline                          |
+| UICapabilityChannel | access_control_io_gateway_dynamic_routing_plan_evolution | ac.io_gateway_routing_plan_evolution | Redis Topic  | Command(CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED), DomainEvent(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED) | ac-io-gateway-pipeline                          |
+| UICapabilityChannel | access_control_tenant_registration                       | ac-tenant_registration               | Redis Stream | Command(CommandName.REGISTER_ORGANIZATION)                                                                                                                | ac-tenant_registration-processing_unit-pipeline |
 
 ## DYNAMIC ROUTING MAP
 The routing map here presented is dynamically build and updated by the components during the runtime.
@@ -99,12 +99,12 @@ flowchart LR
 ```
 
 #### Legend
-|Element Label|Element Type|
-|:--|:--|
-|pres_ann_req|CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED|
-|rout_path_reg|CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED|
-|pres_ann|ProcessingUnitPresenceAnnounced|
-|regist_organ|CommandName.REGISTER_ORGANIZATION|
+| Element Label  | Element Type                                                       |
+|:---------------|:-------------------------------------------------------------------|
+| pres_ann_req   | CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED |
+| rout_path_reg  | CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED    |
+| pres_ann       | ProcessingUnitPresenceAnnounced                                    |
+| regist_organ   | CommandName.REGISTER_ORGANIZATION                                  |
 
 #
 [Back To Home](/README.md)
