@@ -1,7 +1,5 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
