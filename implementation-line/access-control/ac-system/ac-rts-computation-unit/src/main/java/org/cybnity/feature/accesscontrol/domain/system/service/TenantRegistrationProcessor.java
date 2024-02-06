@@ -4,7 +4,7 @@ import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
 import org.cybnity.framework.domain.IDescribed;
 
 /**
- * Execute the application feature in a pipelined way
+ * Execute the application feature as a pipelined way
  */
 public class TenantRegistrationProcessor extends FactBaseHandler {
 

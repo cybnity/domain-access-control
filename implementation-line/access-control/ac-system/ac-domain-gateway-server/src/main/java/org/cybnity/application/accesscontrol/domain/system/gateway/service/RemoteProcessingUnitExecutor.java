@@ -3,7 +3,7 @@ package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 import io.lettuce.core.StreamMessage;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
-import org.cybnity.framework.application.vertx.common.routing.UISRecipientList;
+import org.cybnity.framework.application.vertx.common.routing.RouteRecipientList;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
@@ -62,7 +62,7 @@ public class RemoteProcessingUnitExecutor implements ProcessingUnitDelegation {
             String eventTypeName = factEvent.type().value();
             // Identify existing path (e.g UIS stream recipient dynamically updated according to the started remote IService providers) to the remote service component as able to treat the event
             // based on DynamicRecipientList pattern implementation according to the fact event type name
-            UISRecipientList destinationMap = recipientsProvider.delegateDestinations();
+            RouteRecipientList destinationMap = recipientsProvider.delegateDestinations();
             String PUEntrypointChannel = destinationMap.recipient(eventTypeName);
             if (PUEntrypointChannel != null) {
                 try {
