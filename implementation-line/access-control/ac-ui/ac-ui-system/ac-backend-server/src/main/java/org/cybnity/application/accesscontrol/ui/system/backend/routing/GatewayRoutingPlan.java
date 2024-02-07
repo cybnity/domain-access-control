@@ -2,7 +2,7 @@ package org.cybnity.application.accesscontrol.ui.system.backend.routing;
 
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
-import org.cybnity.framework.application.vertx.common.routing.UISRecipientList;
+import org.cybnity.framework.application.vertx.common.routing.RouteRecipientList;
 
 /**
  * Identify the correct recipient based on a message's content.
@@ -14,7 +14,7 @@ import org.cybnity.framework.application.vertx.common.routing.UISRecipientList;
  * It's an implementation of architectural pattern named "Recipient List".
  * Generally, one common recipient channel (Redis entrypoint materializing domain capability API) is supporting several event types.
  */
-public class GatewayRoutingPlan extends UISRecipientList {
+public class GatewayRoutingPlan extends RouteRecipientList {
 
     /**
      * Default constructor initializing the routing table. This configuration
