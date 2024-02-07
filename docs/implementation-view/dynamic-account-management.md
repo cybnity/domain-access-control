@@ -77,13 +77,13 @@ sequenceDiagram
 	  IdentityServer-->>AccessControlJavaAdapter: existingRes equals organization named
 	  AccessControlJavaAdapter-->>ACDomainGatewayServer: new Tenant(found organization description)
 	end
-	alt authorizedRealAssigning == false
+	alt authorizedRealAssigning == true
 	  par
 	  	ACDomainGatewayServer->>DomainsInteractionsSpace: execute(new AddTenant(existingTenant description, new TenantConnectorConfiguration(new created tenant regarding future Keycloak adapter client connections via dedicated realm's clientscope setting)))
 	  and
 	  	ACDomainGatewayServer->>ACDomainGatewayServer: OrganizationRegistered organizationActioned = prepare new OrganizationRegistered(new created tenant description) for domain storage notification and confirmation send
 	  end
-	else authorizedRealAssigning == true
+	else authorizedRealAssigning == false
 	  ACDomainGatewayServer->>ACDomainGatewayServer: OrganizationRegistered organizationActioned = prepare new OrganizationRegistered(previous existing tenant description) for domain storage notification and confirmation send
 	end
 		
