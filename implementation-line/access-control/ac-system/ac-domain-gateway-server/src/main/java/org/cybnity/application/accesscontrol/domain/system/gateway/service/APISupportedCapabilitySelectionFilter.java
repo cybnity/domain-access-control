@@ -2,7 +2,7 @@ package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
 import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
 import org.cybnity.framework.application.vertx.common.routing.RouteRecipientList;
-import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
+import org.cybnity.framework.application.vertx.common.service.AbstractServiceActivator;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
@@ -18,7 +18,7 @@ import java.util.logging.Level;
  * Selection Value — One or more values specified in the event that allow to decide whether to select the event.
  * Selective Consumer — Only receives event that meet its selection criteria.
  */
-public class APISupportedCapabilitySelectionFilter extends FactBaseHandler {
+public class APISupportedCapabilitySelectionFilter extends AbstractServiceActivator {
 
     /**
      * Origin entrypoint of API under selective pattern.
@@ -88,23 +88,37 @@ public class APISupportedCapabilitySelectionFilter extends FactBaseHandler {
                     return true; // Confirm next step activation
                 } else {
                     // Event shall be ignored because not supported by this API
-                    // It's a violation of API requirements (e.g technical error by routing map)
-                    // or it's a potential security event (e.g attempt of penetration of invalid data into the API)
-                    // Log error for technical analysis by operator and remediation execution
-                    logger().log(Level.SEVERE, errorMsg.toString());
+                    // Move it to Invalid Message Channel
+                    moveToInvalidMessageChannel(fact, errorMsg.toString());
                 }
             } else {
                 // Invalid structure of received event
-                logger().log(Level.SEVERE, errorMsg.toString());
+                moveToInvalidMessageChannel(fact, errorMsg.toString());
             }
         } else {
             // Invalid fact event type received
-            // Several potential cause can be managed regarding this situation in terms of security violation
-            // For example:
-            // - development error of command transmission to the right stream
-            // - security attack attempt with bad command send test through any channel for test of entry by any capability api entry point
-            logger().log(Level.SEVERE, ConformityViolation.UNIDENTIFIED_EVENT_TYPE.name() + ": invalid fact type received from channel (" + receivedFrom.name() + ")!");
+            moveToInvalidMessageChannel(fact, ConformityViolation.UNIDENTIFIED_EVENT_TYPE.name() + ": invalid fact type received from channel (" + receivedFrom.name() + ")!");
         }
         return false; // Interrupt next step activation
+    }
+
+
+    @Override
+    protected void moveToInvalidMessageChannel(IDescribed unprocessedEvent, String cause) {
+        // It's a violation of API requirements (e.g technical error by routing map)
+        // or it's a potential security event (e.g attempt of penetration of invalid data into the API)
+
+        // Several potential cause can be managed regarding this situation in terms of security violation
+        // For example:
+        // - development error of command transmission to the right stream
+        // - security attack attempt with bad command send test through any channel for test of entry by any capability api entry point
+
+        // Log error for technical analysis by operator and remediation execution
+        logger().log(Level.SEVERE, cause);
+    }
+
+    @Override
+    protected void moveToDeadLetterChannel(IDescribed unprocessedEvent, String cause) {
+
     }
 }

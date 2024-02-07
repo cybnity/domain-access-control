@@ -42,6 +42,24 @@
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.cybnity.application.access-control</groupId>
+				<artifactId>service-impl</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.application.access-control</groupId>
+				<artifactId>service-api</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.application.access-control</groupId>
+				<artifactId>domain</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
 				<groupId>io.vertx</groupId>
 				<artifactId>vertx-web-client</artifactId>
 				<version>${vertx.version}</version>

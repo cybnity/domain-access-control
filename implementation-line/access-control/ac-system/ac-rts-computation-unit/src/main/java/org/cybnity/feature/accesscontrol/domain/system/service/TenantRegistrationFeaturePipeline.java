@@ -78,10 +78,9 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
             AccessControlChecker securityFilteringStep = new AccessControlChecker(observed(), initSecuredFunctions());
             eventTypeFilteringStep.setNext(securityFilteringStep);
 
-            // PROCESSING : ...
-            // TODO coder le traitement des events entrant depuis le endpoint selon on pattern de splitter selon le type de message ou selective consumer
-            //EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient, getMessageMapperProvider());
-            //securityFilteringStep.setNext(processingAssignmentStep);
+            // PROCESSING : identify processor (e.g local capability processor, or remote proxy) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
+            TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator();
+            securityFilteringStep.setNext(processingAssignmentStep);
             pipelinedProcessSingleton = eventTypeFilteringStep;
         }
         return pipelinedProcessSingleton;
