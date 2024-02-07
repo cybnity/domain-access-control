@@ -1,18 +1,17 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
-import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
+import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
+import org.cybnity.framework.application.vertx.common.routing.RouteRecipientList;
 import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.ConformityViolation;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.logging.Level;
 
 /**
- * Selective Consumer (EI pattern), one that filteres the messages delivered by a channel so that it only receives the ones that match its criteria.
+ * Selective Consumer (EI pattern), one that filter the messages delivered by a channel so that it only receives the ones that match its criteria.
  * <p>
  * There are three parts to this filtering process:
  * Specifying Producer — Specifies the event’s selection value before sending it.
@@ -22,38 +21,30 @@ import java.util.logging.Level;
 public class APISupportedCapabilitySelectionFilter extends FactBaseHandler {
 
     /**
-     * Referential of criteria that allow (e.g by evaluation as filtering pattern) to select or not the event as supported by an API.
-     * Each item is defined by an event type name (key) and a UIS recipient path (value identifying a topic/stream name).
-     */
-    private Collection<String> selectionCriteria;
-
-    /**
      * Origin entrypoint of API under selective pattern.
      */
     private final Stream receivedFrom;
 
     /**
-     * Default constructor.
-     *
-     * @param receivedFrom Mandatory API entrypoint of collecting events to filter.
-     * @throws IllegalArgumentException When mandatory parameter is missing.
+     * Provider of referential criteria that allow (e.g by evaluation as filtering pattern) to select or not the event as supported by an API.
+     * Each item is defined by an event type name (key) and a UIS recipient path (value identifying a topic/stream name).
      */
-    public APISupportedCapabilitySelectionFilter(Stream receivedFrom) throws IllegalArgumentException {
-        super();
-        if (receivedFrom == null) throw new IllegalArgumentException("ReceivedFrom parameter is required!");
-        this.receivedFrom = receivedFrom;
-        initCommandEventSupportedByAPI();
-    }
+    private final IEventProcessingManager eventTypesProvider;
 
     /**
-     * Define the static referential of command or domain event types that are supported and processed by the API.
+     * Default constructor.
+     *
+     * @param receivedFrom                  Mandatory API entrypoint of collecting events to filter.
+     * @param supportableEventTypesProvider Mandatory provider of event types supportable by the API.
+     * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    private void initCommandEventSupportedByAPI() {
-        selectionCriteria = new ArrayList<>();
-        // Add all the command types supported by the API
-        selectionCriteria.add(CommandName.REGISTER_ORGANIZATION.name());
-
-        // Add all the domain event type supported by the API
+    public APISupportedCapabilitySelectionFilter(Stream receivedFrom, IEventProcessingManager supportableEventTypesProvider) throws IllegalArgumentException {
+        super();
+        if (receivedFrom == null) throw new IllegalArgumentException("ReceivedFrom parameter is required!");
+        if (supportableEventTypesProvider == null)
+            throw new IllegalArgumentException("recipientsProvider parameter is required!");
+        this.receivedFrom = receivedFrom;
+        this.eventTypesProvider = supportableEventTypesProvider;
     }
 
     /**
@@ -88,7 +79,10 @@ public class APISupportedCapabilitySelectionFilter extends FactBaseHandler {
 
             if (factEventTypeName != null) {
                 // Check if command event is supported by the API and shall be processed
-                if (selectionCriteria.contains(factEventTypeName)) {
+                // From dynamic routing plan
+                RouteRecipientList destinationMap = eventTypesProvider.delegateDestinations();
+
+                if (destinationMap.supportedEventTypeNames().contains(factEventTypeName)) {
                     // The command is supported by the api
                     // So can continue the processing pipeline
                     return true; // Confirm next step activation

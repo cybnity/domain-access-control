@@ -33,7 +33,7 @@ public class ContextualizedTest {
     /**
      * Test context.
      */
-    protected IContext context;
+    private IContext context;
 
     /**
      * Current started process' environment variables.
@@ -42,8 +42,8 @@ public class ContextualizedTest {
     protected EnvironmentVariables environmentVariables;
 
     static protected Integer HTTP_SERVER_PORT = 8080;
-    static protected int WORKER_INSTANCES = 3;
-    static protected int WORKER_THREAD_POOL = 3;
+    static protected int WORKER_INSTANCES = 1;
+    static protected int WORKER_THREAD_POOL = 1;
 
     /**
      * Start and stop of the server shall be manually managed by child test class.
@@ -143,4 +143,15 @@ public class ContextualizedTest {
         context = null;
         logger = null;
     }
+
+
+    /**
+     * Get test context.
+     *
+     * @return A context instance including environment variable names and values.
+     */
+    protected IContext getContext() {
+        return this.context;
+    }
+
 }

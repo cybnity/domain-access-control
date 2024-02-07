@@ -7,10 +7,14 @@ import org.cybnity.application.accesscontrol.ui.api.experience.ExecutionResource
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.service.AbstractEndpointPipelineImpl;
 import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
+import org.cybnity.framework.application.vertx.common.service.filter.InterestEventFilter;
+import org.cybnity.framework.application.vertx.common.service.security.AccessControlChecker;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.framework.domain.event.IEventType;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -65,19 +69,37 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
     @Override
     protected FactBaseHandler pipelinedProcess() {
         if (pipelinedProcessSingleton == null) {
-            // TODO coder le processus métier pipeliné répondant aux scénarios de supportés par la feature/exigences
             // Build responsibility chain ensuring the command treatment according to the fact conformity
 
-            // FILTER : identify received command (CommandName.REGISTER_ORGANIZATION) as supported by the capability domain
-            TenantRegistrationProcessor filteringStep = new TenantRegistrationProcessor();
+            // FILTER : identify received command as supported by the feature
+            InterestEventFilter eventTypeFilteringStep = new InterestEventFilter(supportedEventTypesToRoutingPath().keySet());
+
+            // SECURITY : select optional authenticator ensuring the domain IO security check (e.g based on JWT/SSO control) when required as API no public capability (e.g ACL based on received event type)
+            AccessControlChecker securityFilteringStep = new AccessControlChecker(observed(), initSecuredFunctions());
+            eventTypeFilteringStep.setNext(securityFilteringStep);
 
             // PROCESSING : ...
-            // TODO coder le traitement des events entrant depuis le endpoint
+            // TODO coder le traitement des events entrant depuis le endpoint selon on pattern de splitter selon le type de message ou selective consumer
             //EventProcessingDispatcher processingAssignmentStep = new EventProcessingDispatcher(this.domainInputChannel, this.delegatedExecutionRecipientsAnnouncesStreamConsumer, uisClient, getMessageMapperProvider());
             //securityFilteringStep.setNext(processingAssignmentStep);
-            pipelinedProcessSingleton = filteringStep;
+            pipelinedProcessSingleton = eventTypeFilteringStep;
         }
         return pipelinedProcessSingleton;
+    }
+
+
+    /**
+     * Define the static referential of command or domain event types that require security check.
+     * This method defines the referential facts under security check (as equals to secured functions).
+     *
+     * @return Collection of event type names.
+     */
+    private Collection<String> initSecuredFunctions() {
+        Collection<String> eventTypeNamesUnderAccessControl = new ArrayList<>();
+        // Define authenticator ensuring the pipeline security check (e.g based on JWT/SSO control)
+        // like required for secured function (e.g ACL based on received event type)
+        // For example, event type equals to CommandName.XXXXXXX.name()
+        return eventTypeNamesUnderAccessControl;
     }
 
     @Override

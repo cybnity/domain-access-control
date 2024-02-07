@@ -9,12 +9,14 @@ import org.cybnity.framework.domain.IDescribed;
 public class TenantRegistrationProcessor extends FactBaseHandler {
 
     @Override
-    public boolean process(IDescribed iDescribed) {
+    public boolean process(IDescribed fact) {
+        // Execute the process rules on the received event
         return false;
     }
 
     @Override
-    protected boolean canHandle(IDescribed iDescribed) {
+    protected boolean canHandle(IDescribed fact) {
+
         return false;
     }
 }

@@ -7,6 +7,7 @@ import org.cybnity.framework.application.vertx.common.event.AttributeName;
 import org.cybnity.framework.application.vertx.common.routing.ProcessingUnitAnnouncesObserver;
 import org.cybnity.framework.application.vertx.common.service.AbstractEndpointPipelineImpl;
 import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
+import org.cybnity.framework.application.vertx.common.service.security.AccessControlChecker;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.IDescribed;
@@ -117,10 +118,10 @@ public class DomainIOEventsPipeline extends AbstractEndpointPipelineImpl {
             // Build responsibility chain ensuring the command treatment according to the fact conformity
 
             // FILTER : identify received command as supported by the capability domain
-            APISupportedCapabilitySelectionFilter eventTypeFilteringStep = new APISupportedCapabilitySelectionFilter(observed());
+            APISupportedCapabilitySelectionFilter eventTypeFilteringStep = new APISupportedCapabilitySelectionFilter(observed(), this.delegatedExecutionRecipientsAnnouncesStreamConsumer);
 
-            // FILTER : select optional authenticator ensuring the domain IO security check (e.g based on JWT/SSO control) when required as API no public capability (e.g ACL based on received event type)
-            CapabilityBoundaryAccessControlChecker securityFilteringStep = new CapabilityBoundaryAccessControlChecker(observed());
+            // SECURITY : select optional authenticator ensuring the domain IO security check (e.g based on JWT/SSO control) when required as API no public capability (e.g ACL based on received event type)
+            AccessControlChecker securityFilteringStep = new AccessControlChecker(observed(), initSecuredAPICapabilities());
             eventTypeFilteringStep.setNext(securityFilteringStep);
 
             // PROCESSING : identify processor (e.g local capability processor, or remote proxy to dedicated UI capability and/or application processing unit) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
@@ -129,6 +130,20 @@ public class DomainIOEventsPipeline extends AbstractEndpointPipelineImpl {
             pipelinedProcessSingleton = eventTypeFilteringStep;
         }
         return pipelinedProcessSingleton;
+    }
+
+    /**
+     * Define the static referential of command or domain event types that require security check.
+     * This method defines the referential facts under security check (as equals to secured UI capabilities).
+     *
+     * @return Collection of event type names.
+     */
+    private Collection<String> initSecuredAPICapabilities() {
+        Collection<String> eventTypeNamesUnderAccessControl = new ArrayList<>();
+        // Define authenticator ensuring the domain IO security check (e.g based on JWT/SSO control)
+        // like required for secured API capability (e.g ACL based on received event type)
+        // For example, event type equals to CommandName.XXXXXXX.name()
+        return eventTypeNamesUnderAccessControl;
     }
 
     @Override

@@ -35,7 +35,9 @@ import java.util.concurrent.TimeUnit;
 public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
 
     private Thread gatewayModule, processModule;
+
     private CountDownLatch waiter;
+
     /**
      * Identifiers of deployment
      */
@@ -59,7 +61,7 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
     @BeforeEach
     public void initThreads(Vertx vertx) throws Exception {
         // Executed activities counter
-        waiter = new CountDownLatch(2 /* Quantity of message to wait about processing end confirmation */);
+        waiter = new CountDownLatch(2 /* Quantity of started modules to wait before test execution */);
         // Prepare gateway module executable instance
         gatewayModule = new Thread(() -> {
             // Start domain IO Gateway

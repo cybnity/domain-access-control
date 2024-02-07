@@ -29,19 +29,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Test of behaviors regarding the public registration service of new tenant.
+ * Test of integration between backend > access control IO gateway > feature module realizing the public registration service of new tenant.
  *
  * @author olivier
  */
 @ExtendWith({VertxExtension.class})
-public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTest {
+public class PublicOrganizationRegistrationUseCaseTestIntegration extends ContextualizedTest {
 
     private HttpClient client;
     private ObjectMapper mapper;
     private Vertx vertx;
+
+    /**
+     * Identifiers of deployment
+     */
+    private String gatewayModuleId, processModuleId;
+    private Thread gatewayModule, processModule;
+    private CountDownLatch waiter;
 
     @BeforeEach
     @DisplayName("Prepare UI gateway server verticle")
@@ -67,11 +75,11 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
     }
 
     /**
-     * Test registration of new no existing organization with callback of organization actioned
+     * Test registration of new no existing organization to validate the operational integration since backend to feature module in charge of the Tenant Registration capability over the Access Control IO Gateway dynamic routing.
      */
     @Test
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    void givenNoExistingTenant_whenRegisterOrganization_thenOrganizationActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
+    void givenNoExistingTenant_whenRegisterOrganization_thenIntegratedTenantRegistrationFeatureConfirmTreatedCommand(Vertx vertx, VertxTestContext testContext) throws Exception {
         EventBus eb = vertx.eventBus();
         // Prepare json object (RegisterOrganization command event including organization naming) from translator
         Collection<Attribute> definition = new ArrayList<>();
@@ -148,41 +156,4 @@ public class PublicOrganizationRegistrationUseCaseTest extends ContextualizedTes
             }
         });
     }
-
-    /**
-     * Test rejected registration of existing organization already assigned to another contact.
-     */
-    @Test
-    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    void givenExistingTenant_whenRegisterOrganization_thenOrganizationActioned(Vertx vertx, VertxTestContext testContext) {
-        // Prepare json object (RegisterOrganization command event including organization naming)
-        JsonObject command = JsonObject.of(CommandName.REGISTER_ORGANIZATION.name(), JsonObject.of("organizationNaming", "CYBNITY"));
-        //logger.log(Level.INFO, command.toString());
-
-        // Send command it to RestAPI service "/organizations/:organizationNaming"
-        ConcreteCommandEvent commandEvent = new ConcreteCommandEvent();
-        // TODO dans le constructeur, entrer une Enum de Type RegisterOrganization issue d'un catalogue de commandes supportées par le backend
-        // depuis une dépendance venant de l'adapter du domaine ac-adapter-api
-
-        // --- CASE : rejected creation for cause of existing named organization that is already used by previous register
-        // Listen potential existing tenant [existingTenant != null && existingTenant.validUsers() > 0]
-
-        testContext.completeNow();
-    }
-
-    /**
-     * Test registration of existing organization that was not assigned, with callback of organization reassigned
-     *
-     @Test
-     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-     void givenNotAssignedExistingTenant_whenRegisterOrganization_thenOrganizationReassigned(Vertx vertx, VertxTestContext testContext) {
-     // Prepare json object (RegisterOrganization command event including organization naming)
-
-     // Send command it to RestAPI service "/organizations/:organizationNaming"
-
-     // --- CASE : organizationActioned about tenantID of created or reassigned organization
-     // Listen organizationActioned because [(existingTenant != null && existingTenant.validUsers() == 0) as re-assignable to new requestor]
-     testContext.completeNow();
-     }
-     */
 }

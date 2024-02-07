@@ -4,6 +4,8 @@ import org.cybnity.application.accesscontrol.domain.system.gateway.Contextualize
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
+import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
+import org.cybnity.framework.application.vertx.common.routing.RouteRecipientList;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.event.CommandFactory;
@@ -22,12 +24,26 @@ import java.util.Collection;
 public class APISupportedCapabilitySelectionFilterUseCaseTest extends ContextualizedTest {
 
     /**
+     * Sample of supported event types equals to implementation class normally supportable scope of commands.
+     */
+    private static final IEventProcessingManager supportableEventTypesProvider = new IEventProcessingManager() {
+        @Override
+        public RouteRecipientList delegateDestinations() {
+            RouteRecipientList list = new RouteRecipientList();
+            // Define all supported event types by the filter
+            // See TenantRegistrationFeaturePipeline of RTS computation unit project supportedEventTypesToRoutingPath() method for examples
+            list.addRoute(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_tenant_registration.shortName());
+            return list;
+        }
+    };
+
+    /**
      * Test detection and reject of undefined fact event type by the filtering process.
      */
     @Test
     void givenEventsFilterConfiguration_whenHandlingNullFactEvent_thenSelectionRejected() {
         // Create a filter processing unit
-        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()));
+        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()), supportableEventTypesProvider);
         // Execute the filter process
         Assertions.assertFalse(filter.process(null));
     }
@@ -38,7 +54,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
     @Test
     void givenEventsFilterConfiguration_whenHandlingUnsupportedFactEvent_thenSelectionRejected() {
         // Create a filter processing unit
-        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()));
+        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()), supportableEventTypesProvider);
         // Create an unknown fact sample (e.g other domain fact or security attack data entry) that should not be supported by the filter
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
@@ -58,7 +74,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
     @Test
     void givenEventsFilterConfiguration_whenHandlingSupportedFactEvent_thenSelectionConfirmed() {
         // Create a filter processing unit
-        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()));
+        APISupportedCapabilitySelectionFilter filter = new APISupportedCapabilitySelectionFilter(new Stream(UICapabilityChannel.access_control_in.shortName()), supportableEventTypesProvider);
         // Create valid fact sample that should be supported by the filter
         // Prepare RegisterOrganization command event including organization naming
         Collection<Attribute> definition = new ArrayList<>();

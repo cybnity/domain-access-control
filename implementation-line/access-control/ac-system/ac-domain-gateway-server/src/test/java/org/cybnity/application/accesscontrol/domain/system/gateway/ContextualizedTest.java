@@ -33,7 +33,7 @@ public class ContextualizedTest {
     /**
      * Test context.
      */
-    protected IContext context;
+    private IContext context;
 
     /**
      * Current started process' environment variables.
@@ -87,12 +87,6 @@ public class ContextualizedTest {
 
         // Build reusable context
         this.context = new Context();
-        context.addResource(DEFAULT_AUTH_PASSWORD, "defaultAuthPassword", false);
-        context.addResource(SERVER_HOST, "serverHost", false);
-        context.addResource(Integer.toString(SERVER_PORT), "serverPort", false);
-        context.addResource(DATABASE_NUMBER, "databaseNumber", false);
-        context.addResource(CONNECTION_USER_ACCOUNT, "connectionUserAccount", false);
-        context.addResource(DEFAULT_AUTH_PASSWORD, "connectionPassword", false);
 
         // Synchronize environment variables test values
         initEnvVariables();
