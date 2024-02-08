@@ -383,7 +383,7 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
         public void notify(IDescribed presenceDeclarationResultEvent) {
             logger.fine("--- Routing plan update event: " + presenceDeclarationResultEvent.type().value());
             // Check event conformity
-            if(CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name().equals(presenceDeclarationResultEvent.type().value())) {
+            if (CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name().equals(presenceDeclarationResultEvent.type().value())) {
                 // Verify the description of the registration confirmation event
                 isValidRoutingPathsRegisteredConfirmation(presenceDeclarationResultEvent, testWaiter);
             } else if (CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED.name().equals(presenceDeclarationResultEvent.type().value())) {
