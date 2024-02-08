@@ -1,7 +1,6 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import org.cybnity.application.accesscontrol.domain.system.gateway.service.APISupportedCapabilitySelectionFilterUseCaseTest;
-import org.cybnity.application.accesscontrol.domain.system.gateway.service.DynamicRecipientsSyncIntegrationTest;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 
