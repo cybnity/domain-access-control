@@ -113,12 +113,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<!-- None integration test executed as automatic unit test; only executable in manual mode -->
-						<include>**/*Integration*.java</include>
-					</excludes>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -179,6 +173,20 @@
 			<properties>
 				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<!-- None integration test executed as automatic unit test; only executable in manual mode -->
+								<include>**/*Integration*.java</include>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 
 		<profile>
@@ -226,6 +234,16 @@
 			</properties>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<!-- None integration test executed as automatic unit test; only executable in manual mode -->
+								<include>**/*Integration*.java</include>
+							</excludes>
+						</configuration>
+					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
