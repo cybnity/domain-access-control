@@ -4,8 +4,8 @@ import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
- * Attribute describing a subject who is demanding access (e.r role, group
- * membership, competency, user id...).
+ * Attribute describing a subject who is demanding access (e.g role, group
+ * membership, competency, user id, email address...).
  * 
  * @author olivier
  *

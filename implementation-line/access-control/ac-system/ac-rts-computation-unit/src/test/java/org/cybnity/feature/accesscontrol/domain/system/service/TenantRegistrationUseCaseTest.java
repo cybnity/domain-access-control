@@ -6,6 +6,7 @@ import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import org.cybnity.accesscontrol.domain.service.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
@@ -52,10 +53,22 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
     private IMessageMapperProvider mapperFactory;
 
+    /**
+     * Enhance default environment variables with additional variables specific to the test.
+     */
+    @Override
+    protected void initEnvVariables() {
+        super.initEnvVariables(); // Init common env values
+        // Add specific env values
+
+        // Define additional environment variable regarding tenant registration service
+        environmentVariables.set(TenantRegistrationServiceConfigurationVariable.TENANT_REGISTRATION_AUTHORIZED_REASSIGNMENT.getName(), Boolean.TRUE);
+    }
+
     @BeforeEach
     public void initThreads(Vertx vertx) throws Exception {
         // Define the supported message mapper relative to the Feature domain
-        mapperFactory=new ACDomainMessageMapperFactory();
+        mapperFactory = new ACDomainMessageMapperFactory();
 
         // Prepare the definition of the feature pipeline entrypoint channel
         featureEndpointChannel = new Stream(UICapabilityChannel.access_control_tenant_registration.shortName());
@@ -102,9 +115,9 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         // TEST PROCESSING
         // Request execution of a new RegisterOrganization command over the UIS
-        String organizationName="givenNoExistingTenant_whenRegisterOrganization_thenOrganizationActioned";
+        String organizationName = "givenNoExistingTenant_whenRegisterOrganization_thenOrganizationActioned";
         Command cmd = prepareRegisterOrganizationCommand(organizationName);
-        String messageId = uisClient.append(cmd,featureEndpointChannel, mapperFactory.getMapper(cmd.getClass(), StreamMessage.class));
+        String messageId = uisClient.append(cmd, featureEndpointChannel, mapperFactory.getMapper(cmd.getClass(), StreamMessage.class));
         // - search tenant control normally does not find any existing same organization named
         // - new Tenant is created for organization name by the feature
         // - Realm representation with configuration is automatically created and registered into the Customer Identity Management service (identity server)
@@ -140,7 +153,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         // TEST PROCESSING
         // Request execution of a new RegisterOrganization command over the UIS
-        String organizationName="givenExistingTenantNotActivatedAndAuthorizedReassignment_whenRegisterOrganization_thenOrganizationActioned";
+        String organizationName = "givenExistingTenantNotActivatedAndAuthorizedReassignment_whenRegisterOrganization_thenOrganizationActioned";
         Command cmd = prepareRegisterOrganizationCommand(organizationName);
         // - search tenant control normally and find an existing same organization equals named as existing (e.g like reserved by another person)
         // - none valid user account already previously registered and activated (email verified) is found regarding the existing tenant
@@ -173,7 +186,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         // TEST PROCESSING
         // Request execution of a new RegisterOrganization command over the UIS
-        String organizationName="givenExistingTenantNotActivatedAndNotAuthorizedReassignment_whenRegisterOrganization_thenOrganizationReused";
+        String organizationName = "givenExistingTenantNotActivatedAndNotAuthorizedReassignment_whenRegisterOrganization_thenOrganizationReused";
         Command cmd = prepareRegisterOrganizationCommand(organizationName);
         // - search tenant control normally and find an existing same organization equals named as existing (e.g like reserved by another person)
         // - none valid user account already previously registered and activated (email verified) is found regarding the existing tenant
@@ -201,7 +214,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         // TEST PROCESSING
         // Request execution of a new RegisterOrganization command over the UIS
-        String organizationName="givenExistingTenantActivated_whenRegisterOrganization_thenOrganizationRegistrationRejected";
+        String organizationName = "givenExistingTenantActivated_whenRegisterOrganization_thenOrganizationRegistrationRejected";
         Command cmd = prepareRegisterOrganizationCommand(organizationName);
 
         // - search tenant control normally and find an existing same organization equals named as existing (e.g like used by another person)
@@ -218,12 +231,14 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
     /**
      * Prepare and return a valid command valid to be treated by the feature entrypoint.
+     *
      * @param organizationName Mandatory name of an organization subject of registration.
      * @return A prepared command.
      * @throws IllegalArgumentException When any mandatory parameter is missing.
      */
     private Command prepareRegisterOrganizationCommand(String organizationName) throws IllegalArgumentException {
-        if (organizationName ==null || organizationName.isEmpty()) throw new IllegalArgumentException("organizationName parameter is required!");
+        if (organizationName == null || organizationName.isEmpty())
+            throw new IllegalArgumentException("organizationName parameter is required!");
         // Prepare json object (RegisterOrganization command event including organization naming) from translator
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name

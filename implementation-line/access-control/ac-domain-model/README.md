@@ -57,7 +57,7 @@ flowchart TB
     id8 -. examples .-> id11((Token)) & id12((Device))
     id9 -. examples .-> id15((Session<br>ID)) & id16((Password))
     id10 -. examples .-> id17((Camera)) & id18((Finger<br>Print))
-    id14 -. example .-> id20((Digital<br>Certificate)) & id21((User ID<br>& Password))
+    id14 -. example .-> id20((Digital<br>Certificate)) & id21((User ID,<br> Password))
     id23 -- can be --> id24(Process) & id25(Machine) & id26(Person) & id27(System) & id28(User)
     id23 -- has --> id19
     id14 -- bind --> id19(Identity)

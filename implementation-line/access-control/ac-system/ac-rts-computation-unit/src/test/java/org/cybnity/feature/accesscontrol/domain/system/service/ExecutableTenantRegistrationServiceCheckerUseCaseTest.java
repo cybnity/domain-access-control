@@ -1,8 +1,9 @@
-package org.cybnity.feature.accesscontrol.domain.system;
+package org.cybnity.feature.accesscontrol.domain.system.service;
 
-import io.vertx.core.Vertx;
+import org.cybnity.accesscontrol.domain.service.TenantRegistrationServiceConfigurationVariable;
+import org.cybnity.accesscontrol.domain.service.impl.ExecutableTenantRegistrationServiceChecker;
+import org.cybnity.feature.accesscontrol.domain.system.ContextualizedTest;
 import org.cybnity.framework.IReadableConfiguration;
-import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
 import org.cybnity.framework.immutable.utility.ExecutableComponentChecker;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -15,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests regarding the utility class that check the healthy and operational
- * state of a process module runnable.
+ * state of a service component runnable.
  *
  * @author olivier
  */
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableACProcessModuleCheckerUseCaseTest extends ContextualizedTest {
+public class ExecutableTenantRegistrationServiceCheckerUseCaseTest extends ContextualizedTest {
 
     /**
      * Test that a module checker which is executed and that require some specific
@@ -31,7 +32,7 @@ public class ExecutableACProcessModuleCheckerUseCaseTest extends ContextualizedT
     public void givenValidSystemEnvironmentVariables_whenCheckConfigurationVariables_thenHealthyAndOperableStateConfirmed()
             throws Exception {
         // Execute the checker process
-        ExecutableACProcessModuleChecker checker = new ExecutableACProcessModuleChecker();
+        ExecutableTenantRegistrationServiceChecker checker = new ExecutableTenantRegistrationServiceChecker();
         checker.checkOperableState();
         // Valid that healthy state is delivered because none exception thrown
         assertTrue(checker.isOperableStateChecked());
@@ -44,13 +45,13 @@ public class ExecutableACProcessModuleCheckerUseCaseTest extends ContextualizedT
     @Test
     public void givenMinimumRequiredVariable_whenReadVariableToCheck_thenAllProvidedByChecker() {
         // Verify that all required variables have been found
-        ExecutableACProcessModuleChecker checker = new ExecutableACProcessModuleChecker();
+        ExecutableTenantRegistrationServiceChecker checker = new ExecutableTenantRegistrationServiceChecker();
 
         // Is there optional variable catalog not required
         Set<IReadableConfiguration> optionalVariables = checker.optionalEnvironmentVariables();
 
         // Check all application environment variables required for write/read models access
-        HashSet<IReadableConfiguration> toCheck = new HashSet<>(EnumSet.allOf(AppConfigurationVariable.class));
+        HashSet<IReadableConfiguration> toCheck = new HashSet<>(EnumSet.allOf(TenantRegistrationServiceConfigurationVariable.class));
         toCheck.removeAll(optionalVariables);
 
         // Verify the controlled variable of module
@@ -76,21 +77,4 @@ public class ExecutableACProcessModuleCheckerUseCaseTest extends ContextualizedT
         }
     }
 
-    /**
-     * Test the start of backend Verticle rejected for cause of missing environment
-     * variable (e.g http port).
-     */
-    @Test
-    void givenUndefinedHttpPortEnvironmentVariable_whenHealthyStateChecked_thenMissingConfigurationException() {
-        // None http port defined in environment variable
-        this.environmentVariables.remove(AppConfigurationVariable.ENDPOINT_HTTP_SERVER_PORT.getName());
-
-        Vertx vertx = Vertx.vertx();
-
-        // Try backend module (Verticle deployment) start
-        vertx.deployVerticle(new AccessControlDomainProcessModule())
-                .onComplete(res -> {
-                    assertFalse(res.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
-                });
-    }
 }

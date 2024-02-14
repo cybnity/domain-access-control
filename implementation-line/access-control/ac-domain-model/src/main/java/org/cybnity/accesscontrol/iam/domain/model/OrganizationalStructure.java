@@ -1,8 +1,5 @@
 package org.cybnity.accesscontrol.iam.domain.model;
 
-import java.io.Serializable;
-import java.util.LinkedHashSet;
-
 import org.cybnity.framework.domain.model.SocialEntity;
 import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.Identifier;
@@ -10,6 +7,9 @@ import org.cybnity.framework.immutable.ImmutabilityException;
 import org.cybnity.framework.immutable.utility.VersionConcreteStrategy;
 import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
+
+import java.io.Serializable;
+import java.util.LinkedHashSet;
 
 /**
  * Represent an organizational structure (e.g company, association, group of

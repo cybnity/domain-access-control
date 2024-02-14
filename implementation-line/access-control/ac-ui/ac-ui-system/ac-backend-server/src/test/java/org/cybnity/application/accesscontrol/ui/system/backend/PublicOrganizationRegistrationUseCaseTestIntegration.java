@@ -20,7 +20,6 @@ import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.DomainEvent;
 import org.cybnity.framework.domain.ObjectMapperBuilder;
 import org.cybnity.framework.domain.event.CommandFactory;
-import org.cybnity.framework.domain.event.ConcreteCommandEvent;
 import org.cybnity.framework.domain.event.ConcreteDomainChangeEvent;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;

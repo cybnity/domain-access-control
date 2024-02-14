@@ -1,8 +1,5 @@
 package org.cybnity.accesscontrol.domain.model.sample.writemodel;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 import org.cybnity.accesscontrol.domain.model.sample.writemodel.OrganizationProperty.PropertyAttributeKey;
 import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.model.DomainEntity;
@@ -10,6 +7,9 @@ import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.HistoryState;
 import org.cybnity.framework.immutable.Identifier;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 public class SampleDataProvider {
 

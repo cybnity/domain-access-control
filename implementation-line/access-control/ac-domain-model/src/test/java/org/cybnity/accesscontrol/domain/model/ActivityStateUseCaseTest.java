@@ -1,7 +1,5 @@
 package org.cybnity.accesscontrol.domain.model;
 
-import java.util.UUID;
-
 import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.model.ActivityState;
 import org.cybnity.framework.domain.model.ActivityState.PropertyAttributeKey;
@@ -14,6 +12,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 

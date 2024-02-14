@@ -39,6 +39,11 @@ public class AccessControlDomainProcessModule extends AbstractProcessModuleImpl 
         });
     }
 
+    /**
+     * Get a checker aggregation allowing the check of all the embedded services components (e.g deployed workers) additionally to the default module checker.
+     *
+     * @return A checker covering this module and embedded services.
+     */
     @Override
     protected ExecutableComponentChecker healthyChecker() {
         return new ExecutableACProcessModuleChecker(workersCapability().context);

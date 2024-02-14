@@ -1,5 +1,6 @@
 package org.cybnity.feature.accesscontrol.domain.system;
 
+import org.cybnity.feature.accesscontrol.domain.system.service.ExecutableTenantRegistrationServiceCheckerUseCaseTest;
 import org.cybnity.feature.accesscontrol.domain.system.service.TenantRegistrationUseCaseTest;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
@@ -11,6 +12,6 @@ import org.junit.platform.suite.api.Suite;
  * @author olivier
  */
 @Suite
-@SelectClasses({ExecutableACProcessModuleCheckerUseCaseTest.class, TenantRegistrationUseCaseTest.class})
+@SelectClasses({ExecutableTenantRegistrationServiceCheckerUseCaseTest.class, ExecutableACProcessModuleCheckerUseCaseTest.class, TenantRegistrationUseCaseTest.class})
 public class AllUseCaseTests {
 }

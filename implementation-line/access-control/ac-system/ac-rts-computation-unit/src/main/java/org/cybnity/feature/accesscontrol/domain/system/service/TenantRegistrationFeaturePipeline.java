@@ -4,6 +4,7 @@ import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMa
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.experience.ExecutionResource;
+import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.service.AbstractEndpointPipelineImpl;
 import org.cybnity.framework.application.vertx.common.service.FactBaseHandler;
@@ -43,12 +44,21 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
     private FactBaseHandler pipelinedProcessSingleton;
 
     /**
+     * Runtime context.
+     */
+    private final IContext context;
+
+    /**
      * Default constructor.
      *
+     * @param context Mandatory runtime context allowing providing of settings required by the pipeline.
+     * @throws IllegalArgumentException    When mandatory parameter is missing.
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the UIS or DIS).
      */
-    public TenantRegistrationFeaturePipeline() throws UnoperationalStateException {
+    public TenantRegistrationFeaturePipeline(IContext context) throws IllegalArgumentException, UnoperationalStateException {
         super();
+        if (context == null) throw new IllegalArgumentException("Context parameter is required!");
+        this.context = context;
     }
 
     @Override
@@ -79,7 +89,8 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
             eventTypeFilteringStep.setNext(securityFilteringStep);
 
             // PROCESSING : identify processor (e.g local capability processor, or remote proxy) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
-            TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator();
+            // according to the type of event to process
+            TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context);
             securityFilteringStep.setNext(processingAssignmentStep);
             pipelinedProcessSingleton = eventTypeFilteringStep;
         }

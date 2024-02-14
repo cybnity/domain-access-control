@@ -1,14 +1,13 @@
 package org.cybnity.accesscontrol.iam.domain.model;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
- * Represent a policy strategy type as policiy of policies that depends of
- * context.
+ * Represent a policy strategy type as policy of policies that depends of context.
  * 
  * @author olivier
  *

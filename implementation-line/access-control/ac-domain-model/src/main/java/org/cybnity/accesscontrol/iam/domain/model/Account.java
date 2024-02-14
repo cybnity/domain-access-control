@@ -1,25 +1,20 @@
 package org.cybnity.accesscontrol.iam.domain.model;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-
 import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.model.Predecessors;
-import org.cybnity.framework.immutable.BaseConstants;
-import org.cybnity.framework.immutable.ChildFact;
-import org.cybnity.framework.immutable.Entity;
-import org.cybnity.framework.immutable.EntityReference;
-import org.cybnity.framework.immutable.Identifier;
-import org.cybnity.framework.immutable.ImmutabilityException;
+import org.cybnity.framework.immutable.*;
 import org.cybnity.framework.immutable.utility.VersionConcreteStrategy;
 import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+
 /**
  * Represent an allowed set of credentials (e.g cryptographic keys that enable
  * the subject to sign or encrypt data) to an owner (e.g organization's member),
- * according to a role (e.g user principal), with accorder privileges (e.g
+ * according to a role (e.g user principal), with accorded privileges (e.g
  * regarding systems and/or capabilities) in the frame of a context (e.g
  * specific Tenant scope).
  * 

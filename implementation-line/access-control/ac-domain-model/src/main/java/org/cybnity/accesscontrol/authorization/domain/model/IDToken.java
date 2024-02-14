@@ -1,11 +1,11 @@
 package org.cybnity.accesscontrol.authorization.domain.model;
 
+import org.cybnity.framework.support.annotation.Requirement;
+import org.cybnity.framework.support.annotation.RequirementCategory;
+
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
-
-import org.cybnity.framework.support.annotation.Requirement;
-import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Represents a token based on OIDC protocol, as standardized JWT token by

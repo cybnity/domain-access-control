@@ -1,10 +1,10 @@
 package org.cybnity.accesscontrol.authorization.domain.model;
 
-import java.time.OffsetDateTime;
-
 import org.cybnity.framework.immutable.EntityReference;
 import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
+
+import java.time.OffsetDateTime;
 
 /**
  * Represents an access token allowed to an account.
