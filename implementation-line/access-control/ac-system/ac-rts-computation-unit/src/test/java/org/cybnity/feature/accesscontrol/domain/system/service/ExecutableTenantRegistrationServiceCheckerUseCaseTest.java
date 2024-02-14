@@ -1,6 +1,6 @@
 package org.cybnity.feature.accesscontrol.domain.system.service;
 
-import org.cybnity.accesscontrol.domain.service.TenantRegistrationServiceConfigurationVariable;
+import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.accesscontrol.domain.service.impl.ExecutableTenantRegistrationServiceChecker;
 import org.cybnity.feature.accesscontrol.domain.system.ContextualizedTest;
 import org.cybnity.framework.IReadableConfiguration;

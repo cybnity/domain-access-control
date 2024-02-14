@@ -1,6 +1,6 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
-import org.cybnity.accesscontrol.domain.service.TenantRegistrationServiceConfigurationVariable;
+import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.IReadableConfiguration;
 import org.cybnity.framework.UnoperationalStateException;

@@ -11,9 +11,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
+import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
@@ -83,7 +83,7 @@ public class PublicOrganizationRegistrationUseCaseTestIntegration extends Contex
         // Prepare json object (RegisterOrganization command event including organization naming) from translator
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
-        Attribute tenantNameToRegister = new Attribute(AttributeName.OrganizationNaming.name(), "CYBNITY");
+        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY");
         definition.add(tenantNameToRegister);
         // Prepare RegisterOrganization command event to perform via API
         Command requestEvent = CommandFactory.create(CommandName.REGISTER_ORGANIZATION.name(),

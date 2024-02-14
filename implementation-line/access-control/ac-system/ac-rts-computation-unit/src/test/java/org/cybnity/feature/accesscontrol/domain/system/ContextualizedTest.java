@@ -1,6 +1,6 @@
 package org.cybnity.feature.accesscontrol.domain.system;
 
-import org.cybnity.accesscontrol.domain.service.TenantRegistrationServiceConfigurationVariable;
+import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 /**
  * Generic helped about unit test contextualized with environment variables.
  * <p>
- * Auto-configuration and start of Redis container usable during a test execution.
+ * Automatic configuration and start of Redis container usable during a test execution.
  * Each unit test requiring a redis container started shall extend this class.
  * EmbeddedRedisExtension.class for Redis 6.0.5 used by default
  */

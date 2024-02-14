@@ -6,11 +6,11 @@ import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import org.cybnity.accesscontrol.domain.service.TenantRegistrationServiceConfigurationVariable;
+import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
-import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
+import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.feature.accesscontrol.domain.system.ContextualizedTest;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
@@ -242,11 +242,11 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         // Prepare json object (RegisterOrganization command event including organization naming) from translator
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
-        Attribute tenantNameToRegister = new Attribute(AttributeName.OrganizationNaming.name(), organizationName);
+        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), organizationName);
         definition.add(tenantNameToRegister);
         // Prepare RegisterOrganization command event to perform via API
         Command cmd = CommandFactory.create(CommandName.REGISTER_ORGANIZATION.name(),
-                new DomainEntity(new IdentifierStringBased("id", UUID.randomUUID().toString())) /* command identity */, definition,
+                new DomainEntity(IdentifierStringBased.generate(null)) /* command identity */, definition,
                 /* none prior command to reference*/ null,
                 /* None pre-identified organization because new creation */ null);
         // Auto-assign correlation identifier allowing finalized transaction check

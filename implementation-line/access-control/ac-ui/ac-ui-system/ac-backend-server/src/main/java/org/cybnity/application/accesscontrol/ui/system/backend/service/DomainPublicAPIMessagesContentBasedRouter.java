@@ -7,8 +7,8 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
-import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
+import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractChannelMessageRouter;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.GatewayRoutingPlan;
@@ -24,7 +24,10 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -274,7 +277,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
             Collection<Attribute> changeEventDefinition = new ArrayList<>();
             Attribute correlationIdAtt = new Attribute(Command.CORRELATION_ID, originCorrelationId);
             // Set organization name created
-            Attribute tenantNameToRegister = new Attribute(AttributeName.OrganizationNaming.name(), "CYBNITY");
+            Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY");
             changeEventDefinition.add(tenantNameToRegister);
             // Set correlation id
             changeEventDefinition.add(correlationIdAtt);// allowing finalized transaction check
@@ -282,12 +285,12 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
             // including a status equals to "actioned" (e.g waiting for user registration finalized with success)
             // and tenant description
             Collection<Attribute> tenantDefinition = new ArrayList<>();
-            tenantDefinition.add(new Attribute(AttributeName.OrganizationNaming.name(), "CYBNITY"));
+            tenantDefinition.add(new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY"));
             // Set correlation id
             tenantDefinition.add(correlationIdAtt); // allowing finalized transaction check
 
             DomainEvent createdTenantEvent = DomainEventFactory.create(DomainEventType.TENANT_CREATED.name(),
-                    new DomainEntity(new IdentifierStringBased("id", UUID.randomUUID().toString())),
+                    new DomainEntity(IdentifierStringBased.generate(null)),
                     tenantDefinition, /* prior as command event entity reference */ null
                     , null);
 

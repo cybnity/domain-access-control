@@ -90,7 +90,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
 
             // PROCESSING : identify processor (e.g local capability processor, or remote proxy) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
             // according to the type of event to process
-            TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context);
+            TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context, featureServiceName());
             securityFilteringStep.setNext(processingAssignmentStep);
             pipelinedProcessSingleton = eventTypeFilteringStep;
         }

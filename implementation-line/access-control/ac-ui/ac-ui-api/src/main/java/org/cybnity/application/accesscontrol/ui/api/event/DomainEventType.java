@@ -9,14 +9,19 @@ import org.cybnity.framework.domain.event.IEventType;
 public enum DomainEventType implements IEventType {
 
     /**
-     * Event about a requested organization registration
+     * Event about a requested organization registration in progress.
      */
     ORGANIZATION_REGISTRATION_SUBMITTED,
 
     /**
-     * Event about an organization registered as eligible to become a tenant.
+     * Event about an organization registered as valid tenant.
      */
     ORGANIZATION_REGISTERED,
+
+    /**
+     * Event about an organization already existing but that is authorized to be re-assigned.
+     */
+    ORGANIZATION_REASSIGNMENT_ELIGIBLE,
 
     /**
      * Event about a tenant created by the domain layer.

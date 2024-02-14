@@ -124,8 +124,4 @@ public class TenantsRepository implements IDomainRepository<Tenant>, TenantsRead
 
     }
 
-    @Override
-    public Tenant findTenant(String organizationName, Boolean includingExistUsers) throws IllegalArgumentException {
-        return null;
-    }
 }

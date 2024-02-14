@@ -2,8 +2,8 @@ package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
 import org.cybnity.application.accesscontrol.domain.system.gateway.ContextualizedTest;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
-import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
+import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
 import org.cybnity.framework.application.vertx.common.routing.RouteRecipientList;
 import org.cybnity.framework.domain.Attribute;
@@ -58,7 +58,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
         // Create an unknown fact sample (e.g other domain fact or security attack data entry) that should not be supported by the filter
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
-        Attribute tenantNameToRegister = new Attribute(AttributeName.OrganizationNaming.name(), "CYBNITY");
+        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY");
         definition.add(tenantNameToRegister);
         // Prepare unknown command event to perform via API
         Command requestEvent = CommandFactory.create("UNKNOWN_EVENT_TYPE", null, definition, null, null);
@@ -79,7 +79,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
         // Prepare RegisterOrganization command event including organization naming
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
-        Attribute tenantNameToRegister = new Attribute(AttributeName.OrganizationNaming.name(), "CYBNITY");
+        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY");
         definition.add(tenantNameToRegister);
         // Prepare RegisterOrganization command event to perform via API
         Command requestEvent = CommandFactory.create(CommandName.REGISTER_ORGANIZATION.name(),

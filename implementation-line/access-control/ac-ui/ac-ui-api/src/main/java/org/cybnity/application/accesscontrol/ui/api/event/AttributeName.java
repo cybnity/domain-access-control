@@ -1,14 +1,18 @@
 package org.cybnity.application.accesscontrol.ui.api.event;
 
 /**
- * Type of attribute supported by the AC domain events and command.
- * Can be used to identify a type of attribute with a value.
+ * Type of standard attribute supported by the AC domain events and command.
+ * Referential that can be used to identify a type of specification attribute with a value.
  */
 public enum AttributeName {
 
     /**
-     * Attribute relative to the value object equals to a name of organization.
+     * Logical name of a service provider (e.g domain feature notifying event)
      */
-    OrganizationNaming
-    ;
+    SERVICE_NAME,
+
+    /**
+     * Type of processing result cause.
+     */
+    OUTPUT_CAUSE_TYPE;
 }

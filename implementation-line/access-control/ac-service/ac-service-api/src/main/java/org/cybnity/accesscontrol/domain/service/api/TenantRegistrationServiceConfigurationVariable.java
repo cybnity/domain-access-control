@@ -1,4 +1,4 @@
-package org.cybnity.accesscontrol.domain.service;
+package org.cybnity.accesscontrol.domain.service.api;
 
 import org.cybnity.framework.IReadableConfiguration;
 

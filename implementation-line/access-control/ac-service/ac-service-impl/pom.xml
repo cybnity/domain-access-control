@@ -21,9 +21,5 @@
 			<groupId>org.cybnity.application.access-control</groupId>
 			<artifactId>domain</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.cybnity.application.access-control.translator</groupId>
-			<artifactId>ui-api</artifactId>
-		</dependency>
 	</dependencies>
 </project>

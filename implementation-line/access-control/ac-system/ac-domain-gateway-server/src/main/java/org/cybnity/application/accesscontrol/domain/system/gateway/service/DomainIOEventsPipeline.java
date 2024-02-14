@@ -14,14 +14,16 @@ import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.event.*;
 import org.cybnity.framework.domain.model.DomainEntity;
-import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.framework.immutable.EntityReference;
 import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.*;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -189,8 +191,7 @@ public class DomainIOEventsPipeline extends AbstractEndpointPipelineImpl {
 
         // Prepare command event's unique identifier
         LinkedHashSet<Identifier> evtUidBasedOn = new LinkedHashSet<>();
-        evtUidBasedOn.add(new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(),
-                /* identifier as performed transaction number */ UUID.randomUUID().toString()));
+        evtUidBasedOn.add(IdentifierStringBased.generate(null));
         if (priorEventRef != null) {
             // Add parent uuid as contributor to the event identification value
             evtUidBasedOn.add(priorEventRef.getEntity().identified());

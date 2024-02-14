@@ -11,4 +11,10 @@
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<name>-- AC domain adapter api (spec)</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.cybnity.application.access-control.translator</groupId>
+			<artifactId>ui-api</artifactId>
+		</dependency>
+	</dependencies>
 </project>

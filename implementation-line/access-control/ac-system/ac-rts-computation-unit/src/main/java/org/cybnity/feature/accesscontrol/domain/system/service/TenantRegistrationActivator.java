@@ -2,7 +2,7 @@ package org.cybnity.feature.accesscontrol.domain.system.service;
 
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsRepository;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.IdentitiesRepository;
-import org.cybnity.accesscontrol.domain.service.ITenantRegistrationService;
+import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
 import org.cybnity.accesscontrol.domain.service.impl.TenantRegistration;
 import org.cybnity.accesscontrol.iam.domain.infrastructure.impl.AccountsRepository;
 import org.cybnity.framework.IContext;
@@ -23,17 +23,21 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
      */
     private final IContext context;
 
+    private String serviceLogicalName;
+
     /**
      * Default constructor.
      *
-     * @param client  Optional Users Interactions Space client interactions with other domain during event processing, and/or dead letter channel notification.
-     * @param context Mandatory configuration context of the processing unit
+     * @param client      Optional Users Interactions Space client interactions with other domain during event processing, and/or dead letter channel notification.
+     * @param context     Mandatory configuration context of the processing unit.
+     * @param serviceName Optional logical name of the service to activate.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public TenantRegistrationActivator(UISAdapter client, IContext context) throws IllegalArgumentException {
+    public TenantRegistrationActivator(UISAdapter client, IContext context, String serviceName) throws IllegalArgumentException {
         this.client = client;
         if (context == null) throw new IllegalArgumentException("Context parameter is required!");
         this.context = context;
+        this.serviceLogicalName = serviceName;
     }
 
     /**
@@ -46,7 +50,7 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
     public boolean process(IDescribed fact) {
         if (canHandle(fact)) {
             // Define the application service (and collaboration components) able to process the event according to business/treatment rules
-            ITenantRegistrationService processor = new TenantRegistration(context, TenantsRepository.getInstance(), IdentitiesRepository.getInstance(), AccountsRepository.getInstance());
+            ITenantRegistrationService processor = new TenantRegistration(context, TenantsRepository.getInstance(), IdentitiesRepository.getInstance(), AccountsRepository.getInstance(), serviceLogicalName);
 
             try {
                 // Execute the process rules on the received event
