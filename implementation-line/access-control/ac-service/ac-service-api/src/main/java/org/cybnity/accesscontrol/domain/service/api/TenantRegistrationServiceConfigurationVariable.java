@@ -7,10 +7,7 @@ import org.cybnity.framework.IReadableConfiguration;
  */
 public enum TenantRegistrationServiceConfigurationVariable implements IReadableConfiguration {
 
-    /**
-     * True or False boolean value supported.
-     */
-    TENANT_REGISTRATION_AUTHORIZED_REASSIGNMENT("TENANT_REGISTRATION_AUTHORIZED_REASSIGNMENT");
+    ;
 
     private final String name;
 

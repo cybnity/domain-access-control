@@ -4,7 +4,6 @@ import org.cybnity.accesscontrol.iam.domain.model.IdentitiesReadModel;
 import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.infrastructure.IDomainRepository;
 import org.cybnity.framework.domain.model.SocialEntity;
-import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.Identifier;
 
 import java.util.Collection;
@@ -106,9 +105,4 @@ public class IdentitiesRepository implements IDomainRepository<SocialEntity>, Id
 
     }
 
-    @Override
-    public Tenant findTenant(String name, Boolean includingExistUsers) throws IllegalArgumentException {
-        // TODO query to Keycloak admin webservice over api connector
-        return null;
-    }
 }

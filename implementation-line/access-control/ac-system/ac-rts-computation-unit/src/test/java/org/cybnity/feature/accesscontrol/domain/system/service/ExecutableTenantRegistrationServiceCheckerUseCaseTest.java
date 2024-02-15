@@ -12,7 +12,8 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests regarding the utility class that check the healthy and operational
@@ -69,7 +70,6 @@ public class ExecutableTenantRegistrationServiceCheckerUseCaseTest extends Conte
 
         // verify provided quantity of minimum environment variables supported
         assertNotNull(minimumEnvVariablesRequired);
-        assertFalse(minimumEnvVariablesRequired.isEmpty());
 
         for (IReadableConfiguration aReq : toCheck) {
             // Verify if treated by checker

@@ -2,7 +2,6 @@ package org.cybnity.accesscontrol.iam.domain.model;
 
 import org.cybnity.framework.domain.IReadModel;
 import org.cybnity.framework.domain.model.SocialEntity;
-import org.cybnity.framework.domain.model.Tenant;
 
 /**
  * Represents a read-oriented and query optimized repository (also sometimes called Aggregate
@@ -10,16 +9,6 @@ import org.cybnity.framework.domain.model.Tenant;
  * Identities are defined about organizations, systems, and users that define a boundary of User Identity & Access Management (UIAM).
  */
 public interface IdentitiesReadModel extends IReadModel {
-
-    /**
-     * Search existing tenant which have an equals name relative to a specific label.
-     *
-     * @param name                Mandatory logical name of tenant to search as owner of a known tenant.
-     * @param includingExistUsers Is tenant to search must shall be filtered according any existing valid (e.g registered and activated as verified user account) user accounts already managed? True if tenant to return shall be a tenant that have valid user accounts already activated. False when the search shall ignore the potential existing of valid user accounts activated. Ignored filter when null.
-     * @return An identified tenant, or null.
-     * @throws IllegalArgumentException When any mandatory parameter is not valid.
-     */
-    public Tenant findTenant(String name, Boolean includingExistUsers) throws IllegalArgumentException;
 
     /**
      * Search social entity (e.g company or realm name) logically identified by a specific label.

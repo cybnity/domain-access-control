@@ -7,12 +7,12 @@ package org.cybnity.application.accesscontrol.ui.api.event;
 public enum AttributeName {
 
     /**
-     * Logical name of a service provider (e.g domain feature notifying event)
+     * Boolean materializing a state of activity (active, no active).
      */
-    SERVICE_NAME,
+    ACTIVITY_STATE,
 
     /**
-     * Type of processing result cause.
+     * Identifier of a Tenant.
      */
-    OUTPUT_CAUSE_TYPE;
+    TENANT_ID;
 }

@@ -6,7 +6,7 @@ package org.cybnity.accesscontrol.domain.service.api;
 public enum ApplicationServiceOutputCause {
 
     /**
-     * A tenant is already existing, assigned and used.
+     * A tenant is already existing, assigned with organization (e.g social entity with equals name).
      */
     EXISTING_TENANT_ALREADY_ASSIGNED;
 }

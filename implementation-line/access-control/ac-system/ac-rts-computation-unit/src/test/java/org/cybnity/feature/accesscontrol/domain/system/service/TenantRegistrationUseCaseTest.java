@@ -6,7 +6,6 @@ import io.vertx.junit5.Checkpoint;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
@@ -61,8 +60,6 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         super.initEnvVariables(); // Init common env values
         // Add specific env values
 
-        // Define additional environment variable regarding tenant registration service
-        environmentVariables.set(TenantRegistrationServiceConfigurationVariable.TENANT_REGISTRATION_AUTHORIZED_REASSIGNMENT.getName(), Boolean.TRUE);
     }
 
     @BeforeEach

@@ -124,4 +124,10 @@ public class TenantsRepository implements IDomainRepository<Tenant>, TenantsRead
 
     }
 
+    @Override
+    public Tenant findByName(String name) throws IllegalArgumentException {
+        // TODO query vers DB domain des tenant avec filtrage sur social entity attachée comme value object avec nom company
+        return null;
+    }
+
 }

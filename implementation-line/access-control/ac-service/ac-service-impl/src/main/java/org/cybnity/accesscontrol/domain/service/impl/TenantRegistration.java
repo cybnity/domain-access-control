@@ -3,16 +3,13 @@ package org.cybnity.accesscontrol.domain.service.impl;
 import org.cybnity.accesscontrol.ciam.domain.model.TenantsReadModel;
 import org.cybnity.accesscontrol.domain.service.api.ApplicationServiceOutputCause;
 import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
-import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.accesscontrol.iam.domain.model.AccountsReadModel;
 import org.cybnity.accesscontrol.iam.domain.model.IdentitiesReadModel;
-import org.cybnity.accesscontrol.iam.domain.model.MailAddress;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.IContext;
-import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.DomainEvent;
@@ -25,6 +22,7 @@ import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -91,37 +89,20 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
                         throw new IllegalArgumentException("Organization naming attribute value shall be defined!");
 
                     // --- PROCESSING RULES ---
-                    // Search if existing tenant already registered including existing a minimum one active user account
-                    Tenant existingOrganizatonTenant = identitiesRepository.findTenant(organizationNaming, /* including existing activated accounts */ true);
+                    // Search if existing tenant already registered in domain
+                    Tenant existingOrganizatonTenant = tenantsRepository.findByName(organizationNaming);
                     if (existingOrganizatonTenant != null) {
-                        // Existing registered tenant is identified with already assigned and used by a minimum one activated user account
+                        // Existing registered tenant is identified and known by access control domain
 
                         // RULE : de-duplication rule about Tenant
-                        if (isAuthorizedTenantReassignment(existingOrganizatonTenant)) {
-                            // CASE: Confirm re-assignable tenant to organization
-                            // Build event regarding existing tenant able to be re-assigned
-                            DomainEvent organizationActioned = prepareCommonResponseEvent(DomainEventType.ORGANIZATION_REASSIGNMENT_ELIGIBLE, command, organizationNamingAtt);
+                        // CASE: tenant (e.g social entity with same name) creation is not authorized AND REJECTION SHALL BE NOTIFIED
+                        // Build DomainEventType.ORGANIZATION_REGISTRATION_REJECTED event
+                        DomainEvent rejectionEvent = prepareCommonResponseEvent(DomainEventType.ORGANIZATION_REGISTRATION_REJECTED, command, organizationNamingAtt, existingOrganizatonTenant);
+                        // Set precision about cause of rejection
+                        rejectionEvent.appendSpecification(new Attribute(org.cybnity.framework.domain.event.AttributeName.OUTPUT_CAUSE_TYPE.name(), ApplicationServiceOutputCause.EXISTING_TENANT_ALREADY_ASSIGNED.name()));
 
-                            // TODO Publish event to output channel
-
-                        } else {
-                            // CASE: Re-assignment of the found tenant is not authorized AND REJECTION SHALL BE NOTIFIED
-                            // Build DomainEventType.ORGANIZATION_REGISTRATION_REJECTED event
-                            DomainEvent rejectionEvent = prepareCommonResponseEvent(DomainEventType.ORGANIZATION_REGISTRATION_REJECTED, command, organizationNamingAtt);
-                            // Set precision about cause of rejection
-                            rejectionEvent.appendSpecification(new Attribute(AttributeName.OUTPUT_CAUSE_TYPE.name(), ApplicationServiceOutputCause.EXISTING_TENANT_ALREADY_ASSIGNED.name()));
-
-                            // Read how many user accounts are already active on the found Tenant
-                            // with verified email address (as usable and owned by account owners)
-                            Integer accountsQty = accountsRepository.accountsCount(existingOrganizatonTenant.identified(), MailAddress.Status.VERIFIED);
-                            if (accountsQty != null) {
-                                // Set precision about found verified accounts quantity
-                                rejectionEvent.appendSpecification(new Attribute(TenantRegistrationAttributeName.ACTIVE_ACCOUNTS_COUNT.name(), accountsQty.toString()));
-                            }
-
-                            // TODO Publish event to output channel
-                            //uisClient.publish(requestEvent, domainIOGateway, new MessageMapperFactory().getMapper(IDescribed.class, String.class));
-                        }
+                        // TODO Publish event to output channel
+                        //uisClient.publish(requestEvent, domainIOGateway, new MessageMapperFactory().getMapper(IDescribed.class, String.class));
                     } else {
                         // None existing tenant with same organization name
                         // CASE: create a new Tenant initializing into the identities repository based on the organization name
@@ -135,9 +116,6 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
             } else {
                 throw new IllegalArgumentException("Command parameter is required!");
             }
-        } catch (UnoperationalStateException use) {
-            // Impossible execution caused by a several code problem
-            logger.log(Level.SEVERE, "Impossible handle(Command command) method execution!", use);
         } catch (ImmutabilityException ime) {
             // Impossible execution caused by a several code problem
             logger.log(Level.SEVERE, "Impossible handle(Command command) method response!!", ime);
@@ -159,20 +137,20 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
         if (tenantLabel == null || tenantLabel.isEmpty())
             throw new IllegalArgumentException("tenantLabel parameter is required and shall not be empty!");
 
-        // TODO implementation of the write model change and registration ot Realm into the identity server with collect of realm's setting allowing connector dynamic configuration
+        // TODO implementation of verification that equals real name is existing and accessible/usable from UIAM server (e.g Keycloak connector)
 
         // RealmRepresentation organizationRealm = buildRealmRepresentation(configurationSettings)
 
-        // create(organizationRealm) in identity repository
-
-        // get success realm registration confirmation (and access control settings recorded)
+        // verify existing realm registered (and access control settings recorded as usable via UIAM connector adapter configuration)
         // RealmResource existingRes = realm(String realmName)
         // existingRes equals organization named
 
-        // create new Tenant(found organization description) into domain repository
+        // TODO implementation of the write model change
 
+        // create new Tenant(found organization description) into domain repository
+        Tenant created = null;
         // Prepare and return new organization actioned event
-        DomainEvent organizationActioned = prepareCommonResponseEvent(DomainEventType.ORGANIZATION_REGISTERED, originEvent, organizationNaming);
+        DomainEvent organizationActioned = prepareCommonResponseEvent(DomainEventType.ORGANIZATION_REGISTERED, originEvent, organizationNaming, created);
 
         return null;
     }
@@ -183,11 +161,12 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
      * @param eventTypeToPrepare    Mandatory type of event to build.
      * @param originEvent           Mandatory origin event handled by the service and which can be referenced as predecessor.
      * @param organizationNamingAtt Optional attribute regarding the requested organization name to register when defined (e.g received by service).
+     * @param tenant                Optional tenant.
      * @return A prepared event including specifications.
      * @throws ImmutabilityException    When usage of immutable version of content have a problem avoiding its usage.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    private DomainEvent prepareCommonResponseEvent(DomainEventType eventTypeToPrepare, Command originEvent, Attribute organizationNamingAtt) throws ImmutabilityException, IllegalArgumentException {
+    private DomainEvent prepareCommonResponseEvent(DomainEventType eventTypeToPrepare, Command originEvent, Attribute organizationNamingAtt, Tenant tenant) throws ImmutabilityException, IllegalArgumentException {
         if (eventTypeToPrepare == null) throw new IllegalArgumentException("eventTypeToPrepare parameter is required!");
         if (originEvent == null) throw new IllegalArgumentException("originEvent parameter is required!");
 
@@ -213,41 +192,18 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
             EventSpecification.appendSpecification(organizationNamingAtt, definition);
         // Set the logical name of this pipeline which is sender of the event
         if (this.serviceName != null && !serviceName.isEmpty())
-            definition.add(new Attribute(AttributeName.SERVICE_NAME.name(), serviceName));
+            definition.add(new Attribute(org.cybnity.framework.domain.event.AttributeName.SERVICE_NAME.name(), serviceName));
+
+        if (tenant != null) {
+            // Set precision about the existing tenant description synthesis (tenant's identifier, and status)
+            Boolean status = tenant.status().isActive();
+            definition.add(new Attribute(AttributeName.ACTIVITY_STATE.name(), status.toString()));
+            Serializable tenantId = tenant.identified().value();
+            definition.add(new Attribute(AttributeName.TENANT_ID.name(), tenantId.toString()));
+        }
 
         // Build instance
         return DomainEventFactory.create(eventTypeToPrepare.name(), eventUID, definition, originEvent.reference(), /* none changedModelElementRef */ null);
     }
 
-    /**
-     * Check if an existing tenant can be reassigned to new owner according to existing verified and active user accounts, and/or re-assignment configuration settings.
-     * It is a de-duplication rule realization about tenant which could have been registered during a previous attempt of user account creation, but which have never been finalized with success.
-     *
-     * @param tenant Mandatory tenant to evaluate for re-assignment eligibility.
-     * @return True when the tenant can be re-assigned to new owner.
-     * @throws IllegalArgumentException    When mandatory parameter is missing.
-     * @throws UnoperationalStateException Can be also thrown in case of impossible read of tenant status (e.g immutability exception). Can be thrown in case of missing service configuration environment variable read from context.
-     */
-    private boolean isAuthorizedTenantReassignment(Tenant tenant) throws IllegalArgumentException, UnoperationalStateException {
-        if (tenant == null) throw new IllegalArgumentException("Tenant parameter is required!");
-        boolean authorizedReassignment = true;
-        try {
-            if (tenant.status().isActive()) {
-                // Check the re-assignment feature setting
-                Object authorizedReassignmentConfig = context.get(TenantRegistrationServiceConfigurationVariable.TENANT_REGISTRATION_AUTHORIZED_REASSIGNMENT.getName());
-                if (authorizedReassignmentConfig != null && Boolean.class.isAssignableFrom(authorizedReassignmentConfig.getClass())) {
-                    // Potential unauthorized re-assignment according to the capability defined configuration
-                    authorizedReassignment = (Boolean) authorizedReassignmentConfig;
-                } else {
-                    // Unknown configuration problem generating untrusted service runtime
-                    // So stop execution
-                    throw new UnoperationalStateException("Missing service configuration variable (" + TenantRegistrationServiceConfigurationVariable.TENANT_REGISTRATION_AUTHORIZED_REASSIGNMENT.getName() + ")!");
-                }
-            }
-        } catch (ImmutabilityException ie) {
-            logger.log(Level.SEVERE, "isAuthorizedTenantReassignment() exception relative to tenant status impossible read!", ie);
-            throw new UnoperationalStateException(ie);
-        }
-        return authorizedReassignment;
-    }
 }

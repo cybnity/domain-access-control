@@ -2,7 +2,6 @@ package org.cybnity.accesscontrol.iam.domain.infrastructure.impl;
 
 import org.cybnity.accesscontrol.iam.domain.model.Account;
 import org.cybnity.accesscontrol.iam.domain.model.AccountsReadModel;
-import org.cybnity.accesscontrol.iam.domain.model.MailAddress;
 import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.infrastructure.IDomainRepository;
 import org.cybnity.framework.immutable.Identifier;
@@ -34,11 +33,6 @@ public class AccountsRepository implements IDomainRepository<Account>, AccountsR
             singleton = new AccountsRepository();
         }
         return singleton;
-    }
-
-    @Override
-    public Integer accountsCount(Identifier tenantIdentifier, MailAddress.Status withMailAddressInStatus) throws IllegalArgumentException {
-        return null;
     }
 
     @Override

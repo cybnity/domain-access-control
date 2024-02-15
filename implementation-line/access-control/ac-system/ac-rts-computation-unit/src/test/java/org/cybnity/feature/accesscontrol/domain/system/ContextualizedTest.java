@@ -1,6 +1,5 @@
 package org.cybnity.feature.accesscontrol.domain.system;
 
-import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
@@ -134,8 +133,6 @@ public class ContextualizedTest {
         environmentVariables.set(AppConfigurationVariable.DOMAIN_WORKER_INSTANCES.getName(), WORKER_INSTANCES);
 
         // Define workers environment variables
-        // -- Tenant registration service -
-        environmentVariables.set(TenantRegistrationServiceConfigurationVariable.TENANT_REGISTRATION_AUTHORIZED_REASSIGNMENT.getName(), Boolean.TRUE);
     }
 
 
