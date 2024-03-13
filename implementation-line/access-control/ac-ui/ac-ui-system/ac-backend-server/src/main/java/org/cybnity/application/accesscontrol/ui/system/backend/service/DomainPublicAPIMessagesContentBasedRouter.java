@@ -289,7 +289,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
             // Set correlation id
             tenantDefinition.add(correlationIdAtt); // allowing finalized transaction check
 
-            DomainEvent createdTenantEvent = DomainEventFactory.create(DomainEventType.TENANT_CREATED.name(),
+            DomainEvent createdTenantEvent = DomainEventFactory.create(org.cybnity.framework.domain.event.DomainEventType.TENANT_CREATED.name(),
                     new DomainEntity(IdentifierStringBased.generate(null)),
                     tenantDefinition, /* prior as command event entity reference */ null
                     , null);

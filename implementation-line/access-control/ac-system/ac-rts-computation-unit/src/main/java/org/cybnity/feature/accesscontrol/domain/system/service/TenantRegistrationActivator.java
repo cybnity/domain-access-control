@@ -25,7 +25,7 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
     private final IContext context;
 
     private final String serviceLogicalName;
-    private Channel featureTenantsChangesNotificationChannel;
+    private final Channel featureTenantsChangesNotificationChannel;
 
     /**
      * Default constructor.
