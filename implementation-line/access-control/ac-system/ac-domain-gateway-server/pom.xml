@@ -10,13 +10,59 @@
 	<artifactId>domain-gateway-server</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
-	<name>-- AC domain gateway impl module</name>
+	<name>-- AC domain IO gateway impl module</name>
 
 	<properties>
-		<main.verticle>org.cybnity.application.access_control.domain.system.gateway.AccessControlDomainIOGateway</main.verticle>
-		<module.system.image.name>access-control-domain-gateway</module.system.image.name>
+		<main.verticle>org.cybnity.application.accesscontrol.domain.system.gateway.AccessControlDomainIOGateway</main.verticle>
+		<module.system.image.name>access-control-io-gateway</module.system.image.name>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<!-- Integration with Users Interactions Space middleware -->
+			<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
+			<artifactId>redis-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.cybnity.application.access-control.translator</groupId>
+			<artifactId>ui-api</artifactId>
+		</dependency>
+
+		<!-- Test utilities -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-junit5</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-unit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-web-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>uk.org.webcompere</groupId>
+			<artifactId>system-stubs-jupiter</artifactId>
+		</dependency>
+		<dependency>
+			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" AVERTISSEMENT on Mac -->
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+		</dependency>
+		<dependency>
+			<!-- Embedded Redis test server (https://github.com/signalapp/embedded-redis) -->
+			<groupId>org.signal</groupId>
+			<artifactId>embedded-redis</artifactId>
+		</dependency>
+		<dependency>
+			<!-- Required for unit test about collaboration processes -->
+			<groupId>org.cybnity.application.access-control.system</groupId>
+			<artifactId>process-module</artifactId>
+			<version>${revision}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>

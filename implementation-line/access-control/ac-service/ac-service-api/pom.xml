@@ -17,5 +17,9 @@
 			<artifactId>domain</artifactId>
 			<version>${foundation.compatibility.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.cybnity.application.access-control.translator</groupId>
+			<artifactId>ui-api</artifactId>
+		</dependency>
 	</dependencies>
 </project>

@@ -16,7 +16,7 @@
 		<revision>0.1.0</revision>
 		<!-- CYBNITY Foundation dependencies link-->
 		<!-- staging-latest-SNAPSHOT -->
-		<foundation.compatibility.version>feature-95-latest-SNAPSHOT</foundation.compatibility.version>
+		<foundation.compatibility.version>feature-237-SNAPSHOT</foundation.compatibility.version>
 		<!-- Standard Trusted Execution Environment (TEE) of java runtime container template -->
 		<docker.java.tee.image.name>cybnity/jre-tee</docker.java.tee.image.name>
 		<!-- NodeJS container template (Bullseye or buster based on Debian)-->
@@ -31,10 +31,49 @@
 
 	<dependencyManagement>
 		<dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.9.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-bom</artifactId>
+                <version>7.12.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 			<!-- Foundation project dependencies -->
 			<dependency>
 				<groupId>org.cybnity.framework</groupId>
 				<artifactId>support</artifactId>
+				<scope>compile</scope>
+				<version>${foundation.compatibility.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.framework</groupId>
+				<artifactId>domain</artifactId>
+				<scope>compile</scope>
+				<version>${foundation.compatibility.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
+				<artifactId>api</artifactId>
+				<scope>compile</scope>
+				<version>${foundation.compatibility.version}</version>
+			</dependency>
+			<dependency>
+				<!-- Integration with Users Interactions Space middleware -->
+				<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
+				<artifactId>redis-impl</artifactId>
+				<scope>compile</scope>
+				<version>${foundation.compatibility.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.framework</groupId>
+				<artifactId>vertx-common</artifactId>
 				<scope>compile</scope>
 				<version>${foundation.compatibility.version}</version>
 			</dependency>
@@ -46,7 +85,30 @@
 			<groupId>org.cybnity.framework</groupId>
 			<artifactId>support</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.cybnity.framework</groupId>
+			<artifactId>domain</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
 	<profiles>
 		<profile>
@@ -104,6 +166,20 @@
 			<properties>
 				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<!-- None integration test executed as automatic unit test; only executable in manual mode -->
+								<exclude>**/*Integration*.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 
 		<profile>
@@ -126,6 +202,20 @@
 				<docker.useColor>true</docker.useColor>
 				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<!-- None integration test executed as automatic unit test; only executable in manual mode -->
+								<exclude>**/*Integration*.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 
 		<profile>
@@ -151,6 +241,16 @@
 			</properties>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<excludes>
+								<!-- None integration test executed as automatic unit test; only executable in manual mode -->
+								<exclude>**/*Integration*.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
@@ -217,6 +317,20 @@
 				<docker.useColor>true</docker.useColor>
 				<docker.images.tag.suffix>-beta</docker.images.tag.suffix>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<includes>
+								<!-- Only integration test executed as automatic unit test -->
+								<include>**/*Integration*.java</include>
+							</includes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 
 		<profile>

@@ -1,10 +1,5 @@
 package org.cybnity.accesscontrol.domain.model;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.UUID;
-
 import org.cybnity.accesscontrol.domain.model.sample.writemodel.SampleDataProvider;
 import org.cybnity.accesscontrol.iam.domain.model.Account;
 import org.cybnity.accesscontrol.iam.domain.model.Person;
@@ -19,6 +14,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test of behaviors regarding the Account class.
@@ -44,8 +44,8 @@ public class AccountUseCaseTest {
 		companySubscription = SampleDataProvider.createTenant();
 		account = new Account(accountParent,
 				new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
-				new EntityReference(owner.parent(), /* none relation */ null, HistoryState.COMMITTED),
-				new EntityReference(companySubscription.parent(), null, HistoryState.COMMITTED));
+				new EntityReference(owner.parent(), /* none relation */ null, HistoryState.COMMITTED, owner.occurredAt()),
+				new EntityReference(companySubscription.parent(), null, HistoryState.COMMITTED, companySubscription.occurredAt()));
 	}
 
 	@AfterEach

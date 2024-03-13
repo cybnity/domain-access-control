@@ -13,5 +13,6 @@
 	<name>- AC translator</name>
 	<modules>
 		<module>keycloak-translator</module>
+		<module>ac-ui-translator</module>
 	</modules>
 </project>

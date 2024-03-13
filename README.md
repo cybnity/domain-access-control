@@ -4,9 +4,9 @@ Discover here the Access Control Management application domain project, that hav
 The CYBNITY Access Control domain technical documentation includes many types of support deliverables produced during the software development life cycle.
 
 You can find informations relative to software maintenance like:
-- Design diagrams regarding software developed concepts and source codes;
-- Support to software build process and packaging;
-- Systems configuration and deployment procedures.
+- Design diagrams regarding software developed concepts and source codes
+- Support to software build process and packaging
+- Systems configuration and deployment procedures
 
 # FUNCTIONAL VIEW (Use Cases)
 ## PURPOSE
@@ -42,34 +42,34 @@ The managed source files are stored in the design-view sub-folder like:
 
 # PROCESS VIEW (Executions)
 ## PURPOSE
-- Show the concurrency of the system(s);
-- Encompasses the threads and processes that form the system's concurrency and synchronization mechanisms.
+- Show the concurrency of the system(s)
+- Encompasses the threads and processes that form the system's concurrency and synchronization mechanisms
 
 ### Usage
 Describes execution models and synchronization rules, identified during the technical design phase and implementation rules definition.
 
 ### Artifacts
 The managed source files are stored in the process-view sub-folder like:
-- Static aspects: equals to design view's diagrams, with focus on the active classes that represent theses threads and processes.
+- Static aspects: equals to design view's diagrams, with focus on the active classes that represent theses threads and processes
 - Model sub-packages:
   - Performance
   - Scalability
 
 # IMPLEMENTATION VIEW (Packaged Components)
 ## PURPOSE
-- Show the organization of the core components and files (e.g source code, setting files);
-- Packaging models and dependencies distribution;
-- Addresses the configuration management of the system's releases.
+- Show the organization of the core components and files (e.g source code, setting files)
+- Packaging models and dependencies distribution
+- Addresses the configuration management of the system's releases
 
 ### Usage
 Formalizes the maintenance documentation aligned with source codes developed, including specificities regarding technologies (e.g language requirements) and frameworks (e.g implementation templates, protocols) used for implementation of the software.
 
 ### Artifacts
 The managed source files are stored in the [implementation-view](docs/implementation-view) sub-folder like:
-- Static aspects (structural diagrams): components, packages;
-- Dynamic aspects (behavioral diagrams): interactions, statecharts, activities.
+- Static aspects (structural diagrams): components, packages
+- Dynamic aspects (behavioral diagrams): interactions, statecharts, activities
 - Model sub-packages:
-  - [Implementation principles & models](docs/implementation-view)
+  - Implementation principles & models
   - Configuration-management
   - System-assembly
 
@@ -84,7 +84,7 @@ The implementation projects are supported by an Official TechStack version defin
 
 ## UI COMPONENTS
 The source codes managed in theses sub-projects are providing capabilities to final user via web interfaces (e.g visual interfaces and/or backend API services) which can enhance the Foundation Core project's capabilities layer:
-- [User Interface API](/implementation-line/access-control/ac-ui/ac-ui-api)
+- [User Interface API](/implementation-line/access-control/ac-ui/ac-ui-api/docs/README.md)
 
 ## APPLICATION COMPONENTS
 The source codes managed in theses sub-projects (Maven projects) are supporting the features (as micro-service components constituing the business capabilities provided by the application domain) provided by the bounded context:
@@ -111,7 +111,7 @@ Describes the environment(s), infrastructure and operating conditions required t
 
 ### Artifacts
 The managed source files are stored in the deployment-view sub-folder like:
-- Static aspects (structural diagrams): components, deployment.
+- Static aspects (structural diagrams): components, deployment
 - Model sub-packages:
   - Installation
     - Systems deployment
@@ -124,7 +124,7 @@ Several systems are built as executable modules, containerized (Docker images) a
 - [Backend Server](/implementation-line/access-control/ac-ui/ac-ui-system/ac-backend-server)
 - [Frontend Server](/implementation-line/access-control/ac-ui/ac-ui-system/ac-frontend-server)
 
-Several systems are developed as executable modules, which are containerized and ready for deployment via provisioning management solution:
+Several servers are developed as executable domain components, which are containerized and ready for deployment via provisioning management solution:
 - Domain Gateway Server
   - For example, to start auto-generated docker image (by Maven) into a Minikube platform, execute command line `kubectl run cybnity-ac-domain-gateway --image=cybnity/access-control-domain-gateway --image-pull-policy=Never`
 - Real-Time Stream Computation Unit

@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.cybnity</groupId>
 		<artifactId>techstack</artifactId>
-		<version>0.18.0</version>
+		<version>0.26.0</version>
 	</parent>
 
 	<groupId>org.cybnity</groupId>
@@ -78,9 +78,10 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>uk.org.webcompere</groupId>
-				<artifactId>system-stubs-jupiter</artifactId>
-				<version>[2.0.2,)</version>
+				<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" AVERTISSEMENT on Mac -->
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>4.1.106.Final</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>

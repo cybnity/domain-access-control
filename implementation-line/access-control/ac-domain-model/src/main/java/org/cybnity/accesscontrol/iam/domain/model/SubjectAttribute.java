@@ -4,8 +4,8 @@ import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
- * Attribute describing a subject who is demanding access (e.r role, group
- * membership, competency, user id...).
+ * Attribute describing a subject who is demanding access (e.g role, group
+ * membership, competency, user id, email address...).
  * 
  * @author olivier
  *
@@ -16,7 +16,7 @@ public abstract class SubjectAttribute {
     /**
      * Dedicated scope regarding this attribute.
      */
-    private ScopeAttribute scope;
+    private final ScopeAttribute scope;
 
     /**
      * Default constructor based on a scope.

@@ -1,11 +1,11 @@
 package org.cybnity.accesscontrol.authorization.domain.model;
 
+import org.cybnity.framework.support.annotation.Requirement;
+import org.cybnity.framework.support.annotation.RequirementCategory;
+
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
-
-import org.cybnity.framework.support.annotation.Requirement;
-import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Represents a token based on OIDC protocol, as standardized JWT token by
@@ -18,10 +18,10 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 public abstract class IDToken implements ISecurityToken {
 
     protected OffsetDateTime expiration;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime authentifiedAt;
-    private Collection<IClaim> userClaims;
-    private Collection<IAccreditation> userHabilitations;
+    private final OffsetDateTime createdAt;
+    private final OffsetDateTime authentifiedAt;
+    private final Collection<IClaim> userClaims;
+    private final Collection<IAccreditation> userHabilitations;
 
     /**
      * Default constructor.

@@ -4,7 +4,7 @@ import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
- * Atribute that represent a definition or criteria about an identity (e.g
+ * Attribute that represent a definition or criteria about an identity (e.g
  * company, person as subject of authorization).
  * 
  * @author olivier

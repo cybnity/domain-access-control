@@ -4,7 +4,7 @@ import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
- * Represent model of authorization (e.g requested, accepted, rejected) followed
+ * Represent model of authorization (e.g requested, verified, accepted, rejected) followed
  * by a stakeholder.
  * 
  * @author olivier

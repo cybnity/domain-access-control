@@ -10,9 +10,11 @@
 	<artifactId>systems</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
-	<name>-- AC UI systems</name>
+	<name>- AC UI systems</name>
 	<modules>
 		<module>ac-backend-server</module>
-		<module>ac-frontend-server</module>
+		<!--
+		<module>ac-frontend-server</module>-->
 	</modules>
+
 </project>

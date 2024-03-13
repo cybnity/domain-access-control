@@ -1,14 +1,13 @@
 package org.cybnity.accesscontrol.iam.domain.model;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
- * Represent a policy strategy type as policiy of policies that depends of
- * context.
+ * Represent a policy strategy type as policy of policies that depends of context.
  * 
  * @author olivier
  *
@@ -16,9 +15,9 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_AC_3")
 public class AttributesBasedAccessControl extends AuthorizationPolicy {
 
-    private Collection<SubjectAttribute> subjectDescription;
-    private Collection<ActionAttribute> actionableActions;
-    private Collection<EnvironmentAttribute> environmentDescription;
+    private final Collection<SubjectAttribute> subjectDescription;
+    private final Collection<ActionAttribute> actionableActions;
+    private final Collection<EnvironmentAttribute> environmentDescription;
 
     /**
      * Default constructor.

@@ -5,7 +5,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Represent a policy strategy type defined according to a regex pattern
- * respected by attribute(s) defined a subject.
+ * respected by attribute(s) defining a subject.
  * 
  * @author olivier
  *

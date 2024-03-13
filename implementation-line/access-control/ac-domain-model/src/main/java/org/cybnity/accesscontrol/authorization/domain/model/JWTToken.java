@@ -1,9 +1,9 @@
 package org.cybnity.accesscontrol.authorization.domain.model;
 
-import java.util.Collection;
-
 import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
+
+import java.util.Collection;
 
 /**
  * Represents an OAuth2 JWT Token as exchange format.
@@ -14,7 +14,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_IA_2")
 public class JWTToken {
 
-    private IDToken token;
+    private final IDToken token;
 
     /**
      * Default constructor.

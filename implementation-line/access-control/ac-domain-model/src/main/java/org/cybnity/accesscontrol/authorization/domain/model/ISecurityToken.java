@@ -17,28 +17,28 @@ public interface ISecurityToken {
      * 
      * @return A character chain coded in base64 format.
      */
-    public String base64TokenValue();
+    String base64TokenValue();
 
     /**
      * Get plain text value of this token.
      * 
      * @return A character chain.
      */
-    public String plainTextTokenValue();
+    String plainTextTokenValue();
 
     /**
      * Get the private key used to sign this token.
      * 
      * @return A private key.
      */
-    public String signaturePrivateKey();
+    String signaturePrivateKey();
 
     /**
      * Get hash representing this token.
      * 
      * @return Hashed version of this token.
      */
-    public int hashCode();
+    int hashCode();
 
     @Override
     boolean equals(Object obj);

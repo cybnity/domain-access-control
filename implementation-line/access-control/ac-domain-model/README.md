@@ -57,7 +57,7 @@ flowchart TB
     id8 -. examples .-> id11((Token)) & id12((Device))
     id9 -. examples .-> id15((Session<br>ID)) & id16((Password))
     id10 -. examples .-> id17((Camera)) & id18((Finger<br>Print))
-    id14 -. example .-> id20((Digital<br>Certificate)) & id21((User ID<br>& Password))
+    id14 -. example .-> id20((Digital<br>Certificate)) & id21((User ID,<br> Password))
     id23 -- can be --> id24(Process) & id25(Machine) & id26(Person) & id27(System) & id28(User)
     id23 -- has --> id19
     id14 -- bind --> id19(Identity)
@@ -78,12 +78,12 @@ Several sub-packages are implemented according to the specialization of sub-doma
 ### IAM SUB-PACKAGE
 The package `org.cybnity.accesscontrol.iam.domain.model` provide standard components regarding the access control of any type, as Identity & Access Management (IAM) features and domain objects.
 
-|Class Type|Motivation|
-| :-- | :-- |
-|Account|Domain root aggregate object relative to a subject's usable account|
-|OrganizationalStructure|Organizational structure (e.g company, association, group of companies, institution) who can have interactions with systems|
-|Person|Physical social entity (e.g human person)|
-|SmartSystem|Represent a software and/or hardware system (e.g autonomous accessory representing a person or organization)|
+| Class Type              | Motivation                                                                                                                  |
+|:------------------------|:----------------------------------------------------------------------------------------------------------------------------|
+| Account                 | Domain root aggregate object relative to a subject's usable account                                                         |
+| OrganizationalStructure | Organizational structure (e.g company, association, group of companies, institution) who can have interactions with systems |
+| Person                  | Physical social entity (e.g human person)                                                                                   |
+| SmartSystem             | Represent a software and/or hardware system (e.g autonomous accessory representing a person or organization)                |
 
 ```mermaid
 %%{
@@ -159,7 +159,7 @@ Presentation of the core components and files organization, packaging models and
 
 - Structural diagrams regarding the domain model components matching the Keycloak domain elements
   - [CYBNITY Domain Model Mapping with Keycloak domain components](cybnity-keycloak-components-mapping.md)
-- Behavioral diagrams regarding the interactions, states machins and activities provided by the model
+- Behavioral diagrams regarding the interactions, states machines and activities provided by the model
 - System assembly is mainly managed by Maven as a Java library artifact reused by the application service layer
 
 # RELEASES HISTORY

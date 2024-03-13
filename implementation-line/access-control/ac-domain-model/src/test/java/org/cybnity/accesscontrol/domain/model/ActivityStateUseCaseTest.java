@@ -1,13 +1,5 @@
 package org.cybnity.accesscontrol.domain.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.UUID;
-
 import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.model.ActivityState;
 import org.cybnity.framework.domain.model.ActivityState.PropertyAttributeKey;
@@ -20,6 +12,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Behaviors unit test regarding the ActivityState class.
@@ -38,7 +34,7 @@ public class ActivityStateUseCaseTest {
 				new DomainEntity(
 						new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString())),
 				new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
-				Boolean.TRUE);
+				Boolean.TRUE, "CYBNITY");
 		// Deactivate by default
 		owner.deactivate();
 		propertyOwner = owner.parent().reference();
@@ -120,8 +116,7 @@ public class ActivityStateUseCaseTest {
 		// V2
 		assertEquals(1, v2.changesHistory().size(), "Only v1 previous version shall exist in history!");
 		// Check that v2 state was updated as cancelled version
-		assertTrue(HistoryState.CANCELLED == v2.historyStatus(),
-				"enhanced V2 instance shall had been automatically setted during the enhancement executed method!");
+        assertSame(HistoryState.CANCELLED, v2.historyStatus(), "enhanced V2 instance shall had been automatically setted during the enhancement executed method!");
 
 		// Create another version with again changed state
 		ActivityState v3 = new ActivityState(propertyOwner.getEntity(),
@@ -129,7 +124,7 @@ public class ActivityStateUseCaseTest {
 				HistoryState.MERGED, v2);
 		// Enhance history about all old versions chain
 		v2.enhanceHistoryOf(v3, null /* without change of new version state */);
-		assertTrue(HistoryState.MERGED == v3.historyStatus(), "State shall had not been modified during enhancement!");
+        assertSame(HistoryState.MERGED, v3.historyStatus(), "State shall had not been modified during enhancement!");
 
 		// Check that all previous versions are saved into its history attribute
 		assertEquals(2, v3.changesHistory().size(), "Invalid lost history versions!");
