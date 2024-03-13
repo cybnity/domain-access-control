@@ -2,9 +2,11 @@ package org.cybnity.accesscontrol.ciam.domain.infrastructure.impl;
 
 import org.cybnity.framework.domain.DomainEvent;
 import org.cybnity.framework.domain.ISessionContext;
+import org.cybnity.framework.domain.ISnapshotRepository;
 import org.cybnity.framework.domain.infrastructure.IDomainStore;
 import org.cybnity.framework.domain.model.EventStore;
 import org.cybnity.framework.domain.model.EventStream;
+import org.cybnity.framework.domain.model.HydrationCapability;
 import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
@@ -19,7 +21,7 @@ import java.util.logging.Logger;
  * Implementation store optimized for write operations regarding Tenant objects.
  * This store is delegating persistence services to IAM server via connector (e.g Keycloak Rest API).
  */
-public class TenantsStore extends EventStore implements IDomainStore<Tenant> {
+public class TenantsStore extends EventStore implements IDomainStore<Tenant>, ISnapshotRepository {
 
     private static TenantsStore singleton;
 
@@ -130,4 +132,13 @@ public class TenantsStore extends EventStore implements IDomainStore<Tenant> {
         throw new IllegalArgumentException("to implement!");
     }
 
+    @Override
+    public HydrationCapability getLatestSnapshotById(String s, String s1) throws IllegalArgumentException {
+        return null;
+    }
+
+    @Override
+    public void saveSnapshot(String s, HydrationCapability hydrationCapability, String s1) throws IllegalArgumentException {
+
+    }
 }

@@ -1,8 +1,13 @@
 package org.cybnity.feature.accesscontrol.domain.system.service;
 
+import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantTransactionsRepository;
+import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsReadModelImpl;
+import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsStore;
+import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsWriteModelImpl;
 import org.cybnity.accesscontrol.ciam.domain.model.TenantsWriteModel;
 import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
 import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantTransactionProjection;
+import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantsReadModel;
 import org.cybnity.accesscontrol.domain.service.impl.TenantRegistration;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.application.vertx.common.service.AbstractServiceActivator;
@@ -20,12 +25,9 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
     private final UISAdapter client;
 
     /**
-     * Configuration context of the processing unit.
+     * Handled facts processing component.
      */
-    private final IContext context;
-
-    private final String serviceLogicalName;
-    private final Channel featureTenantsChangesNotificationChannel;
+    private final ITenantRegistrationService processor;
 
     /**
      * Default constructor.
@@ -39,9 +41,21 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
     public TenantRegistrationActivator(UISAdapter client, IContext context, String serviceName, Channel featureTenantsChangesNotificationChannel) throws IllegalArgumentException {
         this.client = client;
         if (context == null) throw new IllegalArgumentException("Context parameter is required!");
-        this.context = context;
-        this.serviceLogicalName = serviceName;
-        this.featureTenantsChangesNotificationChannel = featureTenantsChangesNotificationChannel;
+
+        // --- Initialization of the tenant read-model and write-model reused by the registration service ---
+
+        // Event store managing the tenant streams persistence layer
+        TenantsStore tenantWriteModelPersistenceLayer = TenantsStore.instance();
+        // Repository managing the tenant read-model projections
+        TenantTransactionsRepository tenantsRepository = TenantTransactionsRepository.instance();
+
+        // Prepare the processing component based on write-model and read-model persistence systems
+        ITenantsReadModel tenantsReadModel = new TenantsReadModelImpl(tenantWriteModelPersistenceLayer, tenantsRepository, tenantWriteModelPersistenceLayer);
+        ITenantTransactionProjection tenantsProjection = (ITenantTransactionProjection) tenantsReadModel.getProjection(ITenantTransactionProjection.class);
+        TenantsWriteModel tenantsWriteModel = TenantsWriteModelImpl.instance(tenantWriteModelPersistenceLayer);
+
+        // Define the application service (and collaboration components) able to process the event according to business/treatment rules
+        processor = new TenantRegistration(new SessionContext(/* none pre-registered tenant is defined or usable by the registration service*/null), tenantsWriteModel, tenantsProjection, serviceName, featureTenantsChangesNotificationChannel, client);
     }
 
     /**
@@ -53,12 +67,6 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
     @Override
     public boolean process(IDescribed fact) {
         if (canHandle(fact)) {
-            // TODO add initialization of the tenant read-model and write-model reused by the registration service
-            ITenantTransactionProjection tenantsProjection = null;
-            TenantsWriteModel tenantsWriteModel = null;
-            // Define the application service (and collaboration components) able to process the event according to business/treatment rules
-            ITenantRegistrationService processor = new TenantRegistration(new SessionContext(/* none pre-registered tenant is defined or usable by the registration service*/null), tenantsWriteModel, tenantsProjection, serviceLogicalName, featureTenantsChangesNotificationChannel, client);
-
             try {
                 // Execute the process rules on the received event
                 processor.handle((Command) fact);
