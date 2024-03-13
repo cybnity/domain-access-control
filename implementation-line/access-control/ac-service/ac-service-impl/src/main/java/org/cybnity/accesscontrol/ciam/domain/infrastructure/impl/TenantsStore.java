@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 /**
  * Implementation store optimized for write operations regarding Tenant objects.
- * This store is delegating persistence services to IAM server via connector (e.g Keycloak Rest API).
+ * This store is delegating persistence services to persistent stream .
  */
 public class TenantsStore extends EventStore implements IDomainStore<Tenant>, ISnapshotRepository {
 

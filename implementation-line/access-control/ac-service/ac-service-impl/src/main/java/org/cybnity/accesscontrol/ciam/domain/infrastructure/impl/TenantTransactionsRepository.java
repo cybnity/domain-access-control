@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  * Implementation repository optimized for query regarding TenantItem versions (e.g projections of optimized search of tenant from label).
- * This store is delegating persistence services to UIAM server (Rest API) via connector.
+ * This store is delegating persistence services to GraphQL or caching database optimized for read-model access and query.
  */
 public class TenantTransactionsRepository extends Repository implements IDomainRepository<TenantTransactionsCollection> {
 
