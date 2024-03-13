@@ -8,6 +8,7 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.feature.accesscontrol.domain.system.ContextualizedTest;
@@ -33,7 +34,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Usage tests regarding the tenant registration application service exposed by the pipelined feature.
- * It is the use case scenarios test of "Register Organization" commands treatment as specified by functional requirements.
+ * It is the use case scenarios test of "Register Tenant" commands treatment as specified by functional requirements.
+ * This test scope is focused on integration validation between collaborative components (e.g event sourcing promotion) and error cases.
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -100,7 +102,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
      */
     @Test
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    void givenNoExistingTenant_whenRegisterOrganization_thenOrganizationActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
+    void givenNoExistingTenant_whenRegisterTenant_thenTenantActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID newly defined in Identity server and tenant domain as usable for new user account creation
 
         // UTILITIES PREPARATION
@@ -112,8 +114,8 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         // TEST PROCESSING
         // Request execution of a new RegisterOrganization command over the UIS
-        String organizationName = "givenNoExistingTenant_whenRegisterOrganization_thenOrganizationActioned";
-        Command cmd = prepareRegisterOrganizationCommand(organizationName);
+        String organizationName = "givenNoExistingTenant_whenRegisterTenant_thenTenantActioned";
+        Command cmd = prepareRegisterTenantCommand(organizationName);
         String messageId = uisClient.append(cmd, featureEndpointChannel, mapperFactory.getMapper(cmd.getClass(), StreamMessage.class));
         // - search tenant control normally does not find any existing same organization named
         // - new Tenant is created for organization name by the feature
@@ -136,7 +138,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
      */
     @Test
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    void givenExistingTenantNotActivatedAndAuthorizedReassignment_whenRegisterOrganization_thenOrganizationActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
+    void givenExistingTenantNotActivatedAndAuthorizedReassignment_whenRegisterTenant_thenTenantActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID is reassigned as dedicated to new user account creation
 
         // UTILITIES PREPARATION
@@ -150,9 +152,9 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         // TEST PROCESSING
         // Request execution of a new RegisterOrganization command over the UIS
-        String organizationName = "givenExistingTenantNotActivatedAndAuthorizedReassignment_whenRegisterOrganization_thenOrganizationActioned";
-        Command cmd = prepareRegisterOrganizationCommand(organizationName);
-        // - search tenant control normally and find an existing same organization equals named as existing (e.g like reserved by another person)
+        String organizationName = "givenExistingTenantNotActivatedAndAuthorizedReassignment_whenRegisterTenant_thenTenantActioned";
+        Command cmd = prepareRegisterTenantCommand(organizationName);
+        // - search tenant control normally and find an existing same tenant equals named as existing (e.g like reserved by another person)
         // - none valid user account already previously registered and activated (email verified) is found regarding the existing tenant
         // - existing equals Tenant reference is confirmed with same name, but confirmed as not used (zero active user account)
         // - feature setting is authorized to dynamically authorize Real re-assigning and made it with Tenant added into the domain as known organization (reserved)
@@ -171,7 +173,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
      */
     @Test
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    void givenExistingTenantNotActivatedAndNotAuthorizedReassignment_whenRegisterOrganization_thenOrganizationReused(Vertx vertx, VertxTestContext testContext) throws Exception {
+    void givenExistingTenantNotActivatedAndNotAuthorizedReassignment_whenRegisterTenant_thenTenantReused(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID is not reassigned but is usable for new user account creation
 
         // UTILITIES PREPARATION
@@ -183,9 +185,9 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         // TEST PROCESSING
         // Request execution of a new RegisterOrganization command over the UIS
-        String organizationName = "givenExistingTenantNotActivatedAndNotAuthorizedReassignment_whenRegisterOrganization_thenOrganizationReused";
-        Command cmd = prepareRegisterOrganizationCommand(organizationName);
-        // - search tenant control normally and find an existing same organization equals named as existing (e.g like reserved by another person)
+        String organizationName = "givenExistingTenantNotActivatedAndNotAuthorizedReassignment_whenRegisterTenant_thenTenantReused";
+        Command cmd = prepareRegisterTenantCommand(organizationName);
+        // - search tenant control normally and find an existing same tenant equals named as existing (e.g like reserved by another person)
         // - none valid user account already previously registered and activated (email verified) is found regarding the existing tenant
         // - existing equals Tenant reference is confirmed with same name, but confirmed as not used (zero active user account)
         // - feature setting is NOT authorized to dynamically authorize Real re-assigning and made it
@@ -202,8 +204,8 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
      */
     @Test
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    void givenExistingTenantActivated_whenRegisterOrganization_thenOrganizationRegistrationRejected(Vertx vertx, VertxTestContext testContext) throws Exception {
-        // USE CASE TEST SCENARIO: rejected creation for cause of existing named organization that is already used by previous register
+    void givenExistingTenantActivated_whenRegisterTenant_thenTenantRegistrationRejected(Vertx vertx, VertxTestContext testContext) throws Exception {
+        // USE CASE TEST SCENARIO: rejected creation for cause of existing named tenant that is already used by previous register
 
         // START FEATURE MODULE
         featureModule.start();
@@ -211,10 +213,10 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         // TEST PROCESSING
         // Request execution of a new RegisterOrganization command over the UIS
-        String organizationName = "givenExistingTenantActivated_whenRegisterOrganization_thenOrganizationRegistrationRejected";
-        Command cmd = prepareRegisterOrganizationCommand(organizationName);
+        String organizationName = "givenExistingTenantActivated_whenRegisterTenant_thenTenantRegistrationRejected";
+        Command cmd = prepareRegisterTenantCommand(organizationName);
 
-        // - search tenant control normally and find an existing same organization equals named as existing (e.g like used by another person)
+        // - search tenant control normally and find an existing same tenant equals named as existing (e.g like used by another person)
         // - valid user account already previously registered and activated (email verified) is found regarding the existing tenant
         // - existing equals Tenant reference is confirmed with same name and already used by other population (active user accounts)
         // CHECKPOINT: Receive organization registration rejected event relative to existing/assigned tenant with used registered accounts
@@ -229,20 +231,23 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     /**
      * Prepare and return a valid command valid to be treated by the feature entrypoint.
      *
-     * @param organizationName Mandatory name of an organization subject of registration.
+     * @param tenantName Mandatory name of an organization subject of registration.
      * @return A prepared command.
      * @throws IllegalArgumentException When any mandatory parameter is missing.
      */
-    private Command prepareRegisterOrganizationCommand(String organizationName) throws IllegalArgumentException {
-        if (organizationName == null || organizationName.isEmpty())
+    private Command prepareRegisterTenantCommand(String tenantName) throws IllegalArgumentException {
+        if (tenantName == null || tenantName.isEmpty())
             throw new IllegalArgumentException("organizationName parameter is required!");
-        // Prepare json object (RegisterOrganization command event including organization naming) from translator
+        // Prepare json object (RegisterTenant command event including tenant naming) from translator
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
-        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), organizationName);
+        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.TENANT_NAMING.name(), tenantName);
         definition.add(tenantNameToRegister);
+        // Define default activity state
+        Attribute activityStatus = new Attribute(AttributeName.ACTIVITY_STATE.name(), Boolean.TRUE.toString());
+        definition.add(activityStatus);
         // Prepare RegisterOrganization command event to perform via API
-        Command cmd = CommandFactory.create(CommandName.REGISTER_ORGANIZATION.name(),
+        Command cmd = CommandFactory.create(CommandName.REGISTER_TENANT.name(),
                 new DomainEntity(IdentifierStringBased.generate(null)) /* command identity */, definition,
                 /* none prior command to reference*/ null,
                 /* None pre-identified organization because new creation */ null);

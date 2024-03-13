@@ -1,28 +1,27 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
-import org.cybnity.accesscontrol.ciam.domain.model.TenantsReadModel;
+import org.cybnity.accesscontrol.ciam.domain.model.TenantsWriteModel;
 import org.cybnity.accesscontrol.domain.service.api.ApplicationServiceOutputCause;
 import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
-import org.cybnity.accesscontrol.iam.domain.model.AccountsReadModel;
-import org.cybnity.accesscontrol.iam.domain.model.IdentitiesReadModel;
+import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantTransactionProjection;
+import org.cybnity.accesscontrol.domain.service.api.model.TenantTransaction;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
-import org.cybnity.framework.IContext;
-import org.cybnity.framework.domain.Attribute;
-import org.cybnity.framework.domain.Command;
-import org.cybnity.framework.domain.DomainEvent;
-import org.cybnity.framework.domain.IdentifierStringBased;
+import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.application.ApplicationService;
 import org.cybnity.framework.domain.event.DomainEventFactory;
 import org.cybnity.framework.domain.event.EventSpecification;
 import org.cybnity.framework.domain.model.DomainEntity;
 import org.cybnity.framework.domain.model.Tenant;
+import org.cybnity.framework.domain.model.TenantBuilder;
 import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
+import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -42,35 +41,39 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
     /**
      * Runtime context provider of service configuration.
      */
-    private final IContext context;
+    private final ISessionContext context;
+
     /**
      * Logical name of this executed service.
      */
-    private String serviceName;
-    private final TenantsReadModel tenantsRepository;
-    private final IdentitiesReadModel identitiesRepository;
-    private final AccountsReadModel accountsRepository;
+    private final String serviceName;
+    private final ITenantTransactionProjection tenantsReadModel;
+    private final TenantsWriteModel tenantsWriteModel;
+    private final Channel tenantsChangesNotificationChannel;
+    private final UISAdapter client;
 
     /**
      * Default constructor.
      *
-     * @param context              Mandatory execution context allowing read of settings required by this service.
-     * @param tenantsRepository    Mandatory repository of Tenants.
-     * @param identitiesRepository Optional repository of Identities.
-     * @param accountsRepository   Mandatory repository of Accounts.
-     * @param serviceName          Optional logical name of the service to activate.
+     * @param context                           Mandatory execution context allowing read of settings required by this service.
+     * @param tenantsStore                      Mandatory store of Tenants.
+     * @param tenantsProjection                 Mandatory repository of Tenants.
+     * @param serviceName                       Optional logical name of the service to activate.
+     * @param tenantsChangesNotificationChannel Optional output channel to feed about changed tenants (e.g created, removed, changed).
+     * @param client                            Optional client to Users Interactions Space.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    public TenantRegistration(IContext context, TenantsReadModel tenantsRepository, IdentitiesReadModel identitiesRepository, AccountsReadModel accountsRepository, String serviceName) throws IllegalArgumentException {
+    public TenantRegistration(ISessionContext context, TenantsWriteModel tenantsStore, ITenantTransactionProjection tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter client) throws IllegalArgumentException {
         super();
-        if (tenantsRepository == null) throw new IllegalArgumentException("tenantsRepository parameter is required!");
-        this.tenantsRepository = tenantsRepository;
-        if (accountsRepository == null) throw new IllegalArgumentException("accountsRepository parameter is required!");
-        this.accountsRepository = accountsRepository;
-        if (context == null) throw new IllegalArgumentException("Context parameter is require!");
+        if (tenantsStore == null) throw new IllegalArgumentException("tenantsStore parameter is required!");
+        this.tenantsWriteModel = tenantsStore;
+        if (tenantsProjection == null) throw new IllegalArgumentException("tenantsProjection parameter is required!");
+        this.tenantsReadModel = tenantsProjection;
+        if (context == null) throw new IllegalArgumentException("Context parameter is required!");
         this.context = context;
-        this.identitiesRepository = identitiesRepository;
         this.serviceName = serviceName;
+        this.client = client;
+        this.tenantsChangesNotificationChannel = tenantsChangesNotificationChannel;
     }
 
     @Override
@@ -78,64 +81,82 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
         try {
             if (command != null) {
                 // Check that command is a request of organization registration
-                if (CommandName.REGISTER_ORGANIZATION.name().equals(command.type().value())) {
+                if (CommandName.REGISTER_TENANT.name().equals(command.type().value())) {
                     // --- INPUT VALIDATION ---
                     // Read and check the organization name to register
-                    Attribute organizationNamingAtt = EventSpecification.findSpecificationByName(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), command.specification());
-                    if (organizationNamingAtt == null)
+                    Attribute tenantNamingAtt = EventSpecification.findSpecificationByName(TenantRegistrationAttributeName.TENANT_NAMING.name(), command.specification());
+                    if (tenantNamingAtt == null)
                         throw new IllegalArgumentException("Organization naming attribute shall be defined!");
-                    String organizationNaming = organizationNamingAtt.value();
-                    if (organizationNaming == null || organizationNaming.isEmpty())
+                    String tenantName = tenantNamingAtt.value();
+                    if (tenantName == null || tenantName.isEmpty())
                         throw new IllegalArgumentException("Organization naming attribute value shall be defined!");
+                    DomainEvent commandResponse;
 
                     // --- PROCESSING RULES ---
                     // Search if existing tenant already registered in domain
-                    Tenant existingOrganizatonTenant = tenantsRepository.findByName(organizationNaming);
+                    TenantTransaction existingOrganizatonTenant = tenantsReadModel.findByLabel(tenantName, /* search tenant in any in operational status avoiding duplicated tenants with same name */ null, this.context);
+
                     if (existingOrganizatonTenant != null) {
                         // Existing registered tenant is identified and known by access control domain
-
-                        // RULE : de-duplication rule about Tenant
-                        // CASE: tenant (e.g social entity with same name) creation is not authorized AND REJECTION SHALL BE NOTIFIED
-                        // Build DomainEventType.ORGANIZATION_REGISTRATION_REJECTED event
-                        DomainEvent rejectionEvent = prepareCommonResponseEvent(DomainEventType.ORGANIZATION_REGISTRATION_REJECTED, command, organizationNamingAtt, existingOrganizatonTenant);
-                        // Set precision about cause of rejection
-                        rejectionEvent.appendSpecification(new Attribute(org.cybnity.framework.domain.event.AttributeName.OUTPUT_CAUSE_TYPE.name(), ApplicationServiceOutputCause.EXISTING_TENANT_ALREADY_ASSIGNED.name()));
-
-                        // TODO Publish event to output channel
-                        //uisClient.publish(requestEvent, domainIOGateway, new MessageMapperFactory().getMapper(IDescribed.class, String.class));
+                        // RULE : de-duplication rule about existing Tenant that is already in operational activity
+                        if (existingOrganizatonTenant.activityStatus != null && existingOrganizatonTenant.activityStatus) {
+                            // CASE: tenant (e.g platform tenant with same name and already in an operational activity status not re-assignable) creation is not authorized AND REJECTION SHALL BE NOTIFIED
+                            commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTRATION_REJECTED, command, existingOrganizatonTenant.label, existingOrganizatonTenant.activityStatus, existingOrganizatonTenant.identifiedBy);
+                            // Set precision about cause of rejection
+                            commandResponse.appendSpecification(new Attribute(org.cybnity.framework.domain.event.AttributeName.OUTPUT_CAUSE_TYPE.name(), ApplicationServiceOutputCause.EXISTING_TENANT_ALREADY_ASSIGNED.name()));
+                        } else {
+                            // CASE: tenant (e.g platform tenant with same name and that is not in an operational activity status, and could potentially be re-assignable) return as known AND ELIGIBLE TO RE-ASSIGNMENT
+                            // Prepare and return new tenant actioned event
+                            commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTERED, command, existingOrganizatonTenant.label, existingOrganizatonTenant.activityStatus, existingOrganizatonTenant.identifiedBy);
+                        }
                     } else {
                         // None existing tenant with same organization name
-                        // CASE: create a new Tenant initializing into the identities repository based on the organization name
-                        DomainEvent actionedOrganizationTenantEvent = addTenant(organizationNaming, organizationNamingAtt, command);
+                        // CASE: create a new Tenant
+                        // Read optional definition of tenant activity state
+                        Attribute isActiveTenantAtt = EventSpecification.findSpecificationByName(AttributeName.ACTIVITY_STATE.name(), command.specification());
+                        Boolean activeTenantToCreate = (isActiveTenantAtt != null) ? Boolean.valueOf(isActiveTenantAtt.value()) : /* Default not active tenant */ Boolean.FALSE;
+                        // Create the new tenant item
+                        commandResponse = addTenant(tenantName, tenantNamingAtt, command, activeTenantToCreate);
+                    }
 
-                        // TODO Publish event to output channel
+                    if (commandResponse != null) {
+                        // Notify response to command sender
+                        if (this.tenantsChangesNotificationChannel != null && this.client != null) {
+                            // Notify the general output channel regarding new actioned tenant
+                            try {
+                                this.client.publish(commandResponse, tenantsChangesNotificationChannel, new MessageMapperFactory().getMapper(IDescribed.class, String.class));
+                            } catch (Exception e) {
+                                logger.log(Level.SEVERE, "Impossible notification of organization tenant registration result!", e);
+                            }
+                        }
                     }
                 } else {
-                    throw new IllegalArgumentException("Invalid type of command which is not managed by " + this.getClass().getSimpleName());
+                    throw new IllegalArgumentException("Invalid type of command which is not managed by " + this.getClass().getSimpleName() + "!");
                 }
             } else {
                 throw new IllegalArgumentException("Command parameter is required!");
             }
         } catch (ImmutabilityException ime) {
             // Impossible execution caused by a several code problem
-            logger.log(Level.SEVERE, "Impossible handle(Command command) method response!!", ime);
+            logger.log(Level.SEVERE, "Impossible handle(Command command) method response!", ime);
         }
     }
 
     /**
-     * Add a new tenant domain object into the repository of identities server.
-     * This method use delegation connector to the Identity server (e.g Keycloak system) delegated as UIAM including tenants repository.
+     * Add a new tenant domain object into the aggregates store.
      *
-     * @param tenantLabel        Mandatory name of the tenant to create into repositories.
-     * @param organizationNaming Optional attribute regarding the requested organization name to register when defined (e.g received by service).
-     * @param originEvent        Mandatory origin event handled by the service and which can be referenced as predecessor.
+     * @param tenantLabel    Mandatory name of the tenant to create into store.
+     * @param tenantNaming   Optional attribute regarding the requested tenant name to register when defined (e.g received by service).
+     * @param originEvent    Mandatory origin event handled by the service and which can be referenced as predecessor.
+     * @param isActiveTenant Optional activity status of tenant to create.
      * @return Actioned organization event including tenant description (e.g potential additional configuration and/or technical information).
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      * @throws ImmutabilityException    When usage of immutable version of content have a problem avoiding its usage.
      */
-    private DomainEvent addTenant(String tenantLabel, Attribute organizationNaming, Command originEvent) throws IllegalArgumentException, ImmutabilityException {
+    private DomainEvent addTenant(String tenantLabel, Attribute tenantNaming, Command originEvent, Boolean isActiveTenant) throws IllegalArgumentException, ImmutabilityException {
         if (tenantLabel == null || tenantLabel.isEmpty())
             throw new IllegalArgumentException("tenantLabel parameter is required and shall not be empty!");
+        if (originEvent == null) throw new IllegalArgumentException("originEvent parameter is required!");
 
         // TODO implementation of verification that equals real name is existing and accessible/usable from UIAM server (e.g Keycloak connector)
 
@@ -145,31 +166,37 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
         // RealmResource existingRes = realm(String realmName)
         // existingRes equals organization named
 
-        // TODO implementation of the write model change
+        // --- EXECUTE THE WRITE MODEL CHANGE ---
+        // Create new Tenant fact
+        TenantBuilder builder = new TenantBuilder(tenantLabel, /* Predecessor event of new tenant creation */ originEvent.getIdentifiedBy(), isActiveTenant);
+        builder.buildInstance();
+        Tenant tenant = builder.getResult();
 
-        // create new Tenant(found organization description) into domain repository
-        Tenant created = null;
-        // Prepare and return new organization actioned event
-        DomainEvent organizationActioned = prepareCommonResponseEvent(DomainEventType.ORGANIZATION_REGISTERED, originEvent, organizationNaming, created);
+        // --- EXECUTE THE WRITE MODEL CHANGE ---
+        // Append new tenant into write model stream
+        this.tenantsWriteModel.appendToStream(tenant);// Read-model is automatically notified
 
-        return null;
+        // Prepare and return new tenant actioned event
+        return prepareCommonResponseEvent(DomainEventType.TENANT_REGISTERED, originEvent, tenant.label().getLabel(), tenant.status().isActive(), tenant.identified().value().toString());
     }
 
     /**
      * Prepare and build a type of event including all standard attributes promise by this registration service as output event.
      *
-     * @param eventTypeToPrepare    Mandatory type of event to build.
-     * @param originEvent           Mandatory origin event handled by the service and which can be referenced as predecessor.
-     * @param organizationNamingAtt Optional attribute regarding the requested organization name to register when defined (e.g received by service).
-     * @param tenant                Optional tenant.
+     * @param eventTypeToPrepare   Mandatory type of event to build.
+     * @param originEvent          Mandatory origin event handled by the service and which can be referenced as predecessor.
+     * @param tenantLabel          Optional attribute regarding the requested organization name to register when defined (e.g received by service).
+     * @param tenantActivityStatus Optional activity status of tenant.
+     * @param tenantIdentifier     Mandatory identifier of tenant.
      * @return A prepared event including specifications.
      * @throws ImmutabilityException    When usage of immutable version of content have a problem avoiding its usage.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    private DomainEvent prepareCommonResponseEvent(DomainEventType eventTypeToPrepare, Command originEvent, Attribute organizationNamingAtt, Tenant tenant) throws ImmutabilityException, IllegalArgumentException {
+    private DomainEvent prepareCommonResponseEvent(DomainEventType eventTypeToPrepare, Command originEvent, String tenantLabel, Boolean tenantActivityStatus, String tenantIdentifier) throws ImmutabilityException, IllegalArgumentException {
         if (eventTypeToPrepare == null) throw new IllegalArgumentException("eventTypeToPrepare parameter is required!");
         if (originEvent == null) throw new IllegalArgumentException("originEvent parameter is required!");
-
+        if (tenantIdentifier == null || tenantIdentifier.isEmpty())
+            throw new IllegalArgumentException("Tenant identifier parameter is required!");
         // Prepare event's unique identifier referencing origin command event
         LinkedHashSet<Identifier> evtIDBasedOn = new LinkedHashSet<>();
         evtIDBasedOn.add(IdentifierStringBased.generate(null));// technical technical uid
@@ -188,19 +215,22 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
             EventSpecification.appendSpecification(correlationIdAtt, definition);
         }
         // Add origin organization name requested for registration
-        if (organizationNamingAtt != null)
-            EventSpecification.appendSpecification(organizationNamingAtt, definition);
+        if (tenantLabel != null && !tenantLabel.isEmpty()) {
+            definition.add(new Attribute(TenantRegistrationAttributeName.TENANT_NAMING.name(), tenantLabel));
+        }
+
         // Set the logical name of this pipeline which is sender of the event
         if (this.serviceName != null && !serviceName.isEmpty())
             definition.add(new Attribute(org.cybnity.framework.domain.event.AttributeName.SERVICE_NAME.name(), serviceName));
 
-        if (tenant != null) {
+        // Set activity status
+        if (tenantActivityStatus != null) {
             // Set precision about the existing tenant description synthesis (tenant's identifier, and status)
-            Boolean status = tenant.status().isActive();
-            definition.add(new Attribute(AttributeName.ACTIVITY_STATE.name(), status.toString()));
-            Serializable tenantId = tenant.identified().value();
-            definition.add(new Attribute(AttributeName.TENANT_ID.name(), tenantId.toString()));
+            definition.add(new Attribute(AttributeName.ACTIVITY_STATE.name(), tenantActivityStatus.toString()));
         }
+
+        // Set tenant uid
+        definition.add(new Attribute(AttributeName.TENANT_ID.name(), tenantIdentifier));
 
         // Build instance
         return DomainEventFactory.create(eventTypeToPrepare.name(), eventUID, definition, originEvent.reference(), /* none changedModelElementRef */ null);

@@ -9,12 +9,17 @@ import org.cybnity.framework.domain.event.IEventType;
 public enum CommandName implements IEventType {
 
     /**
-     * Registration command of an organization eligible to become a tenant as perimeter of access control.
+     * Registration command of a tenant eligible to become a perimeter of access control.
      */
-    REGISTER_ORGANIZATION,
+    REGISTER_TENANT,
 
     /**
-     * Registration command of a user account for an existing organization.
+     * Upgrade an existing tenant.
+     */
+    UPGRADE_TENANT,
+
+    /**
+     * Registration command of a user account for an existing tenant.
      */
     REGISTER_ACCOUNT,
 

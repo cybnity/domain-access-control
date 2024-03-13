@@ -32,7 +32,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
             RouteRecipientList list = new RouteRecipientList();
             // Define all supported event types by the filter
             // See TenantRegistrationFeaturePipeline of RTS computation unit project supportedEventTypesToRoutingPath() method for examples
-            list.addRoute(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_tenant_registration.shortName());
+            list.addRoute(CommandName.REGISTER_TENANT.name(), UICapabilityChannel.access_control_tenant_registration.shortName());
             return list;
         }
     };
@@ -58,7 +58,7 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
         // Create an unknown fact sample (e.g other domain fact or security attack data entry) that should not be supported by the filter
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
-        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY");
+        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.TENANT_NAMING.name(), "CYBNITY");
         definition.add(tenantNameToRegister);
         // Prepare unknown command event to perform via API
         Command requestEvent = CommandFactory.create("UNKNOWN_EVENT_TYPE", null, definition, null, null);
@@ -79,10 +79,10 @@ public class APISupportedCapabilitySelectionFilterUseCaseTest extends Contextual
         // Prepare RegisterOrganization command event including organization naming
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
-        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY");
+        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.TENANT_NAMING.name(), "CYBNITY");
         definition.add(tenantNameToRegister);
         // Prepare RegisterOrganization command event to perform via API
-        Command requestEvent = CommandFactory.create(CommandName.REGISTER_ORGANIZATION.name(),
+        Command requestEvent = CommandFactory.create(CommandName.REGISTER_TENANT.name(),
                 /* No identified as anonymous transaction without correlation id need*/ null, definition,
                 /* none prior command to reference*/ null,
                 /* None pre-identified organization because new creation */ null);

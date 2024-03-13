@@ -11,6 +11,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
@@ -37,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * @author olivier
  */
 @ExtendWith({VertxExtension.class})
-public class PublicOrganizationRegistrationUseCaseTestIntegration extends ContextualizedTest {
+public class PublicTenantRegistrationUseCaseTestIntegration extends ContextualizedTest {
 
     private HttpClient client;
     private ObjectMapper mapper;
@@ -83,10 +84,13 @@ public class PublicOrganizationRegistrationUseCaseTestIntegration extends Contex
         // Prepare json object (RegisterOrganization command event including organization naming) from translator
         Collection<Attribute> definition = new ArrayList<>();
         // Set organization name
-        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY");
+        Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.TENANT_NAMING.name(), "CYBNITY");
         definition.add(tenantNameToRegister);
+        // Set tenant activity status (TRUE by default as deployed application configuration)
+        definition.add(new Attribute(AttributeName.ACTIVITY_STATE.name(), Boolean.TRUE.toString()));
+
         // Prepare RegisterOrganization command event to perform via API
-        Command requestEvent = CommandFactory.create(CommandName.REGISTER_ORGANIZATION.name(),
+        Command requestEvent = CommandFactory.create(CommandName.REGISTER_TENANT.name(),
                 /* No identified as anonymous transaction without correlation id need*/ null, definition,
                 /* none prior command to reference*/ null,
                 /* None pre-identified organization because new creation */ null);
@@ -134,7 +138,7 @@ public class PublicOrganizationRegistrationUseCaseTestIntegration extends Contex
                     boolean isRegisteredOrganization = false, isGoodNamedTenant = false;
                     for (Attribute spec : changedEvent.specification()) {
                         // Is it an event about registered organization?
-                        if ("type".equals(spec.name()) && DomainEventType.ORGANIZATION_REGISTERED.name().equals(spec.value())) {
+                        if ("type".equals(spec.name()) && DomainEventType.TENANT_REGISTERED.name().equals(spec.value())) {
                             isRegisteredOrganization = true;
                         }
                         // Is organization naming attribute is valued?

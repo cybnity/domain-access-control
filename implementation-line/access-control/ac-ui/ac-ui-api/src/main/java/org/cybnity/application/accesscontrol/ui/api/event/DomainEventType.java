@@ -9,23 +9,28 @@ import org.cybnity.framework.domain.event.IEventType;
 public enum DomainEventType implements IEventType {
 
     /**
-     * Event about a requested organization registration in progress.
+     * Event about a requested tenant registration in progress.
      */
-    ORGANIZATION_REGISTRATION_SUBMITTED,
+    TENANT_REGISTRATION_SUBMITTED,
 
     /**
-     * Event about an organization registered as valid tenant.
+     * Event about a tenant registration finalized with success.
      */
-    ORGANIZATION_REGISTERED,
+    TENANT_REGISTERED,
 
     /**
-     * Event about a tenant created by the domain layer.
+     * Event about an existing tenant upgraded into the domain layer.
      */
-    TENANT_CREATED,
+    TENANT_CHANGED,
 
     /**
-     * Event about refused registration that include a cause (e;g existing tenant already used by other owner).
+     * Event about a tenant deleted from the domain layer.
      */
-    ORGANIZATION_REGISTRATION_REJECTED;
+    TENANT_REMOVED,
+
+    /**
+     * Event about refused registration that include a cause (e.g existing tenant already used by other owner).
+     */
+    TENANT_REGISTRATION_REJECTED;
 
 }

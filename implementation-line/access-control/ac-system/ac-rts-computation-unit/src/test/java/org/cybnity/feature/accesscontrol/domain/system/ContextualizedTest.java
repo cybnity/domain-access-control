@@ -135,7 +135,6 @@ public class ContextualizedTest {
         // Define workers environment variables
     }
 
-
     @AfterEach
     public void cleanValues() {
         // Stop redis server used by worker

@@ -31,7 +31,15 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
      */
     private static final Logger logger = Logger.getLogger(TenantRegistrationFeaturePipeline.class.getName());
 
+    /**
+     * Input channel of the registration pipeline.
+     */
     private final ICapabilityChannel pipelineInputChannel = UICapabilityChannel.access_control_tenant_registration;
+
+    /**
+     * Output channel managed by this service and which can be used for notification of any tenant change (e.g registered).
+     */
+    private final Channel featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
 
     /**
      * UIS entrypoint monitored by this worker.
@@ -90,7 +98,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
 
             // PROCESSING : identify processor (e.g local capability processor, or remote proxy) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
             // according to the type of event to process
-            TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context, featureServiceName());
+            TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context, featureServiceName(), featureTenantsChangesNotificationChannel);
             securityFilteringStep.setNext(processingAssignmentStep);
             pipelinedProcessSingleton = eventTypeFilteringStep;
         }
@@ -117,7 +125,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
         Map<IEventType, ICapabilityChannel> supportedEventTypesToRoutingPath = new HashMap<>();
 
         // --- Define each event type supported by this feature pipeline, and observed from an entrypoint ---
-        supportedEventTypesToRoutingPath.put(CommandName.REGISTER_ORGANIZATION, pipelineInputChannel);
+        supportedEventTypesToRoutingPath.put(CommandName.REGISTER_TENANT, pipelineInputChannel);
 
         return supportedEventTypesToRoutingPath;
     }

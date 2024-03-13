@@ -27,7 +27,7 @@ public class GatewayRoutingPlan extends RouteRecipientList {
         super();
 
         // Set each domain destination path supporting each type of authorized message
-        addRoute(CommandName.REGISTER_ORGANIZATION.name(), UICapabilityChannel.access_control_in.shortName());// Global entrypoint supporting organization registration command
+        addRoute(CommandName.REGISTER_TENANT.name(), UICapabilityChannel.access_control_in.shortName());// Global entrypoint supporting organization registration command
     }
 
 }

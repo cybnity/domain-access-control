@@ -34,7 +34,7 @@ public class ActivityStateUseCaseTest {
 				new DomainEntity(
 						new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString())),
 				new IdentifierStringBased(BaseConstants.IDENTIFIER_ID.name(), UUID.randomUUID().toString()),
-				Boolean.TRUE);
+				Boolean.TRUE, "CYBNITY");
 		// Deactivate by default
 		owner.deactivate();
 		propertyOwner = owner.parent().reference();

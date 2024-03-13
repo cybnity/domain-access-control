@@ -223,7 +223,7 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
         // Prepare a listener of the confirmed recipients changes
         ChannelObserver gatewayRoutingPlanChangesListener = new GatewayRoutingPlanChangesListener(testWaiter);
 
-        Runnable action = () -> {
+        final Runnable action = () -> {
             // Execute the stop of the module by undeploy process
             vertx.undeploy(processModuleId);
             processModuleId = null;
@@ -265,7 +265,7 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
                     // Detect that event is about a stopped module
 
                     // Confirm the success received announce of presence end
-                    waiter.countDown();
+                    testWaiter.countDown();
                 }
             }
         };
@@ -358,7 +358,7 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
         public void notify(IDescribed presenceAnnounceEvent) {
             logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
             // Check conformity of event
-            isValidPUPresenceAnnounced(presenceAnnounceEvent, testWaiter);
+            isValidPUPresenceAnnounced(presenceAnnounceEvent, this.testWaiter);
         }
     }
 
@@ -385,10 +385,10 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
             // Check event conformity
             if (CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name().equals(presenceDeclarationResultEvent.type().value())) {
                 // Verify the description of the registration confirmation event
-                isValidRoutingPathsRegisteredConfirmation(presenceDeclarationResultEvent, testWaiter);
+                isValidRoutingPathsRegisteredConfirmation(presenceDeclarationResultEvent, this.testWaiter);
             } else if (CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED.name().equals(presenceDeclarationResultEvent.type().value())) {
                 // Verify the description of the requested re-registration demand
-                isValidRoutingPathsRegistrationRequest(presenceDeclarationResultEvent, testWaiter);
+                isValidRoutingPathsRegistrationRequest(presenceDeclarationResultEvent, this.testWaiter);
             }
         }
     }

@@ -1,18 +1,20 @@
 package org.cybnity.accesscontrol.domain.infrastructure.impl;
 
-import org.cybnity.accesscontrol.iam.domain.model.IdentitiesReadModel;
 import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.infrastructure.IDomainRepository;
+import org.cybnity.framework.domain.model.Repository;
 import org.cybnity.framework.domain.model.SocialEntity;
 import org.cybnity.framework.immutable.Identifier;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation repository optimized for query regarding Identity objects.
  * This store is delegating persistence services to Identity server via connector (e.g identity server used by Keycloak UIAM).
  */
-public class IdentitiesRepository implements IDomainRepository<SocialEntity>, IdentitiesReadModel {
+public class IdentitiesRepository extends Repository implements IDomainRepository<SocialEntity> {
 
     private static IdentitiesRepository singleton;
 
@@ -20,6 +22,7 @@ public class IdentitiesRepository implements IDomainRepository<SocialEntity>, Id
      * Reserved constructor.
      */
     private IdentitiesRepository() {
+        super();
     }
 
     /**
@@ -27,7 +30,7 @@ public class IdentitiesRepository implements IDomainRepository<SocialEntity>, Id
      *
      * @return A singleton instance.
      */
-    public static IdentitiesReadModel getInstance() {
+    public static IdentitiesRepository instance() {
         if (singleton == null) {
             // Initializes singleton instance
             singleton = new IdentitiesRepository();
@@ -36,43 +39,38 @@ public class IdentitiesRepository implements IDomainRepository<SocialEntity>, Id
     }
 
     @Override
-    public SocialEntity findByName(String s) throws IllegalArgumentException {
+    public SocialEntity nextIdentity(ISessionContext ctx) {
         return null;
     }
 
     @Override
-    public SocialEntity findByName(String s, Class<? extends SocialEntity> aClass) throws IllegalArgumentException {
+    public SocialEntity factOfId(Identifier identifier, ISessionContext ctx) {
         return null;
     }
 
     @Override
-    public SocialEntity nextIdentity(ISessionContext iSessionContext) {
-        return null;
-    }
-
-    @Override
-    public SocialEntity factOfId(Identifier identifier, ISessionContext iSessionContext) {
-        return null;
-    }
-
-    @Override
-    public boolean remove(SocialEntity socialEntity, ISessionContext iSessionContext) {
+    public boolean remove(SocialEntity socialEntity, ISessionContext ctx) {
         return false;
     }
 
     @Override
-    public void removeAll(Collection<SocialEntity> collection, ISessionContext iSessionContext) {
+    public void removeAll(Collection<SocialEntity> collection, ISessionContext ctx) {
 
     }
 
     @Override
-    public SocialEntity save(SocialEntity socialEntity, ISessionContext iSessionContext) {
+    public SocialEntity save(SocialEntity socialEntity, ISessionContext ctx) {
         return null;
     }
 
     @Override
-    public void saveAll(Collection<SocialEntity> collection, ISessionContext iSessionContext) {
+    public void saveAll(Collection<SocialEntity> collection, ISessionContext ctx) {
 
+    }
+
+    @Override
+    public List<SocialEntity> queryWhere(Map<String, String> map, ISessionContext iSessionContext) {
+        return null;
     }
 
     @Override

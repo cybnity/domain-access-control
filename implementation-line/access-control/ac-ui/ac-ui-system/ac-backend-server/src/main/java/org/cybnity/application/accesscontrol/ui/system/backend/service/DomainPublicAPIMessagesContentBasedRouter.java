@@ -277,7 +277,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
             Collection<Attribute> changeEventDefinition = new ArrayList<>();
             Attribute correlationIdAtt = new Attribute(Command.CORRELATION_ID, originCorrelationId);
             // Set organization name created
-            Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY");
+            Attribute tenantNameToRegister = new Attribute(TenantRegistrationAttributeName.TENANT_NAMING.name(), "CYBNITY");
             changeEventDefinition.add(tenantNameToRegister);
             // Set correlation id
             changeEventDefinition.add(correlationIdAtt);// allowing finalized transaction check
@@ -285,7 +285,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
             // including a status equals to "actioned" (e.g waiting for user registration finalized with success)
             // and tenant description
             Collection<Attribute> tenantDefinition = new ArrayList<>();
-            tenantDefinition.add(new Attribute(TenantRegistrationAttributeName.ORGANIZATION_NAMING.name(), "CYBNITY"));
+            tenantDefinition.add(new Attribute(TenantRegistrationAttributeName.TENANT_NAMING.name(), "CYBNITY"));
             // Set correlation id
             tenantDefinition.add(correlationIdAtt); // allowing finalized transaction check
 
@@ -294,7 +294,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
                     tenantDefinition, /* prior as command event entity reference */ null
                     , null);
 
-            DomainEvent changeEvent = DomainEventFactory.create(DomainEventType.ORGANIZATION_REGISTERED.name(),
+            DomainEvent changeEvent = DomainEventFactory.create(DomainEventType.TENANT_REGISTERED.name(),
                     /* Identifier of the event to prepare */ null, changeEventDefinition,
                     /* Prior command cause of change*/ createdTenantEvent.getIdentifiedBy().reference(),
                     /* None pre-identified organization because new creation */ null);

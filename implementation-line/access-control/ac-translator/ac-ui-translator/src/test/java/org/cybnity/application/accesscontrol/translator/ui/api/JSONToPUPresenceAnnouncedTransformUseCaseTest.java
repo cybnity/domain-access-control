@@ -31,7 +31,7 @@ public class JSONToPUPresenceAnnouncedTransformUseCaseTest {
         Map<IEventType, ICapabilityChannel> supportedEventTypesToRoutingPath = new HashMap<>();
 
         // Defining one or several routing paths as entrypoint
-        supportedEventTypesToRoutingPath.put(DomainEventType.ORGANIZATION_REGISTRATION_SUBMITTED, UICapabilityChannel.access_control_tenant_registration);
+        supportedEventTypesToRoutingPath.put(DomainEventType.TENANT_REGISTRATION_SUBMITTED, UICapabilityChannel.access_control_tenant_registration);
         // Define a sample name of announcer
         String puServiceName = "OrganizationRegistrationFeature" + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + "capability";
 
@@ -66,7 +66,7 @@ public class JSONToPUPresenceAnnouncedTransformUseCaseTest {
         Map<IEventType, ICapabilityChannel> supportedEventTypesToRoutingPath = new HashMap<>();
 
         // Defining one or several routing paths as entrypoint
-        supportedEventTypesToRoutingPath.put(DomainEventType.ORGANIZATION_REGISTRATION_SUBMITTED, UICapabilityChannel.access_control_tenant_registration);
+        supportedEventTypesToRoutingPath.put(DomainEventType.TENANT_REGISTRATION_SUBMITTED, UICapabilityChannel.access_control_tenant_registration);
         // Define a sample name of announcer
         String puServiceName = "OrganizationRegistrationFeature" + NamingConventions.SPACE_ACTOR_NAME_SEPARATOR + "capability";
 

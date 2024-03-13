@@ -7,9 +7,9 @@ package org.cybnity.application.accesscontrol.ui.api.event;
 public enum TenantRegistrationAttributeName {
 
     /**
-     * Attribute relative to the value object equals to a name of organization.
+     * Attribute relative to the value object equals to a name of tenant.
      */
-    ORGANIZATION_NAMING,
+    TENANT_NAMING,
 
     /**
      * Quantity of active accounts.

@@ -12,6 +12,11 @@ public enum AttributeName {
     ACTIVITY_STATE,
 
     /**
+     * Naming label of a tenant.
+     */
+    TENANT_LABEL,
+
+    /**
      * Identifier of a Tenant.
      */
     TENANT_ID;

@@ -1,18 +1,20 @@
 package org.cybnity.accesscontrol.iam.domain.infrastructure.impl;
 
 import org.cybnity.accesscontrol.iam.domain.model.Account;
-import org.cybnity.accesscontrol.iam.domain.model.AccountsReadModel;
 import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.infrastructure.IDomainRepository;
+import org.cybnity.framework.domain.model.Repository;
 import org.cybnity.framework.immutable.Identifier;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation repository optimized for query regarding Account objects.
  * This store is delegating persistence services to UIAM server via connector.
  */
-public class AccountsRepository implements IDomainRepository<Account>, AccountsReadModel {
+public class AccountsRepository extends Repository implements IDomainRepository<Account> {
 
     private static AccountsRepository singleton;
 
@@ -20,6 +22,7 @@ public class AccountsRepository implements IDomainRepository<Account>, AccountsR
      * Reserved constructor.
      */
     private AccountsRepository() {
+        super();
     }
 
     /**
@@ -27,7 +30,7 @@ public class AccountsRepository implements IDomainRepository<Account>, AccountsR
      *
      * @return A singleton instance.
      */
-    public static AccountsReadModel getInstance() {
+    public static AccountsRepository instance() {
         if (singleton == null) {
             // Initializes singleton instance
             singleton = new AccountsRepository();
@@ -66,6 +69,11 @@ public class AccountsRepository implements IDomainRepository<Account>, AccountsR
     }
 
     @Override
+    public List<Account> queryWhere(Map<String, String> map, ISessionContext iSessionContext) {
+        return null;
+    }
+
+    @Override
     public Account nextIdentity() {
         return null;
     }
@@ -94,4 +102,5 @@ public class AccountsRepository implements IDomainRepository<Account>, AccountsR
     public void saveAll(Collection<Account> collection) {
 
     }
+
 }

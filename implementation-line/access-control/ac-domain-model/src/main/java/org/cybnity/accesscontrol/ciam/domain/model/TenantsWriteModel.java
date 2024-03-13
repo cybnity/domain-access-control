@@ -13,11 +13,12 @@ import org.cybnity.framework.domain.model.Tenant;
 public interface TenantsWriteModel extends IWriteModel {
 
     /**
-     * Register a new Tenant into the Tenants registry which is declared as represent of an organization.
+     * Add change events into the tenant stream as modified domain object, which is saved into the tenants store.
+     * When previous stream already exist regarding the same tenant stream version, it is enhanced.
+     * When none is existing, a new tenant stream is created and
      *
-     * @param organizationName Mandatory name of the organization owning the tenant to create.
-     * @return Instance of new created tenant.
-     * @throws IllegalArgumentException When any mandatory parameter is not valid.
+     * @param fact Mandatory fact to append.
+     * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public Tenant createTenant(String organizationName) throws IllegalArgumentException;
+    public void appendToStream(Tenant fact) throws IllegalArgumentException;
 }
