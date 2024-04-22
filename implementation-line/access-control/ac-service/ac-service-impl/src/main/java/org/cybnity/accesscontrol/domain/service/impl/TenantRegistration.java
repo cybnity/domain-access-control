@@ -9,6 +9,7 @@ import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.application.ApplicationService;
 import org.cybnity.framework.domain.event.DomainEventFactory;
@@ -139,6 +140,9 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
         } catch (ImmutabilityException ime) {
             // Impossible execution caused by a several code problem
             logger.log(Level.SEVERE, "Impossible handle(Command command) method response!", ime);
+        } catch (UnoperationalStateException e) {
+            // Problem during the persistence system usage
+            logger.log(Level.SEVERE, "Impossible handle(Command command) for cause of persistence system in non operational state!", e);
         }
     }
 
@@ -150,10 +154,11 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
      * @param originEvent    Mandatory origin event handled by the service and which can be referenced as predecessor.
      * @param isActiveTenant Optional activity status of tenant to create.
      * @return Actioned organization event including tenant description (e.g potential additional configuration and/or technical information).
-     * @throws IllegalArgumentException When mandatory parameter is not defined.
-     * @throws ImmutabilityException    When usage of immutable version of content have a problem avoiding its usage.
+     * @throws IllegalArgumentException    When mandatory parameter is not defined.
+     * @throws ImmutabilityException       When usage of immutable version of content have a problem avoiding its usage.
+     * @throws UnoperationalStateException When problem of persistence system usage.
      */
-    private DomainEvent addTenant(String tenantLabel, Attribute tenantNaming, Command originEvent, Boolean isActiveTenant) throws IllegalArgumentException, ImmutabilityException {
+    private DomainEvent addTenant(String tenantLabel, Attribute tenantNaming, Command originEvent, Boolean isActiveTenant) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException {
         if (tenantLabel == null || tenantLabel.isEmpty())
             throw new IllegalArgumentException("tenantLabel parameter is required and shall not be empty!");
         if (originEvent == null) throw new IllegalArgumentException("originEvent parameter is required!");
@@ -174,7 +179,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
 
         // --- EXECUTE THE WRITE MODEL CHANGE ---
         // Append new tenant into write model stream
-        this.tenantsWriteModel.appendToStream(tenant);// Read-model is automatically notified
+        this.tenantsWriteModel.add(tenant);// Read-model is automatically notified
 
         // Prepare and return new tenant actioned event
         return prepareCommonResponseEvent(DomainEventType.TENANT_REGISTERED, originEvent, tenant.label().getLabel(), tenant.status().isActive(), tenant.identified().value().toString());

@@ -1,144 +1,149 @@
 package org.cybnity.accesscontrol.ciam.domain.infrastructure.impl;
 
-import org.cybnity.framework.domain.DomainEvent;
+import org.cybnity.framework.IContext;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.ISessionContext;
-import org.cybnity.framework.domain.ISnapshotRepository;
 import org.cybnity.framework.domain.infrastructure.IDomainStore;
-import org.cybnity.framework.domain.model.EventStore;
-import org.cybnity.framework.domain.model.EventStream;
-import org.cybnity.framework.domain.model.HydrationCapability;
-import org.cybnity.framework.domain.model.Tenant;
+import org.cybnity.framework.domain.infrastructure.ISnapshotRepository;
+import org.cybnity.framework.domain.infrastructure.SnapshotProcessEventStreamPersistenceBased;
+import org.cybnity.framework.domain.model.*;
 import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
-import org.cybnity.framework.support.annotation.Requirement;
-import org.cybnity.framework.support.annotation.RequirementCategory;
+import org.cybnity.framework.immutable.persistence.FactRecord;
+import org.cybnity.infastructure.technical.persistence.store.impl.redis.DomainResourceStoreRedisImpl;
+import org.cybnity.infastructure.technical.persistence.store.impl.redis.PersistentObjectNamingConvention;
 
-import java.util.List;
-import java.util.logging.Level;
+import java.io.Serializable;
 import java.util.logging.Logger;
 
 /**
  * Implementation store optimized for write operations regarding Tenant objects.
- * This store is delegating persistence services to persistent stream .
+ * This store is delegating persistence services to unified persistent stream supporting all Tenants instances histories, and is supported by snapshot management capabilities.
  */
-public class TenantsStore extends EventStore implements IDomainStore<Tenant>, ISnapshotRepository {
+public class TenantsStore extends DomainResourceStoreRedisImpl implements IDomainStore<Tenant> {
 
     private static TenantsStore singleton;
 
     private final Logger logger = Logger.getLogger(TenantsStore.class.getName());
 
     /**
-     * Get a store instance.
+     * Default constructor.
      *
-     * @return A singleton instance.
+     * @param ctx                   Mandatory context.
+     * @param dataOwner             Mandatory domain which is owner of the persisted object types into the store.
+     * @param managedObjectCategory Mandatory type of convention applicable for the type of object which is managed by this store.
+     * @param snapshotsCapability   Optional snapshots repository able to be used by this store helping to optimize events rehydration.
+     * @throws UnoperationalStateException When impossible instantiation of UISAdapter based on context parameter.
+     * @throws IllegalArgumentException    When any mandatory parameter is missing.
      */
-    public static TenantsStore instance() {
+    public TenantsStore(IContext ctx, IDomainModel dataOwner, PersistentObjectNamingConvention.NamingConventionApplicability managedObjectCategory, ISnapshotRepository snapshotsCapability) throws UnoperationalStateException, IllegalArgumentException {
+        super(ctx, dataOwner, managedObjectCategory, snapshotsCapability);
+    }
+
+    /**
+     * Get an instance of the event store, ready for operating (e.g configured).
+     *
+     * @param ctx                   Mandatory context.
+     * @param dataOwner             Mandatory domain which is owner of the persisted object types into the store.
+     * @param managedObjectCategory Mandatory type of convention applicable for the type of object which is managed by this store.
+     * @param snapshotsCapability   Optional snapshots repository able to be used by this store helping to optimize events rehydration.
+     * @return An instance ensuring the persistence of events.
+     * @throws UnoperationalStateException When impossible instantiation of adapter to Redis persistence system.
+     * @throws IllegalArgumentException    When any mandatory parameter is missing.
+     */
+    public static IDomainStore<Tenant> instance(IContext ctx, IDomainModel dataOwner, PersistentObjectNamingConvention.NamingConventionApplicability managedObjectCategory, ISnapshotRepository snapshotsCapability) throws UnoperationalStateException, IllegalArgumentException {
         if (singleton == null) {
             // Initializes singleton instance
-            singleton = new TenantsStore();
+            singleton = new TenantsStore(ctx, dataOwner, managedObjectCategory, snapshotsCapability);
         }
         return singleton;
     }
 
-    /**
-     * Reserved constructor.
-     */
-    private TenantsStore() {
-    }
-
     @Override
-    public void append(Tenant tenant, ISessionContext ctx) {
+    public void append(Tenant tenant, ISessionContext ctx) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException {
         if (tenant != null) {
-            // Append in persistent stream
             this.append(tenant);
         }
     }
 
     @Override
-    public void append(Tenant tenant) {
+    public void append(Tenant tenant) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException {
         if (tenant != null) {
-            try {
-                // Append in persistent stream
-                this.appendToStream(tenant.identified(), tenant.changeEvents());
-            } catch (ImmutabilityException e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);
-                throw new RuntimeException(e);
+            // Execute the storage action to the store's stream
+            appendToStream(tenant.identified(), tenant.changeEvents());
+
+            // --- SNAPSHOT ACTIVATION ---
+            ISnapshotRepository snapRepo = this.snapshotsRepository();
+            if (snapRepo != null) {
+                final Identifier id = tenant.identified();
+                // Create and save a snapshot version into snapshots repository
+                SnapshotProcessEventStreamPersistenceBased snapshotProcess = new SnapshotProcessEventStreamPersistenceBased(/* streamedEventsProvider*/ this, /* snapshotsPersistenceSystem */ snapRepo, new Tenant.MutedTenantFactory()) {
+                    @Override
+                    protected HydrationCapability getRehydratedInstanceFrom(EventStream eventStream, MutedAggregateFactory mutedInstanceFactory) throws IllegalArgumentException {
+                        // Re-hydrate events from stream
+                        return mutedInstanceFactory.instanceOf(id, eventStream.getEvents());
+                    }
+
+                    @Override
+                    protected String snapshotsNamespace() {
+                        return snapshotsStorageNameSpace;
+                    }
+                };
+
+                // Generate snapshot and save it into snapshots repository
+                snapshotProcess.generateSnapshot(tenant.identified().value().toString());
             }
         }
     }
 
     @Override
-    public Tenant findEventFrom(Identifier identifier, ISessionContext ctx) {
+    public Tenant findEventFrom(Identifier identifier, ISessionContext ctx) throws IllegalArgumentException, UnoperationalStateException {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         return findEventFrom(identifier);
     }
 
+    /**
+     * Get the last version of Tenant full state from its write-model, as last version known when the change identifier was applied.
+     * When snapshot repository is existing, this service attempt to find latest snapshot version for re-hydration performance optimization;
+     * else read origin event stream for re-hydration of the tenant to search and return.
+     *
+     * @param identifier Mandatory identifier of the Tenant to load.
+     * @return A tenant full state valued.
+     */
     @Override
-    public Tenant findEventFrom(Identifier identifier) {
+    public Tenant findEventFrom(Identifier identifier) throws IllegalArgumentException, UnoperationalStateException {
         if (identifier != null) {
-            EventStream stream = loadEventStream(identifier.value().toString());
+            // Read potential existing snapshot when available repository
+            String snapshotVersion = String.valueOf(Tenant.serialVersionUID());
+            ISnapshotRepository snapRepo = snapshotsRepository();
+            if (snapRepo != null) {
+                ISnapshot rehydratedVersionContainer = snapRepo.getLatestSnapshotById(identifier.value().toString(), snapshotsStorageNameSpace);
+                if (rehydratedVersionContainer != null && FactRecord.class.isAssignableFrom(rehydratedVersionContainer.getClass())) {
+                    FactRecord fact = (FactRecord) rehydratedVersionContainer;
+                    Serializable rehydratableObject = fact.body();
+                    if (rehydratableObject != null && HydrationCapability.class.isAssignableFrom(rehydratableObject.getClass())) {
+                        // Load any events since snapshot was taken
+                        EventStream stream = loadEventStreamAfterVersion(identifier.value().toString(), snapshotVersion);
+                        if (stream != null) {
+                            // Replay these events to update snapshot
+                            Tenant tenantObj = (Tenant) rehydratableObject;
+                            tenantObj.replayEvents(stream);
+                            return tenantObj;// Return rehydrated snapshot based instance
+                        }
+                    }
 
+                } // else  None available persisted snapshot
+            }
+
+            // --- None active snapshot supporting this store, or none rehydrated version retrieved from snapshots repository ---
+            // Load events and aggregate from store
+            EventStream stream = loadEventStream(identifier.value().toString());
             if (stream != null) {
-                // Re-hydrate event from stream
+                // Re-hydrate event from origin stream and return instance
                 return Tenant.instanceOf(identifier, stream.getEvents());
             }
         }
         return null;
     }
 
-
-    @Requirement(reqType = RequirementCategory.Robusteness, reqId = "REQ_ROB_3")
-    @Override
-    public void appendToStream(Identifier domainEventId, List<DomainEvent> changes) throws IllegalArgumentException, ImmutabilityException {
-        if (domainEventId == null) throw new IllegalArgumentException("domainEventId parameter is required!");
-        if (changes == null) throw new IllegalArgumentException("changes parameter is required!");
-        if (changes.isEmpty()) return; // noting to change on domain event
-
-        // TODO implementation of append to persistent stream
-        // TODO identifier si event stream déjà existant concernant dans les tenant de cette version (le réutiliser, ou en créer un nouveau)
-        // REQ_ROB_3, REQ_CONS_8 use generic fact table (application-agnostic structure) approach for any type of data type (states persistence database, optimized for insertion, and saving the data changes in one collection per type of fact) with structural version model based on hashed version of 88 characters using 512-bit SHA-2 hash that support base-64
-
-        //@Requirement(reqType = RequirementCategory.Consistency, reqId = "REQ_CONS_8")
-        //@Requirement(reqType = RequirementCategory.Robustness, reqId = "REQ_ROB_3")
-
-
-        // Promote notification to subscribers (e.g read-model repositories) about the change events that have been stored and that can have interested fo data view projections (read-model)
-        for (DomainEvent changeEvt : changes) {
-            subscribersManager().publish(changeEvt);
-        }
-        throw new IllegalArgumentException("to implement!");
-    }
-
-    @Override
-    public EventStream loadEventStream(String id) throws IllegalArgumentException {
-        if (id == null) throw new IllegalArgumentException("id parameter is required!");
-        // Search event stream according to all event record versions supported (all columns per event record class version)
-
-        // TODO load from store all event regarding this tenant id
-        // TODO add snapshot repository load in case of version availability before to load the full events for rehydration
-        throw new IllegalArgumentException("to implement!");
-    }
-
-    @Override
-    public EventStream loadEventStreamAfterVersion(String domainEventId, String snapshotVersion) throws IllegalArgumentException {
-        // TODO
-        return null;
-    }
-
-    @Override
-    public EventStream loadEventStream(String id, int skipEvents, int maxCount) throws IllegalArgumentException {
-        // TODO load from store all event regarding this tenant id
-        // TODO add snapshot repository load in case of version availability before to load the full events for rehydration
-        throw new IllegalArgumentException("to implement!");
-    }
-
-    @Override
-    public HydrationCapability getLatestSnapshotById(String s, String s1) throws IllegalArgumentException {
-        return null;
-    }
-
-    @Override
-    public void saveSnapshot(String s, HydrationCapability hydrationCapability, String s1) throws IllegalArgumentException {
-
-    }
 }

@@ -77,6 +77,11 @@
 				<scope>compile</scope>
 				<version>${foundation.compatibility.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.cybnity.features.technical.persistence</groupId>
+				<artifactId>redis-store</artifactId>
+				<version>${foundation.compatibility.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

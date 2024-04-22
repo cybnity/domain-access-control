@@ -4,6 +4,7 @@ import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantTransactionProje
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransaction;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.DomainEvent;
 import org.cybnity.framework.domain.ISessionContext;
@@ -88,7 +89,7 @@ public class TenantLabelOptimizedProjectionImpl implements ITenantTransactionPro
         }
     }
 
-    private void whenRegistered(ConcreteDomainChangeEvent evt) throws ImmutabilityException {
+    private void whenRegistered(ConcreteDomainChangeEvent evt) throws ImmutabilityException, UnoperationalStateException {
         if (evt != null) {
             // Read the domain object's identifier that have been changed
             EntityReference changedWriteModelObjectRef = evt.changedModelElementReference();
@@ -125,7 +126,7 @@ public class TenantLabelOptimizedProjectionImpl implements ITenantTransactionPro
         }
     }
 
-    private void whenChanged(ConcreteDomainChangeEvent evt) throws ImmutabilityException {
+    private void whenChanged(ConcreteDomainChangeEvent evt) throws ImmutabilityException, UnoperationalStateException {
         if (evt != null) {
             EntityReference changedWriteModelObjectRef = evt.changedModelElementReference();
             Identifier sourceDomainObjId = evt.changeSourceIdentifier();

@@ -1,9 +1,11 @@
 package org.cybnity.accesscontrol.ciam.domain.infrastructure.impl;
 
 import org.cybnity.accesscontrol.ciam.domain.model.TenantsWriteModel;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.infrastructure.IDomainStore;
 import org.cybnity.framework.domain.model.Tenant;
+import org.cybnity.framework.immutable.ImmutabilityException;
 
 import java.util.logging.Logger;
 
@@ -48,14 +50,14 @@ public class TenantsWriteModelImpl implements TenantsWriteModel {
     }
 
     @Override
-    public void appendToStream(Tenant tenant) throws IllegalArgumentException {
-        if (tenant == null) throw new IllegalArgumentException("tenant parameter is required!");
-        // Add new version  of object into persistence system
-        this.persistenceLayer.append(tenant);
+    public void handle(Command command) throws IllegalArgumentException {
+        throw new IllegalArgumentException("not implemented!");
     }
 
     @Override
-    public void handle(Command command) throws IllegalArgumentException {
-        throw new IllegalArgumentException("not implemented!");
+    public void add(Tenant tenant) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException {
+        if (tenant == null) throw new IllegalArgumentException("tenant parameter is required!");
+        // Add new version  of object into persistence system
+        this.persistenceLayer.append(tenant);
     }
 }
