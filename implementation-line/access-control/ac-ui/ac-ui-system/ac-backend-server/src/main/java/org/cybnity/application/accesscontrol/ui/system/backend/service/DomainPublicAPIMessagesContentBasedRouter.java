@@ -22,7 +22,7 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.MessageMappe
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
-import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,7 +79,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
             // Prepare client configured for interactions with the UIS
             // according to the defined environment variables (autonomous connection from worker to UIS)
             // defined on the runtime server executing this worker
-            uisClient = new UISAdapterImpl(new Context() /* Current context of adapter runtime*/);
+            uisClient = new UISAdapterRedisImpl(new Context() /* Current context of adapter runtime*/);
         } catch (IllegalArgumentException iae) {
             // Problem of context read
             throw new UnoperationalStateException(iae);

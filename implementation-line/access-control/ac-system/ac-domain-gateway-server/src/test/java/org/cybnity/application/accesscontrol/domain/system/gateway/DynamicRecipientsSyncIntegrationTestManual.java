@@ -16,7 +16,7 @@ import org.cybnity.framework.domain.event.CollaborationEventType;
 import org.cybnity.framework.domain.event.EventSpecification;
 import org.cybnity.framework.domain.event.ProcessingUnitPresenceAnnounced;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.*;
-import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
+public class DynamicRecipientsSyncIntegrationTestManual extends ContextualizedTest {
 
     private Thread gatewayModule, processModule;
 
@@ -80,7 +80,7 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
         });
 
         // Initialize an adapter connected to contextualized Redis server (Users Interactions Space)
-        uisClient = new UISAdapterImpl(getContext());
+        uisClient = new UISAdapterRedisImpl(getContext());
     }
 
     /**
@@ -242,30 +242,33 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
             }
 
             @Override
-            public void notify(IDescribed presenceAnnounceEvent) {
-                // Process module announce have been received
-                logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
+            public void notify(Object event) {
+                if(IDescribed.class.isAssignableFrom(event.getClass())) {
+                    IDescribed presenceAnnounceEvent = (IDescribed) event;
+                    // Process module announce have been received
+                    logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
 
-                // --- CHECK VALID ANNOUNCE ABOUT UNAVAILABILITY ---
-                Assertions.assertTrue(presenceAnnounceEvent instanceof ProcessingUnitPresenceAnnounced, "Should be announced over a standardized event type!");
-                ProcessingUnitPresenceAnnounced evt = (ProcessingUnitPresenceAnnounced) presenceAnnounceEvent;
-                Assertions.assertNotNull(evt.serviceName());
+                    // --- CHECK VALID ANNOUNCE ABOUT UNAVAILABILITY ---
+                    Assertions.assertTrue(presenceAnnounceEvent instanceof ProcessingUnitPresenceAnnounced, "Should be announced over a standardized event type!");
+                    ProcessingUnitPresenceAnnounced evt = (ProcessingUnitPresenceAnnounced) presenceAnnounceEvent;
+                    Assertions.assertNotNull(evt.serviceName());
 
-                // Detect if it's a module start or end of operational status
-                if (IPresenceObservability.PresenceState.AVAILABLE.name().equals(evt.presenceStatus().value())) {
-                    Collection<Attribute> att = presenceAnnounceEvent.specification();
-                    Attribute nameAttr = EventSpecification.findSpecificationByName(ProcessingUnitPresenceAnnounced.SpecificationAttribute.SERVICE_NAME.name(), att);
-                    // Considerate only feature processing unit
-                    if (nameAttr != null && FEATURE_SERVICE_NAME.equals(nameAttr.value())) {
-                        // Now undeploy the confirmed started PU
-                        // via stop of module
-                        action.run();
+                    // Detect if it's a module start or end of operational status
+                    if (IPresenceObservability.PresenceState.AVAILABLE.name().equals(evt.presenceStatus().value())) {
+                        Collection<Attribute> att = presenceAnnounceEvent.specification();
+                        Attribute nameAttr = EventSpecification.findSpecificationByName(ProcessingUnitPresenceAnnounced.SpecificationAttribute.SERVICE_NAME.name(), att);
+                        // Considerate only feature processing unit
+                        if (nameAttr != null && FEATURE_SERVICE_NAME.equals(nameAttr.value())) {
+                            // Now undeploy the confirmed started PU
+                            // via stop of module
+                            action.run();
+                        }
+                    } else {
+                        // Detect that event is about a stopped module
+
+                        // Confirm the success received announce of presence end
+                        testWaiter.countDown();
                     }
-                } else {
-                    // Detect that event is about a stopped module
-
-                    // Confirm the success received announce of presence end
-                    testWaiter.countDown();
                 }
             }
         };
@@ -355,10 +358,13 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
         }
 
         @Override
-        public void notify(IDescribed presenceAnnounceEvent) {
-            logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
-            // Check conformity of event
-            isValidPUPresenceAnnounced(presenceAnnounceEvent, this.testWaiter);
+        public void notify(Object evt) {
+            if (IDescribed.class.isAssignableFrom(evt.getClass())) {
+                IDescribed presenceAnnounceEvent = (IDescribed)evt;
+                logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
+                // Check conformity of event
+                isValidPUPresenceAnnounced(presenceAnnounceEvent, this.testWaiter);
+            }
         }
     }
 
@@ -380,15 +386,18 @@ public class DynamicRecipientsSyncIntegrationTest extends ContextualizedTest {
         }
 
         @Override
-        public void notify(IDescribed presenceDeclarationResultEvent) {
-            logger.fine("--- Routing plan update event: " + presenceDeclarationResultEvent.type().value());
-            // Check event conformity
-            if (CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name().equals(presenceDeclarationResultEvent.type().value())) {
-                // Verify the description of the registration confirmation event
-                isValidRoutingPathsRegisteredConfirmation(presenceDeclarationResultEvent, this.testWaiter);
-            } else if (CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED.name().equals(presenceDeclarationResultEvent.type().value())) {
-                // Verify the description of the requested re-registration demand
-                isValidRoutingPathsRegistrationRequest(presenceDeclarationResultEvent, this.testWaiter);
+        public void notify(Object evt) {
+            if (IDescribed.class.isAssignableFrom(evt.getClass())) {
+                IDescribed presenceDeclarationResultEvent = (IDescribed) evt;
+                logger.fine("--- Routing plan update event: " + presenceDeclarationResultEvent.type().value());
+                // Check event conformity
+                if (CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name().equals(presenceDeclarationResultEvent.type().value())) {
+                    // Verify the description of the registration confirmation event
+                    isValidRoutingPathsRegisteredConfirmation(presenceDeclarationResultEvent, this.testWaiter);
+                } else if (CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED.name().equals(presenceDeclarationResultEvent.type().value())) {
+                    // Verify the description of the requested re-registration demand
+                    isValidRoutingPathsRegistrationRequest(presenceDeclarationResultEvent, this.testWaiter);
+                }
             }
         }
     }

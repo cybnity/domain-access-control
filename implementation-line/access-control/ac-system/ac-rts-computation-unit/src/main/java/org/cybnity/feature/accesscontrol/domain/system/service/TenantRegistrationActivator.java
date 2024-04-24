@@ -9,11 +9,15 @@ import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
 import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantTransactionProjection;
 import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantsReadModel;
 import org.cybnity.accesscontrol.domain.service.impl.TenantRegistration;
+import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.IContext;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.service.AbstractServiceActivator;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.IDescribed;
 import org.cybnity.framework.domain.model.SessionContext;
+import org.cybnity.infastructure.technical.persistence.store.impl.redis.PersistentObjectNamingConvention;
+import org.cybnity.infastructure.technical.persistence.store.impl.redis.SnapshotRepositoryRedisImpl;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 
@@ -37,15 +41,16 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
      * @param serviceName                              Optional logical name of the service to activate.
      * @param featureTenantsChangesNotificationChannel Optional channel managed by registration service for notification of Tenants changes (e.g created, removed).
      * @throws IllegalArgumentException When mandatory parameter is missing.
+     * @throws UnoperationalStateException When impossible instantiation of the tenant snapshots repository adapter.
      */
-    public TenantRegistrationActivator(UISAdapter client, IContext context, String serviceName, Channel featureTenantsChangesNotificationChannel) throws IllegalArgumentException {
+    public TenantRegistrationActivator(UISAdapter client, IContext context, String serviceName, Channel featureTenantsChangesNotificationChannel) throws IllegalArgumentException, UnoperationalStateException {
         this.client = client;
         if (context == null) throw new IllegalArgumentException("Context parameter is required!");
 
         // --- Initialization of the tenant read-model and write-model reused by the registration service ---
 
         // Event store managing the tenant streams persistence layer
-        TenantsStore tenantWriteModelPersistenceLayer = TenantsStore.instance();
+        TenantsStore tenantWriteModelPersistenceLayer = new TenantsStore(context, new AccessControlDomainModel(), PersistentObjectNamingConvention.NamingConventionApplicability.TENANT, new SnapshotRepositoryRedisImpl(context));
         // Repository managing the tenant read-model projections
         TenantTransactionsRepository tenantsRepository = TenantTransactionsRepository.instance();
 

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -96,11 +97,15 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
             AccessControlChecker securityFilteringStep = new AccessControlChecker(observed(), initSecuredFunctions());
             eventTypeFilteringStep.setNext(securityFilteringStep);
 
-            // PROCESSING : identify processor (e.g local capability processor, or remote proxy) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
-            // according to the type of event to process
-            TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context, featureServiceName(), featureTenantsChangesNotificationChannel);
-            securityFilteringStep.setNext(processingAssignmentStep);
-            pipelinedProcessSingleton = eventTypeFilteringStep;
+            try {
+                // PROCESSING : identify processor (e.g local capability processor, or remote proxy) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
+                // according to the type of event to process
+                TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context, featureServiceName(), featureTenantsChangesNotificationChannel);
+                securityFilteringStep.setNext(processingAssignmentStep);
+                pipelinedProcessSingleton = eventTypeFilteringStep;
+            } catch (UnoperationalStateException e) {
+                logger().log(Level.SEVERE, e.getMessage(), e);
+            }
         }
         return pipelinedProcessSingleton;
     }

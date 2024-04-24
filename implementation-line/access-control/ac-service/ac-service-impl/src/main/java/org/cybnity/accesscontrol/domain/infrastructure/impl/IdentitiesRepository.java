@@ -39,6 +39,11 @@ public class IdentitiesRepository extends Repository implements IDomainRepositor
     }
 
     @Override
+    public void freeResources() {
+
+    }
+
+    @Override
     public SocialEntity nextIdentity(ISessionContext ctx) {
         return null;
     }

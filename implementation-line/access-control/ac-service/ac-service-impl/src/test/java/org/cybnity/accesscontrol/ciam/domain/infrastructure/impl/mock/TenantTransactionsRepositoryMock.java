@@ -53,6 +53,11 @@ public class TenantTransactionsRepositoryMock extends Repository implements IDom
     }
 
     @Override
+    public void freeResources() {
+
+    }
+
+    @Override
     public TenantTransactionsCollection nextIdentity(ISessionContext ctx) {
         return null;
     }

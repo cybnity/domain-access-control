@@ -45,6 +45,11 @@ public class TenantTransactionsRepository extends Repository implements IDomainR
     }
 
     @Override
+    public void freeResources() {
+
+    }
+
+    @Override
     public TenantTransactionsCollection nextIdentity(ISessionContext ctx) {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         return null;

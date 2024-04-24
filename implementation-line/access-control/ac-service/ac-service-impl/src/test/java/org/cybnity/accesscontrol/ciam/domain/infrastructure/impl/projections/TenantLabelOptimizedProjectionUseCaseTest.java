@@ -1,5 +1,6 @@
 package org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.projections;
 
+import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantTransactionsRepository;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantTransactionsRepositoryMock;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransaction;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
@@ -25,6 +26,8 @@ public class TenantLabelOptimizedProjectionUseCaseTest {
     @BeforeEach
     public void initResources() {
         viewsRepository = TenantTransactionsRepositoryMock.instance();
+        // TODO Change for use of the standard repository based on adapter to ArangoDB
+        //viewsRepository = TenantTransactionsRepository.instance();
         projection = new TenantLabelOptimizedProjectionImpl(viewsRepository, null);
     }
 

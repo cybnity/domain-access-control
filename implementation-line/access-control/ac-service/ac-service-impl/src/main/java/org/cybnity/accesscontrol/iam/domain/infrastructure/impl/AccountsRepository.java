@@ -39,6 +39,11 @@ public class AccountsRepository extends Repository implements IDomainRepository<
     }
 
     @Override
+    public void freeResources() {
+
+    }
+
+    @Override
     public Account nextIdentity(ISessionContext iSessionContext) {
         return null;
     }

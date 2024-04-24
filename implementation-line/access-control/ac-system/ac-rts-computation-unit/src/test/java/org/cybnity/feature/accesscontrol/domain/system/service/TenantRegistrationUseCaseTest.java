@@ -20,7 +20,7 @@ import org.cybnity.framework.domain.model.DomainEntity;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
-import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterImpl;
+import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,7 +82,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         });
 
         // Initialize an adapter connected to contextualized Redis server (Users Interactions Space)
-        uisClient = new UISAdapterImpl(getContext());
+        uisClient = new UISAdapterRedisImpl(getContext());
     }
 
     /**

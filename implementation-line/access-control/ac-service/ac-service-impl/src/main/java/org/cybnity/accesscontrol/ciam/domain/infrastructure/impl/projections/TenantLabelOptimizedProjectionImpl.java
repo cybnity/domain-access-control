@@ -169,7 +169,7 @@ public class TenantLabelOptimizedProjectionImpl implements ITenantTransactionPro
     }
 
     private void whenRemoved(ConcreteDomainChangeEvent evt) {
-
+        // TODO remove projection from the repository regarding deleted tenant
     }
 
     /**
