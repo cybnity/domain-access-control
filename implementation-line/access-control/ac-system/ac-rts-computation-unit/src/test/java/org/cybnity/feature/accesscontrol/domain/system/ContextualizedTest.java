@@ -1,5 +1,8 @@
 package org.cybnity.feature.accesscontrol.domain.system;
 
+import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.CIAMWriteModelConfigurationVariable;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.ACWriteModelConfigurationVariable;
+import org.cybnity.accesscontrol.iam.domain.infrastructure.impl.IAMWriteModelConfigurationVariable;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
@@ -72,6 +75,21 @@ public class ContextualizedTest {
      */
     static protected String DATABASE_NUMBER = "1";
 
+    /**
+     * Default duration in seconds of each IAM object snapshot version stored in Redis.
+     */
+    static protected Long IAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 60L;
+
+    /**
+     * Default duration in seconds of each CIAM object snapshot version stored in Redis.
+     */
+    static protected Long CIAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 60L;
+
+    /**
+     * Default duration in seconds of each Access Control object snapshot version stored in Redis.
+     */
+    static protected Long AC_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 20L;
+
     @BeforeEach
     public void initRedisConnectionChainValues() {
         logger = Logger.getLogger(this.getClass().getName());
@@ -113,6 +131,11 @@ public class ContextualizedTest {
                 DATABASE_NUMBER);
         environmentVariables.set(WriteModelConfigurationVariable.REDIS_WRITEMODEL_SERVER_HOST.getName(), SERVER_HOST);
         environmentVariables.set(WriteModelConfigurationVariable.REDIS_WRITEMODEL_SERVER_PORT.getName(), Integer.toString(SERVER_PORT));
+
+        environmentVariables.set(CIAMWriteModelConfigurationVariable.CIAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS.getName(), CIAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS);
+        environmentVariables.set(IAMWriteModelConfigurationVariable.IAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS.getName(), IAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS);
+        environmentVariables.set(ACWriteModelConfigurationVariable.AC_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS.getName(), AC_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS);
+
         // Variables regarding read model
         environmentVariables.set(
                 ReadModelConfigurationVariable.REDIS_READMODEL_CONNECTION_DEFAULT_AUTH_PASSWORD.getName(),

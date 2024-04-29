@@ -1,6 +1,5 @@
 package org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.projections;
 
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantTransactionsRepository;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantTransactionsRepositoryMock;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransaction;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;

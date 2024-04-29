@@ -1,6 +1,9 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
+import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.CIAMWriteModelConfigurationVariable;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.ACWriteModelConfigurationVariable;
 import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
+import org.cybnity.accesscontrol.iam.domain.infrastructure.impl.IAMWriteModelConfigurationVariable;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.IReadableConfiguration;
 import org.cybnity.framework.UnoperationalStateException;
@@ -57,6 +60,9 @@ public class ExecutableTenantRegistrationServiceChecker extends ExecutableCompon
     public Set<IReadableConfiguration> optionalEnvironmentVariables() {
         // Define the optional environment variables for service running
         HashSet<IReadableConfiguration> variables = new HashSet<>();
+        variables.addAll(EnumSet.allOf(ACWriteModelConfigurationVariable.class));
+        variables.addAll(EnumSet.allOf(CIAMWriteModelConfigurationVariable.class));
+        variables.addAll(EnumSet.allOf(IAMWriteModelConfigurationVariable.class));
         return variables;
     }
 

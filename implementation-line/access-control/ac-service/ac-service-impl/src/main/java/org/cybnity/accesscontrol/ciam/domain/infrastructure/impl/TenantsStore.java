@@ -1,6 +1,7 @@
 package org.cybnity.accesscontrol.ciam.domain.infrastructure.impl;
 
 import org.cybnity.framework.IContext;
+import org.cybnity.framework.IReadableConfiguration;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.infrastructure.IDomainStore;
@@ -25,6 +26,11 @@ public class TenantsStore extends DomainResourceStoreRedisImpl implements IDomai
     private static TenantsStore singleton;
 
     private final Logger logger = Logger.getLogger(TenantsStore.class.getName());
+
+    /**
+     * Configuration variable defining the applicable expiration relative to each Tenant snapshot item expiration.
+     */
+    private static final IReadableConfiguration SNAPSHOT_ITEM_EXPIRATION_CONFIG_VARIABLE = CIAMWriteModelConfigurationVariable.CIAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS;
 
     /**
      * Default constructor.
@@ -76,8 +82,13 @@ public class TenantsStore extends DomainResourceStoreRedisImpl implements IDomai
             ISnapshotRepository snapRepo = this.snapshotsRepository();
             if (snapRepo != null) {
                 final Identifier id = tenant.identified();
+
+                // Aligned with the expiration duration per saved item relative to the managed object type (tenant)
+                String snapshotItemExpirationIn = context().get(SNAPSHOT_ITEM_EXPIRATION_CONFIG_VARIABLE);
+                Long snapshotShallExpireIn = (snapshotItemExpirationIn != null && !snapshotItemExpirationIn.isEmpty()) ? Long.valueOf(snapshotItemExpirationIn) : null;
+
                 // Create and save a snapshot version into snapshots repository
-                SnapshotProcessEventStreamPersistenceBased snapshotProcess = new SnapshotProcessEventStreamPersistenceBased(/* streamedEventsProvider*/ this, /* snapshotsPersistenceSystem */ snapRepo, new Tenant.MutedTenantFactory()) {
+                SnapshotProcessEventStreamPersistenceBased snapshotProcess = new SnapshotProcessEventStreamPersistenceBased(/* streamedEventsProvider*/ this, /* snapshotsPersistenceSystem */ snapRepo, new Tenant.MutedTenantFactory(), snapshotShallExpireIn) {
                     @Override
                     protected HydrationCapability getRehydratedInstanceFrom(EventStream eventStream, MutedAggregateFactory mutedInstanceFactory) throws IllegalArgumentException {
                         // Re-hydrate events from stream
