@@ -14,6 +14,7 @@ import org.cybnity.framework.domain.event.EventSpecification;
 import org.cybnity.framework.domain.infrastructure.IDomainRepository;
 import org.cybnity.framework.domain.infrastructure.IDomainStore;
 import org.cybnity.framework.domain.model.ActivityState;
+import org.cybnity.framework.domain.model.ReadModelProjectionDescriptor;
 import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.EntityReference;
 import org.cybnity.framework.immutable.Identifier;
@@ -87,6 +88,22 @@ public class TenantLabelOptimizedProjectionImpl implements ITenantTransactionPro
                 }
             }
         }
+    }
+
+    @Override
+    public ReadModelProjectionDescriptor description() {
+        // TODO implement return of projection description
+        return null;
+    }
+
+    @Override
+    public void activate() throws UnoperationalStateException {
+        // TODO implement projection activation
+    }
+
+    @Override
+    public void deactivate() throws UnoperationalStateException {
+        // TODO implement projection deactivation
     }
 
     private void whenRegistered(ConcreteDomainChangeEvent evt) throws ImmutabilityException, UnoperationalStateException {
