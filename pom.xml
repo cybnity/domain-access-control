@@ -11,6 +11,14 @@
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 	<name>CYBNITY domain application</name>
+	<description>Access control features supporting the CYBNITY defense platform solution</description>
+	<url>https://github.com/cybnity/domain-access-control</url>
+	<licenses>
+		<license>
+		<name>The Apache Software License, Version 2.0</name>
+		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
 	<properties>
 		<!-- CYBNITY project default revision -->
@@ -28,6 +36,12 @@
 		<name>CYBNITY</name>
 		<url>http://www.cybnity.org</url>
 	</organization>
+
+	<scm>
+		<connection>scm:git:git://github.com/cybnity/domain-access-control.git</connection>
+		<developerConnection>scm:git:https://github.com:cybnity/domain-access-control.git</developerConnection>
+		<url>http://github.com/cybnity/domain-access-control/tree/main</url>
+	</scm>
 
 	<distributionManagement>
 		<!-- GitHub Packages development artifacts distribution
