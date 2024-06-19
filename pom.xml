@@ -11,7 +11,7 @@
 	<packaging>pom</packaging>
 	<name>CYBNITY access control application</name>
 
-	<!-- Required informations for Maven Central Repository publishing -->
+	<!-- Required information for Maven Central Repository publishing -->
 	<description>Access control features supporting the CYBNITY defense platform solution</description>
 	<url>https://github.com/cybnity/domain-access-control</url>
 	<licenses>
@@ -95,7 +95,6 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
-
 		<repository>
 			<id>agnet-releases</id>
 			<!-- CYBNITY artefact release versions provided -->
@@ -135,7 +134,7 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<!-- Lits of advise about project -->
+	<!-- List of advise about project -->
 	<mailingLists>
 		<mailingList>
 			<name>${project.name} developers list</name>
