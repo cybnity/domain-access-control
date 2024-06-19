@@ -8,5 +8,4 @@ import org.cybnity.framework.domain.event.IEventType;
  */
 public enum QueryName implements IEventType {
 
-    ;
 }

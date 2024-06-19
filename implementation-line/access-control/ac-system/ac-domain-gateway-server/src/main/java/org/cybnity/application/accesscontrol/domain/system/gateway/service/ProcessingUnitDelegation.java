@@ -13,6 +13,6 @@ public interface ProcessingUnitDelegation {
      * @param factEvent Mandatory event to process.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public void process(IDescribed factEvent) throws IllegalArgumentException;
+    void process(IDescribed factEvent) throws IllegalArgumentException;
 
 }

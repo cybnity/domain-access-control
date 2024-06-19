@@ -40,7 +40,7 @@ public enum UICapabilityChannel implements ICapabilityChannel {
 
     private final String shortName;
 
-    private UICapabilityChannel(String acronym) {
+    UICapabilityChannel(String acronym) {
         this.shortName = acronym;
     }
 

@@ -33,7 +33,7 @@ public enum CollaborationChannel {
 
     private final String label;
 
-    private CollaborationChannel(String label) {
+    CollaborationChannel(String label) {
         this.label = label;
     }
 

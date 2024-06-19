@@ -6,11 +6,13 @@
 		<version>${revision}</version>
 		<relativePath>..</relativePath>
 	</parent>
+
 	<groupId>org.cybnity</groupId>
 	<artifactId>applications-impl</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 	<name>CYBNITY ACCESS CONTROL APPLICATION</name>
+
 	<properties>
 		<!-- CYBNITY project default revision -->
 		<revision>0.1.0</revision>
@@ -117,7 +119,7 @@
 
 	<profiles>
 		<profile>
-			<!-- Build regarding a development version on developer station -->
+			<!-- Developer workstation environment -->
 			<id>localhost</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -136,7 +138,7 @@
 		</profile>
 
 		<profile>
-			<!-- Build regarding a development version on shared development platform -->
+			<!-- Shared development platform between developers -->
 			<id>dev-deploy-environment</id>
 			<activation>
 				<property>
@@ -159,7 +161,7 @@
 		</profile>
 
 		<profile>
-			<!-- Build regarding a qualification version on test environment -->
+			<!-- Test environment -->
 			<id>qa-environment</id>
 			<activation>
 				<property>
@@ -224,7 +226,7 @@
 		</profile>
 
 		<profile>
-			<!-- Build regarding a technical quality stage -->
+			<!-- Phase of technical quality validation of a software version -->
 			<id>technical-quality-stage</id>
 			<activation>
 				<property>
@@ -349,6 +351,5 @@
 				</property>
 			</activation>
 		</profile>
-
 	</profiles>
 </project>

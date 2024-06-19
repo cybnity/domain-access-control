@@ -31,6 +31,6 @@ public enum DomainEventType implements IEventType {
     /**
      * Event about refused registration that include a cause (e.g existing tenant already used by other owner).
      */
-    TENANT_REGISTRATION_REJECTED;
+    TENANT_REGISTRATION_REJECTED
 
 }
