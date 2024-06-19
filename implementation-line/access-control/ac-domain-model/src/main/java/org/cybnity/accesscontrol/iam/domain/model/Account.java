@@ -77,7 +77,6 @@ public class Account extends Aggregate {
          * Type of identifier that is supported as tenant reference.
          */
         TENANT_REFERENCE_IDENTIFIER_NAME,
-        ;
     }
 
     /**
@@ -170,6 +169,7 @@ public class Account extends Aggregate {
      *
      * @param instanceId     Mandatory unique identifier of the child fact instance to rehydrate.
      * @param changesHistory Mandatory not empty history. History order shall be ascending ordered with the last list element equals to the more young creation event relative to this instance to rehydrate.
+     * @return Created account instance.
      * @throws IllegalArgumentException When mandatory parameter is not valid or empty. When list does not contain identifiable creation event as first list element.
      */
     public static Account instanceOf(Identifier instanceId, List<DomainEvent> changesHistory) throws IllegalArgumentException {

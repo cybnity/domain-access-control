@@ -14,5 +14,5 @@ public enum TenantRegistrationAttributeName {
     /**
      * Quantity of active accounts.
      */
-    ACTIVE_ACCOUNTS_COUNT;
+    ACTIVE_ACCOUNTS_COUNT
 }

@@ -8,11 +8,11 @@ package org.cybnity.accesscontrol.iam.domain.model;
  */
 public interface MailAddress extends IdentityAttribute {
 
-    public enum Status {
+    enum Status {
 
         /**
          * Mail address recipient have been tested and confirmed as valid (usable).
          */
-        VERIFIED;
+        VERIFIED
     }
 }

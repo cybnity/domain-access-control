@@ -20,7 +20,7 @@ public interface IdentitiesWriteModel extends IWriteModel {
      * @return Instance of new created social entity.
      * @throws IllegalArgumentException When any mandatory parameter is not valid.
      */
-    public OrganizationalStructure createOrganizationalStructure(String name, ISessionContext ctx) throws IllegalArgumentException;
+    OrganizationalStructure createOrganizationalStructure(String name, ISessionContext ctx) throws IllegalArgumentException;
 
     /**
      * Register a new identity into the Identities registry which is declared as human person.
@@ -31,7 +31,7 @@ public interface IdentitiesWriteModel extends IWriteModel {
      * @return Instance of new created social entity.
      * @throws IllegalArgumentException When any mandatory parameter is not valid.
      */
-    public Person createPerson(String firstName, String lastName, ISessionContext ctx) throws IllegalArgumentException;
+    Person createPerson(String firstName, String lastName, ISessionContext ctx) throws IllegalArgumentException;
 
     /**
      * Register a new social entity into the Identities registry which is declared as system (e.g device).
@@ -41,5 +41,5 @@ public interface IdentitiesWriteModel extends IWriteModel {
      * @return Instance of new created identity.
      * @throws IllegalArgumentException When any mandatory parameter is not valid.
      */
-    public SmartSystem createSystem(String name, ISessionContext ctx) throws IllegalArgumentException;
+    SmartSystem createSystem(String name, ISessionContext ctx) throws IllegalArgumentException;
 }

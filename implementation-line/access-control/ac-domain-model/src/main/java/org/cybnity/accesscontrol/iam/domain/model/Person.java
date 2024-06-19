@@ -42,7 +42,6 @@ public class Person extends SocialEntity {
      * Attribute type managed via command event allowing change of this aggregate, and/or allowing notification of information changed via a promoted event type.
      */
     public enum Attribute implements IAttribute {
-        ;
     }
 
     /**
@@ -97,6 +96,7 @@ public class Person extends SocialEntity {
      *
      * @param instanceId     Mandatory unique identifier of the child fact instance to rehydrate.
      * @param changesHistory Mandatory not empty history. History order shall be ascending ordered with the last list element equals to the more young creation event relative to this instance to rehydrate.
+     * @return Created instance.
      * @throws IllegalArgumentException When mandatory parameter is not valid or empty. When list does not contain identifiable creation event as first list element.
      */
     public static Person instanceOf(Identifier instanceId, List<DomainEvent> changesHistory) throws IllegalArgumentException {

@@ -26,5 +26,5 @@ public enum CommandName implements IEventType {
     /**
      * Activate an existing pre-registered account that become usable by a person into a tenant perimeter.
      */
-    ACTIVATE_REGISTERED_ACCOUNT;
+    ACTIVATE_REGISTERED_ACCOUNT
 }
