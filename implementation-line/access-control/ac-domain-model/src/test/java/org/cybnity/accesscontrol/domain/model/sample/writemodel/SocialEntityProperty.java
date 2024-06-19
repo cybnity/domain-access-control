@@ -30,7 +30,7 @@ public class SocialEntityProperty extends MutableProperty {
      * atomic fact.
      */
     public enum PropertyAttributeKey {
-        Name, LocationCity, LocationCountry;
+        Name, LocationCity, LocationCountry
     }
 
     public SocialEntityProperty(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue, HistoryState status)

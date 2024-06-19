@@ -4,8 +4,6 @@ import io.vertx.core.AsyncResult;
 
 /**
  * Generic result of resource access authorization performed and resulting as a valid authorized status or rejected for a cause.
- *
- * @param <T>
  */
 public class ResourceAccessAuthorizationResult<T> implements AsyncResult<Boolean> {
 
@@ -29,7 +27,7 @@ public class ResourceAccessAuthorizationResult<T> implements AsyncResult<Boolean
 
     @Override
     public boolean succeeded() {
-        return this.status.booleanValue();
+        return this.status;
     }
 
     @Override

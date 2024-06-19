@@ -9,7 +9,7 @@
 	<artifactId>applications</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
-	<name>CYBNITY domain application</name>
+	<name>CYBNITY access control application</name>
 
 	<!-- Required informations for Maven Central Repository publishing -->
 	<description>Access control features supporting the CYBNITY defense platform solution</description>
@@ -112,7 +112,7 @@
 		<repository>
 			<id>github</id>
 			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/cybnity/foundation</url>
+			<url>https://maven.pkg.github.com/cybnity/domain-access-control</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>

@@ -7,7 +7,7 @@ import org.cybnity.framework.domain.model.SocialEntity;
 /**
  * Represents a read-oriented and query optimized repository (also sometimes called Aggregate
  * store, or Aggregate-Oriented database) contract for the identities and access bounded context.
- * Identities are defined about organizations, systems, and users that define a boundary of User Identity & Access Management (UIAM).
+ * Identities are defined about organizations, systems, and users that define a boundary of User Identity and Access Management (UIAM).
  */
 public interface IdentitiesReadModel extends IReadModel {
 
@@ -19,7 +19,7 @@ public interface IdentitiesReadModel extends IReadModel {
      * @return Existing entity named by a label equals to the name. Null when not found.
      * @throws IllegalArgumentException When any mandatory parameter is not defined.
      */
-    public SocialEntity findByName(String name, ISessionContext ctx) throws IllegalArgumentException;
+    SocialEntity findByName(String name, ISessionContext ctx) throws IllegalArgumentException;
 
     /**
      * Search a specific type of social entity logically identified by a specific label.
@@ -30,5 +30,5 @@ public interface IdentitiesReadModel extends IReadModel {
      * @return Existing entity named by a label equals to the name. Null when not found.
      * @throws IllegalArgumentException When any mandatory parameter is not defined.
      */
-    public SocialEntity findByName(String name, Class<? extends SocialEntity> type, ISessionContext ctx) throws IllegalArgumentException;
+    SocialEntity findByName(String name, Class<? extends SocialEntity> type, ISessionContext ctx) throws IllegalArgumentException;
 }

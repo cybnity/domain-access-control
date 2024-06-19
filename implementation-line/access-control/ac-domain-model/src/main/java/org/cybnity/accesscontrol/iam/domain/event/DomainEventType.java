@@ -66,6 +66,6 @@ public enum DomainEventType implements IEventType {
     /**
      * Event about a person deleted from the domain layer.
      */
-    PERSON_DELETED;
+    PERSON_DELETED
 
 }

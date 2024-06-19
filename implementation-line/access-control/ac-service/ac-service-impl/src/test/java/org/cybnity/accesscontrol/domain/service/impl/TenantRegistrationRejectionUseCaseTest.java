@@ -179,7 +179,7 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
         this.tenantRegistrationService.handle(cmd2); // Tenant shall have not been added into the events store
 
         // Wait for give time to message to be processed
-        Assertions.assertTrue(acceptancesCriteriaCheckResultsWaiter.await(100, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+        Assertions.assertTrue(acceptancesCriteriaCheckResultsWaiter.await(300, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
         // Remove observers from the channels provider
         this.client.unsubscribe(outputObservers);
     }

@@ -24,5 +24,5 @@ public interface TenantsWriteModel extends IWriteModel {
      * @throws ImmutabilityException       When problem of immutable version of stored event is occurred.
      * @throws UnoperationalStateException When technical problem is occurred regarding this model usage.
      */
-    public void add(Tenant fact) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException;
+    void add(Tenant fact) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException;
 }
