@@ -210,7 +210,7 @@ From **Clients > reactive-backend-system > Client Scopes** panel, add the custom
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
 
 #### Applicative role definition
-From **Real roles** menu, complete the **tenant-user** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
+From **Realm roles** menu, complete the **tenant-user** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
 - Find and select the `reactive-backend-system` item
 - Assign it to the `tenant-user` account type
 
