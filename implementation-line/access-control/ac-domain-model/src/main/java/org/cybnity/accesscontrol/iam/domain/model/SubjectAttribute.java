@@ -16,7 +16,7 @@ public abstract class SubjectAttribute {
     /**
      * Dedicated scope regarding this attribute.
      */
-    private final ScopeAttribute scope;
+    private final IScopeAttribute scope;
 
     /**
      * Default constructor based on a scope.
@@ -24,7 +24,7 @@ public abstract class SubjectAttribute {
      * @param scope Mandatory scope of this subject description criteria.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    public SubjectAttribute(ScopeAttribute scope) throws IllegalArgumentException {
+    public SubjectAttribute(IScopeAttribute scope) throws IllegalArgumentException {
 	if (scope == null)
 	    throw new IllegalArgumentException("Mandatory scope parameter shall be defined!");
 	this.scope = scope;

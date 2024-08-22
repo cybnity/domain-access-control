@@ -5,6 +5,7 @@ import org.cybnity.framework.domain.event.IEventType;
 /**
  * Type of API command event supported by the AC domain.
  * Each command name shall be a verb.
+ * The command types defined here have a "business and capability sens" at the functional level, and are evaluable by external system connected over the User Interface layer.
  */
 public enum CommandName implements IEventType {
 
@@ -26,5 +27,5 @@ public enum CommandName implements IEventType {
     /**
      * Activate an existing pre-registered account that become usable by a person into a tenant perimeter.
      */
-    ACTIVATE_REGISTERED_ACCOUNT
+    ACTIVATE_REGISTERED_ACCOUNT;
 }

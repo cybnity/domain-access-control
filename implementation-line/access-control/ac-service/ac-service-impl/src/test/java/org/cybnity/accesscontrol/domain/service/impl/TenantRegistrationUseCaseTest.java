@@ -2,28 +2,20 @@ package org.cybnity.accesscontrol.domain.service.impl;
 
 import io.vertx.junit5.VertxExtension;
 import org.cybnity.accesscontrol.ContextualizedTest;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsReadModelImpl;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsStore;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsWriteModelImpl;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantMockHelper;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantTransactionsRepositoryMock;
-import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantTransactionProjection;
-import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantsReadModel;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImpl;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.event.EventSpecification;
-import org.cybnity.framework.domain.infrastructure.ISnapshotRepository;
-import org.cybnity.framework.domain.model.IDomainModel;
 import org.cybnity.framework.domain.model.SessionContext;
 import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.BaseConstants;
-import org.cybnity.infastructure.technical.persistence.store.impl.redis.PersistentObjectNamingConvention;
-import org.cybnity.infastructure.technical.persistence.store.impl.redis.SnapshotRepositoryRedisImpl;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.ChannelObserver;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
@@ -44,46 +36,34 @@ import java.util.concurrent.TimeUnit;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
-    private ISnapshotRepository snapshotsRepo;
-    private IDomainModel dataOwner;
-    private PersistentObjectNamingConvention.NamingConventionApplicability persistentObjectNamingConvention;
-
     private TenantsStore tenantsStore;
     private TenantRegistration tenantRegistrationService;
     private ISessionContext sessionCtx;
-    private TenantTransactionsRepositoryMock tenantsRepository;
+    private TenantTransactionCollectionsRepository tenantsRepository;
     private String serviceName;
     private Channel featureTenantsChangesNotificationChannel;
     private UISAdapter client;
     private IMessageMapperProvider mapperFactory;
-    private ITenantsReadModel tenantsReadModel;
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
-        dataOwner = new AccessControlDomainModel();
-        persistentObjectNamingConvention = PersistentObjectNamingConvention.NamingConventionApplicability.TENANT;
         // Create a store managing streamed messages
         tenantsStore = getPersistenceOrientedStore(true /* With snapshots management capability activated */);
 
-        this.tenantsRepository = TenantTransactionsRepositoryMock.instance();
+        this.tenantsRepository = TenantTransactionCollectionsRepository.instance(getContext(), tenantsStore);
         this.sessionCtx = new SessionContext(null);
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
         this.client = new UISAdapterRedisImpl(this.sessionCtx);
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantsReadModel = new TenantsReadModelImpl(this.tenantsStore, this.tenantsRepository, this.tenantsStore);
-        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), (ITenantTransactionProjection) tenantsReadModel.getProjection(ITenantTransactionProjection.class), serviceName, featureTenantsChangesNotificationChannel, this.client);
+        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client);
     }
 
     @AfterEach
     public void clean() {
+        this.tenantsRepository.freeResources();
         if (tenantsStore != null) tenantsStore.freeResources();
         tenantsStore = null;
-        persistentObjectNamingConvention = null;
-        dataOwner = null;
-        if (snapshotsRepo != null) snapshotsRepo.freeResources();
-        snapshotsRepo = null;
-        this.tenantsRepository.catalogOfIdentifiedCollections().clear();
         this.tenantsRepository = null;
         this.serviceName = null;
         this.sessionCtx = null;
@@ -91,21 +71,6 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         this.featureTenantsChangesNotificationChannel = null;
         this.client = null;
         this.mapperFactory = null;
-        this.tenantsReadModel = null;
-    }
-
-
-    /**
-     * Get a persistence store implementation with or without support of snapshots capabilities.
-     *
-     * @param supportedBySnapshotRepository True when snapshots usage shall be configured into the returned store.
-     * @return A store.
-     * @throws UnoperationalStateException When impossible instantiation of the Redis adapter.
-     */
-    private TenantsStore getPersistenceOrientedStore(boolean supportedBySnapshotRepository) throws UnoperationalStateException {
-        snapshotsRepo = (supportedBySnapshotRepository) ? new SnapshotRepositoryRedisImpl(getContext()) : null;
-        // Voluntary don't use instance() method to avoid singleton capability usage during this test campaign
-        return new TenantsStore(getContext(), dataOwner, persistentObjectNamingConvention, /* with or without help by a snapshots capability provider */ snapshotsRepo);
     }
 
     /**

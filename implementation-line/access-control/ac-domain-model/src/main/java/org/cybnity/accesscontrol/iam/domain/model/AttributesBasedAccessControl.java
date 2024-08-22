@@ -16,8 +16,8 @@ import java.util.List;
 public class AttributesBasedAccessControl extends AuthorizationPolicy {
 
     private final Collection<SubjectAttribute> subjectDescription;
-    private final Collection<ActionAttribute> actionableActions;
-    private final Collection<EnvironmentAttribute> environmentDescription;
+    private final Collection<IActionAttribute> actionableActions;
+    private final Collection<IEnvironmentAttribute> environmentDescription;
 
     /**
      * Default constructor.
@@ -28,7 +28,7 @@ public class AttributesBasedAccessControl extends AuthorizationPolicy {
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
     public AttributesBasedAccessControl(Collection<SubjectAttribute> subjectDescription,
-	    Collection<ActionAttribute> actionableActions, Collection<EnvironmentAttribute> environmentDescription)
+                                        Collection<IActionAttribute> actionableActions, Collection<IEnvironmentAttribute> environmentDescription)
 	    throws IllegalArgumentException {
 	if (subjectDescription == null || subjectDescription.isEmpty())
 	    throw new IllegalArgumentException("Subject description is required including minimum of one item!");
@@ -55,7 +55,7 @@ public class AttributesBasedAccessControl extends AuthorizationPolicy {
      * 
      * @return An immutable version of the action types.
      */
-    public Collection<ActionAttribute> actionableActions() {
+    public Collection<IActionAttribute> actionableActions() {
 	return List.copyOf(this.actionableActions);
     }
 
@@ -64,7 +64,7 @@ public class AttributesBasedAccessControl extends AuthorizationPolicy {
      * 
      * @return An immutable version of the environment description attributes.
      */
-    public Collection<EnvironmentAttribute> environmentDescription() {
+    public Collection<IEnvironmentAttribute> environmentDescription() {
 	return List.copyOf(this.environmentDescription);
     }
 }

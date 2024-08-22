@@ -5,6 +5,7 @@ import org.cybnity.framework.domain.event.IEventType;
 /**
  * Type of API domain event supported by the AC domain.
  * Each event name shall be an adjective representing a fact state.
+ * The event types defined here have a "business and capability sens" at the functional level, and are evaluable by external system connected over the User Interface layer.
  */
 public enum DomainEventType implements IEventType {
 
@@ -31,6 +32,5 @@ public enum DomainEventType implements IEventType {
     /**
      * Event about refused registration that include a cause (e.g existing tenant already used by other owner).
      */
-    TENANT_REGISTRATION_REJECTED
-
+    TENANT_REGISTRATION_REJECTED;
 }

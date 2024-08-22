@@ -1,13 +1,10 @@
 package org.cybnity.feature.accesscontrol.domain.system.service;
 
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantTransactionsRepository;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsReadModelImpl;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsStore;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsWriteModelImpl;
-import org.cybnity.accesscontrol.ciam.domain.model.TenantsWriteModel;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImpl;
+import org.cybnity.accesscontrol.domain.model.ITenantsWriteModel;
 import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
-import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantTransactionProjection;
-import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantsReadModel;
 import org.cybnity.accesscontrol.domain.service.impl.TenantRegistration;
 import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.IContext;
@@ -50,17 +47,14 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
         // --- Initialization of the tenant read-model and write-model reused by the registration service ---
 
         // Event store managing the tenant streams persistence layer
-        TenantsStore tenantWriteModelPersistenceLayer = new TenantsStore(context, new AccessControlDomainModel(), PersistentObjectNamingConvention.NamingConventionApplicability.TENANT, new SnapshotRepositoryRedisImpl(context));
+        TenantsStore tenantDomainPersistenceLayer = new TenantsStore(context, new AccessControlDomainModel(), PersistentObjectNamingConvention.NamingConventionApplicability.TENANT, new SnapshotRepositoryRedisImpl(context));
         // Repository managing the tenant read-model projections
-        TenantTransactionsRepository tenantsRepository = TenantTransactionsRepository.instance();
-
+        TenantTransactionCollectionsRepository tenantReadModelProjectionsProvider = TenantTransactionCollectionsRepository.instance(context, tenantDomainPersistenceLayer);
         // Prepare the processing component based on write-model and read-model persistence systems
-        ITenantsReadModel tenantsReadModel = new TenantsReadModelImpl(tenantWriteModelPersistenceLayer, tenantsRepository, tenantWriteModelPersistenceLayer);
-        ITenantTransactionProjection tenantsProjection = (ITenantTransactionProjection) tenantsReadModel.getProjection(ITenantTransactionProjection.class);
-        TenantsWriteModel tenantsWriteModel = TenantsWriteModelImpl.instance(tenantWriteModelPersistenceLayer);
+        ITenantsWriteModel tenantsWriteModelManager = TenantsWriteModelImpl.instance(tenantDomainPersistenceLayer);
 
         // Define the application service (and collaboration components) able to process the event according to business/treatment rules
-        processor = new TenantRegistration(new SessionContext(/* none pre-registered tenant is defined or usable by the registration service*/null), tenantsWriteModel, tenantsProjection, serviceName, featureTenantsChangesNotificationChannel, client);
+        processor = new TenantRegistration(new SessionContext(/* none pre-registered tenant is defined or usable by the registration service*/null), tenantsWriteModelManager, tenantReadModelProjectionsProvider, serviceName, featureTenantsChangesNotificationChannel, client);
     }
 
     /**

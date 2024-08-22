@@ -32,6 +32,12 @@
 			<artifactId>redis-store</artifactId>
 		</dependency>
 
+		<dependency>
+			<!-- Read-model repository supported as data layer element -->
+			<groupId>org.cybnity.features.technical.persistence</groupId>
+			<artifactId>janusgraph-repository</artifactId>
+		</dependency>
+
 		<!-- Test utilities -->
 		<dependency>
 			<groupId>org.cybnity.framework</groupId>
@@ -55,7 +61,7 @@
 			<artifactId>system-stubs-jupiter</artifactId>
 		</dependency>
 		<dependency>
-			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" AVERTISSEMENT on Mac -->
+			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" NOTIFICATION on Mac -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
 		</dependency>
@@ -63,6 +69,16 @@
 			<!-- Embedded Redis test server (https://github.com/signalapp/embedded-redis) -->
 			<groupId>org.signal</groupId>
 			<artifactId>embedded-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.janusgraph</groupId>
+			<artifactId>janusgraph-inmemory</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.janusgraph</groupId>
+			<artifactId>janusgraph-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

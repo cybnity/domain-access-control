@@ -2,10 +2,19 @@ package org.cybnity.accesscontrol;
 
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.CIAMWriteModelConfigurationVariable;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.ACWriteModelConfigurationVariable;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
 import org.cybnity.accesscontrol.iam.domain.infrastructure.impl.IAMWriteModelConfigurationVariable;
+import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
+import org.cybnity.framework.domain.ISessionContext;
+import org.cybnity.framework.domain.infrastructure.ISnapshotRepository;
+import org.cybnity.framework.domain.model.IDomainModel;
+import org.cybnity.framework.domain.model.SessionContext;
+import org.cybnity.infastructure.technical.persistence.store.impl.redis.PersistentObjectNamingConvention;
+import org.cybnity.infastructure.technical.persistence.store.impl.redis.SnapshotRepositoryRedisImpl;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.ReadModelConfigurationVariable;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.WriteModelConfigurationVariable;
 import org.junit.jupiter.api.AfterEach;
@@ -27,6 +36,12 @@ import java.util.logging.Logger;
  */
 @ExtendWith({SystemStubsExtension.class})
 public class ContextualizedTest {
+
+    private PersistentObjectNamingConvention.NamingConventionApplicability persistentObjectNamingConvention;
+
+    private IDomainModel dataOwner;
+
+    private ISnapshotRepository snapshotsRepo;
 
     /**
      * Utility logger
@@ -89,16 +104,43 @@ public class ContextualizedTest {
      */
     static protected Long AC_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 20L;
 
+    /**
+     * In-memory storage backend.
+     */
+    public static final String STORAGE_BACKEND_TYPE = "inmemory";
+
+    protected ISessionContext sessionCtx;
+
     @BeforeEach
     public void initRedisConnectionChainValues() {
+        // Initialize shared data and configurations
         logger = Logger.getLogger(this.getClass().getName());
-
+        persistentObjectNamingConvention = PersistentObjectNamingConvention.NamingConventionApplicability.TENANT;
+        dataOwner = new AccessControlDomainModel();
         // Build reusable context
         this.context = new Context();
+        this.sessionCtx = new SessionContext(null);
 
-        // Synchronize environment variables test values
+        // Set JanusGraph repository environment
+        setJanusGraphServer(this.context);
+
+        // Synchronize all environment variables test values
         initEnvVariables();
 
+        // Set Redis server environment
+        setRedisServer();
+    }
+
+    /**
+     * Define runtime environment variable set.
+     */
+    protected void initEnvVariables() {
+        initJanusGraphEnvVariables();
+        initRedisEnvVariables();
+        initGatewayVariables();
+    }
+
+    private void setRedisServer() {
         // Start Redis instance
         // See https://redis.io/docs/management/config-file/ for more detail about supported start options
         redisServer = RedisServer.builder().port(SERVER_PORT)
@@ -115,10 +157,21 @@ public class ContextualizedTest {
         redisServer.start();
     }
 
-    /**
-     * Define runtime environment variable set.
-     */
-    protected void initEnvVariables() {
+    private void setJanusGraphServer(IContext context) {
+        // Set configuration resources required by JanusGraph server
+        context.addResource(STORAGE_BACKEND_TYPE, org.cybnity.infrastructure.technical.registry.adapter.impl.janusgraph.ReadModelConfigurationVariable.JANUSGRAPH_STORAGE_BACKEND.getName(), false);
+    }
+
+    private void initJanusGraphEnvVariables() {
+        if (environmentVariables != null) {
+            // Define environment variables regarding write model
+            environmentVariables.set(
+                    org.cybnity.infrastructure.technical.registry.adapter.impl.janusgraph.ReadModelConfigurationVariable.JANUSGRAPH_STORAGE_BACKEND.getName(),
+                    STORAGE_BACKEND_TYPE);
+        }
+    }
+
+    private void initRedisEnvVariables() {
         // Define environment variables regarding write model
         environmentVariables.set(
                 WriteModelConfigurationVariable.REDIS_WRITEMODEL_CONNECTION_DEFAULT_AUTH_PASSWORD.getName(),
@@ -145,7 +198,9 @@ public class ContextualizedTest {
                 DATABASE_NUMBER);
         environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_HOST.getName(), SERVER_HOST);
         environmentVariables.set(ReadModelConfigurationVariable.REDIS_READMODEL_SERVER_PORT.getName(), Integer.toString(SERVER_PORT));
+    }
 
+    private void initGatewayVariables() {
         // Define additional environment variables regarding gateway
         environmentVariables.set(
                 AppConfigurationVariable.ENDPOINT_HTTP_SERVER_PORT.getName(),
@@ -158,12 +213,16 @@ public class ContextualizedTest {
 
     @AfterEach
     public void cleanValues() {
+        if (snapshotsRepo != null) snapshotsRepo.freeResources();
+        snapshotsRepo = null;
         // Stop redis server used by worker
         redisServer.stop();
         this.environmentVariables = null;
         this.redisServer = null;
         context = null;
         logger = null;
+        dataOwner = null;
+        persistentObjectNamingConvention = null;
     }
 
 
@@ -176,4 +235,17 @@ public class ContextualizedTest {
         return this.context;
     }
 
+
+    /**
+     * Get a persistence store implementation with or without support of snapshots capabilities.
+     *
+     * @param supportedBySnapshotRepository True when snapshots usage shall be configured into the returned store.
+     * @return A store.
+     * @throws UnoperationalStateException When impossible instantiation of the Redis adapter.
+     */
+    protected TenantsStore getPersistenceOrientedStore(boolean supportedBySnapshotRepository) throws UnoperationalStateException {
+        snapshotsRepo = (supportedBySnapshotRepository) ? new SnapshotRepositoryRedisImpl(getContext()) : null;
+        // Voluntary don't use instance() method to avoid singleton capability usage during this test campaign
+        return (TenantsStore) TenantsStore.instance(getContext(), dataOwner, persistentObjectNamingConvention, /* with or without help by a snapshots capability provider */ snapshotsRepo);
+    }
 }

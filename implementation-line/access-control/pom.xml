@@ -73,7 +73,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
 
 	<properties>
 		<launcher.class>io.vertx.core.Launcher</launcher.class>

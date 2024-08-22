@@ -104,7 +104,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenNoExistingTenant_whenRegisterTenant_thenTenantActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID newly defined in Identity server and tenant domain as usable for new user account creation
-
+// TODO coding of use case test and acceptance rules
         // UTILITIES PREPARATION
         // Creation of parallel observer of SSO server admin event relative to new realm creation confirmations
 
@@ -140,7 +140,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenExistingTenantNotActivatedAndAuthorizedReassignment_whenRegisterTenant_thenTenantActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID is reassigned as dedicated to new user account creation
-
+// TODO coding of use case test and acceptance rules
         // UTILITIES PREPARATION
         // Creation of parallel observer of SSO server admin event relative to new realm creation confirmations
         // Configuration of the feature to authorize the dynamic Real re-assigning of existing tenant to new requester when is not used
@@ -175,7 +175,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenExistingTenantNotActivatedAndNotAuthorizedReassignment_whenRegisterTenant_thenTenantReused(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID is not reassigned but is usable for new user account creation
-
+// TODO coding of use case test and acceptance rules
         // UTILITIES PREPARATION
         // Configuration of the feature to NOT authorize the dynamic Real re-assigning of existing tenant to new requester when is not used
 
@@ -206,7 +206,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenExistingTenantActivated_whenRegisterTenant_thenTenantRegistrationRejected(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: rejected creation for cause of existing named tenant that is already used by previous register
-
+// TODO coding of use case test and acceptance rules
         // START FEATURE MODULE
         featureModule.start();
         featureModule.join(); // wait end of module start execution

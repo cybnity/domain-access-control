@@ -4,13 +4,13 @@ import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
- * Represent a policy strategy type according to a scope of client connector.
+ * Combination of attributes describing what user want to perform (e.g read,
+ * write, any action type regarding a resource).
  * 
  * @author olivier
  *
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_AC_3")
-public class ClientScopeBasedAccessControl extends AuthorizationPolicy {
+public interface IActionAttribute {
 
-    private IScopeAttribute scope;
 }

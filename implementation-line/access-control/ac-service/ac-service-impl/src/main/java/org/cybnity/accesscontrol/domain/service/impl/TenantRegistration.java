@@ -1,10 +1,12 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
-import org.cybnity.accesscontrol.ciam.domain.model.TenantsWriteModel;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
+import org.cybnity.accesscontrol.domain.model.ITenantsWriteModel;
 import org.cybnity.accesscontrol.domain.service.api.ApplicationServiceOutputCause;
 import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
-import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantTransactionProjection;
-import org.cybnity.accesscontrol.domain.service.api.model.TenantTransaction;
+import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
+import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
+import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
@@ -23,9 +25,7 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.MessageMapperFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,8 +48,8 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
      * Logical name of this executed service.
      */
     private final String serviceName;
-    private final ITenantTransactionProjection tenantsReadModel;
-    private final TenantsWriteModel tenantsWriteModel;
+    private final TenantTransactionCollectionsRepository tenantsReadModel;
+    private final ITenantsWriteModel tenantsWriteModel;
     private final Channel tenantsChangesNotificationChannel;
     private final UISAdapter client;
 
@@ -64,7 +64,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
      * @param client                            Optional client to Users Interactions Space.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    public TenantRegistration(ISessionContext context, TenantsWriteModel tenantsStore, ITenantTransactionProjection tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter client) throws IllegalArgumentException {
+    public TenantRegistration(ISessionContext context, ITenantsWriteModel tenantsStore, TenantTransactionCollectionsRepository tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter client) throws IllegalArgumentException {
         super();
         if (tenantsStore == null) throw new IllegalArgumentException("tenantsStore parameter is required!");
         this.tenantsWriteModel = tenantsStore;
@@ -95,22 +95,43 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
 
                     // --- PROCESSING RULES ---
                     // Search if existing tenant already registered in domain
-                    TenantTransaction existingOrganizatonTenant = tenantsReadModel.findByLabel(tenantName, /* search tenant in any in operational status avoiding duplicated tenants with same name */ null, this.context);
-
-                    if (existingOrganizatonTenant != null) {
+                    Map<String, String> queryParameters = new HashMap<>();
+                    // Explicit query name to perform with filtering criteria definition
+                    queryParameters.put(Command.TYPE, ACApplicationQueryName.TENANT_VIEW_FIND_BY_LABEL.name());
+                    queryParameters.put(TenantDataView.PropertyAttributeKey.LABEL.name(), tenantName); // Search vertex (data-view) node with equals name
+                    queryParameters.put(TenantDataView.PropertyAttributeKey.DATAVIEW_TYPE.name(), TenantDataView.class.getSimpleName()); // type of vertex (node type in graph model)
+                    // Search tenant in any in operational status avoiding duplicated tenants with same name
+                    List<TenantTransactionsCollection> tenantsCollection = tenantsReadModel.queryWhere(queryParameters, this.context);
+                    TenantDataView existingOrganizatonTenant = null;
+                    if (tenantsCollection != null) {
+                        if (tenantsCollection.size() == 1) {
+                            // Only one valid tenant data view versions history have been found in the repository
+                            List<TenantDataView> existingTenantVersions = tenantsCollection.get(0).versions();
+                            // Get the last known tenant data view version
+                            existingOrganizatonTenant = existingTenantVersions.get(existingTenantVersions.size() - 1);
+                        } else {
+                            // Potential problem of consistency if several tenant data-view are existing in the repository
+                            logger.log(Level.SEVERE, "Multiple tenant data view with label equals to '" + tenantName + "' are existing in the " + TenantTransactionCollectionsRepository.class.getSimpleName() + " graph model, but only unique shall be maintained up-to-date and queryable per unique node label!");
+                        }
+                    }
+                    if (existingOrganizatonTenant != null){
                         // Existing registered tenant is identified and known by access control domain
                         // RULE : de-duplication rule about existing Tenant that is already in operational activity
-                        if (existingOrganizatonTenant.activityStatus != null && existingOrganizatonTenant.activityStatus) {
+                        String statusLabel = existingOrganizatonTenant.valueOfProperty(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS);
+                        Boolean activityStatus = (statusLabel != null && !statusLabel.isEmpty()) ? Boolean.valueOf(statusLabel) : null;
+                        String tenantCurrentLabel = existingOrganizatonTenant.valueOfProperty(TenantDataView.PropertyAttributeKey.LABEL);
+                        String tenantUUID = existingOrganizatonTenant.valueOfProperty(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY);
+                        if (activityStatus != null && activityStatus) {
                             // CASE: tenant (e.g platform tenant with same name and already in an operational activity status not re-assignable) creation is not authorized AND REJECTION SHALL BE NOTIFIED
-                            commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTRATION_REJECTED, command, existingOrganizatonTenant.label, existingOrganizatonTenant.activityStatus, existingOrganizatonTenant.identifiedBy);
+                            commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTRATION_REJECTED, command, tenantCurrentLabel, activityStatus, tenantUUID);
                             // Set precision about cause of rejection
                             commandResponse.appendSpecification(new Attribute(org.cybnity.framework.domain.event.AttributeName.OUTPUT_CAUSE_TYPE.name(), ApplicationServiceOutputCause.EXISTING_TENANT_ALREADY_ASSIGNED.name()));
                         } else {
                             // CASE: tenant (e.g platform tenant with same name and that is not in an operational activity status, and could potentially be re-assignable) return as known AND ELIGIBLE TO RE-ASSIGNMENT
                             // Prepare and return new tenant actioned event
-                            commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTERED, command, existingOrganizatonTenant.label, existingOrganizatonTenant.activityStatus, existingOrganizatonTenant.identifiedBy);
+                            commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTERED, command, tenantCurrentLabel, activityStatus, tenantUUID);
                         }
-                    } else {
+                    } else{
                         // None existing tenant with same organization name
                         // CASE: create a new Tenant
                         // Read optional definition of tenant activity state
@@ -140,9 +161,11 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
         } catch (ImmutabilityException ime) {
             // Impossible execution caused by a several code problem
             logger.log(Level.SEVERE, "Impossible handle(Command command) method response!", ime);
-        } catch (UnoperationalStateException e) {
+        } catch (UnoperationalStateException ue) {
             // Problem during the persistence system usage
-            logger.log(Level.SEVERE, "Impossible handle(Command command) for cause of persistence system in non operational state!", e);
+            logger.log(Level.SEVERE, "Impossible handle(Command command) for cause of persistence system in non operational state!", ue);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Impossible handle(Command command) for cause of technical failure in non operational state!", e);
         }
     }
 

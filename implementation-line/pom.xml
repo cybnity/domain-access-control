@@ -83,6 +83,13 @@
 				<groupId>org.cybnity.features.technical.persistence</groupId>
 				<artifactId>redis-store</artifactId>
 				<version>${foundation.compatibility.version}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.features.technical.persistence</groupId>
+				<artifactId>janusgraph-repository</artifactId>
+				<version>${foundation.compatibility.version}</version>
+				<scope>compile</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

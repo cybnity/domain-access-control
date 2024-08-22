@@ -1,6 +1,6 @@
 package org.cybnity.accesscontrol;
 
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.projections.TenantLabelOptimizedProjectionUseCaseTest;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.ACTransactionsRepositoryUseCaseTest;
 import org.cybnity.accesscontrol.domain.service.impl.TenantRegistrationRejectionUseCaseTest;
 import org.cybnity.accesscontrol.domain.service.impl.TenantRegistrationUseCaseTest;
 import org.junit.platform.suite.api.SelectClasses;
@@ -13,7 +13,7 @@ import org.junit.platform.suite.api.Suite;
  * @author olivier
  */
 @Suite
-@SelectClasses({TenantLabelOptimizedProjectionUseCaseTest.class, TenantRegistrationUseCaseTest.class, TenantRegistrationRejectionUseCaseTest.class})
+@SelectClasses({TenantRegistrationUseCaseTest.class, TenantRegistrationRejectionUseCaseTest.class, ACTransactionsRepositoryUseCaseTest.class})
 public class AllUseCaseTests {
 
 }
