@@ -21,7 +21,7 @@ This is an **implementation sub-project** defining the capabililties implementat
 The implementation sub-projects built client adapters which can be reuse by any other CYBNITY applicative or technical component that require interaction with the UIAM module deployed into a CYBNITY software suite environment.
 
 Compatible integration sub-projects:
-- `keycloak-connector` (default implementation developed with open source Keycloak UAM solution)
+- `ac-adapter-keycloak-impl` (default implementation developed with open source Keycloak UAM solution)
 
 ## KEYCLOAK INTEGRATION
 The default integration implemented is based on Keycloak (see [Keycloak documentation](https://www.keycloak.org/docs/latest/securing_apps/) for developer additional help and [managed token types](https://www.keycloak.org/docs/latest/securing_apps/#_token-exchange)).
@@ -36,7 +36,7 @@ Specific OpenID connect libraries are encapsulated/reused by CYBNITY application
 ### Node.js Integration
 
 ### Java Integration
-The [keycloak-connector](ac-adapter-impl/keycloak-connector) adapter impl sub-project manages the coupling with Keycloak server-side services and exchanged objects via the Keycloak Java API (see library api [javadoc](https://www.keycloak.org/docs-api/21.0.2/javadocs/index.html)) which provide abstract and implementation components used by the security domains provided by Keycloak solution.
+The [keycloak-adapter](ac-adapter-keycloak-impl) adapter impl sub-project manages the coupling with Keycloak server-side services and exchanged objects via the Keycloak Java API (see library api [javadoc](https://www.keycloak.org/docs-api/21.0.2/javadocs/index.html)) which provide abstract and implementation components used by the security domains provided by Keycloak solution.
 
 #### Domain Objects Translation
 The [ac-translator/keycloak-translator](/implementation-line/access-control/ac-translator/keycloak-translator) project manage the hidding and mapping of the Keycloak API library's data structures (e.g representing DTO exposed by the Keycloak API's services) with components external (e.g CYBNITY applicative module of other domains which have interactions with the Keycloak UIAM system) to the CYBNITY Access Control domain.
@@ -50,5 +50,5 @@ The setting resources (e.g parameters to connect with the third-party solution) 
 None statefull configuration shall be implemented (e.g no Maven filtered files) into this sub-project.
 
 #### Keycloak provisioning
-See the [documentation](ac-adapter-impl/keycloak-connector/keycloak-readme.md) regarding the development of provisioned Keycloak system for more detail.
+See the [documentation](ac-adapter-keycloak-impl/keycloak-readme.md) regarding the development of provisioned Keycloak system for more detail.
 

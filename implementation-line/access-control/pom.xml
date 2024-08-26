@@ -24,6 +24,24 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.cybnity.application.access-control.adapters</groupId>
+				<artifactId>api</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.application.access-control.adapters</groupId>
+				<artifactId>keycloak-impl</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.application.access-control.translator</groupId>
+				<artifactId>keycloak</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.cybnity.application.access-control.translator</groupId>
 				<artifactId>ui-api</artifactId>
 				<version>${revision}</version>

@@ -81,8 +81,12 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
     public void handle(Command command) throws IllegalArgumentException {
         try {
             if (command != null) {
+                // TODO coding of USe case about notified realm creation that have been created by UIAM administrator over Keycloak IHM
+
                 // Check that command is a request of organization registration
                 if (CommandName.REGISTER_TENANT.name().equals(command.type().value())) {
+                    // USE CASE: EXPLICIT REGISTRATION OF NEW TENANT BY FINAL USER
+
                     // --- INPUT VALIDATION ---
                     // Read and check the organization name to register
                     Attribute tenantNamingAtt = EventSpecification.findSpecificationByName(TenantRegistrationAttributeName.TENANT_NAMING.name(), command.specification());
@@ -114,7 +118,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
                             logger.log(Level.SEVERE, "Multiple tenant data view with label equals to '" + tenantName + "' are existing in the " + TenantTransactionCollectionsRepository.class.getSimpleName() + " graph model, but only unique shall be maintained up-to-date and queryable per unique node label!");
                         }
                     }
-                    if (existingOrganizatonTenant != null){
+                    if (existingOrganizatonTenant != null) {
                         // Existing registered tenant is identified and known by access control domain
                         // RULE : de-duplication rule about existing Tenant that is already in operational activity
                         String statusLabel = existingOrganizatonTenant.valueOfProperty(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS);
@@ -131,7 +135,12 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
                             // Prepare and return new tenant actioned event
                             commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTERED, command, tenantCurrentLabel, activityStatus, tenantUUID);
                         }
-                    } else{
+                        // --- SECURITY CONTROL: SSO ACCESSIBILITY FOR REALM When realm is existing ---
+                        // & GIVEN EXISTING REALM:
+                        // - WHEN: check that dedicated CYBNITY systems access client is configured (e.g Keycloak connector settings) and accessible from AC read-model (e.g read of tenant equals named and existing client configuration data-view)
+                        // - THEN: if not accessible configuration, start only resolution process (don't wait resolution end) allowing to manage the UIAM client configuration refresh (make SSO accessible regarding the existing tenant)
+                        // TODO impl in async/parallel process without waiting its ends
+                    } else {
                         // None existing tenant with same organization name
                         // CASE: create a new Tenant
                         // Read optional definition of tenant activity state
@@ -170,7 +179,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
     }
 
     /**
-     * Add a new tenant domain object into the aggregates store.
+     * Add a new tenant domain object into the golden source responsible on UIAM (e.g Keycloak), manage the preparation of dedicated UIAM connector settings (making them accessible to other CYBNITY service for SSO capability support), and create new tenant into aggregates store with automatic refresh of the Access Control domain's read-model repository.
      *
      * @param tenantLabel    Mandatory name of the tenant to create into store.
      * @param tenantNaming   Optional attribute regarding the requested tenant name to register when defined (e.g received by service).
@@ -186,23 +195,25 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
             throw new IllegalArgumentException("tenantLabel parameter is required and shall not be empty!");
         if (originEvent == null) throw new IllegalArgumentException("originEvent parameter is required!");
 
-        // TODO implementation of verification that equals real name is existing and accessible/usable from UIAM server (e.g Keycloak connector)
+        // GIVEN POTENTIAL NEW REALM TO CREATE FOR SAME TENANT NAME:
+        // - Search existing realm registered (and access control settings recorded as usable via UIAM connector adapter configuration)
+        // RealmResource existingRes = realm(String realmName) // existingRes equals organization named
+// TODO impl
 
+
+        // --- NEW REALM REGISTRATION ---
+        // GIVEN NOT EXISTING REALM:
+        // - WHEN: create new realm into the UIAM system (e.g over Keycloak API; connector settings for dedicated Tenant scope; default values initialized regarding authentication and SSO features) which can be mapped with a new Tenant to register
         // RealmRepresentation organizationRealm = buildRealmRepresentation(configurationSettings)
-
-        // verify existing realm registered (and access control settings recorded as usable via UIAM connector adapter configuration)
-        // RealmResource existingRes = realm(String realmName)
-        // existingRes equals organization named
-
-        // --- EXECUTE THE WRITE MODEL CHANGE ---
-        // Create new Tenant fact
+        // TODO impl
+        // - & WHEN: new realm created and ready for usage (e.g accounts creation) as SSO context
+        // - THEN: create a newt Tenant fact (mapped to realm specification) including the connection settings
         TenantBuilder builder = new TenantBuilder(tenantLabel, /* Predecessor event of new tenant creation */ originEvent.getIdentifiedBy(), isActiveTenant);
         builder.buildInstance();
         Tenant tenant = builder.getResult();
-
-        // --- EXECUTE THE WRITE MODEL CHANGE ---
-        // Append new tenant into write model stream
-        this.tenantsWriteModel.add(tenant);// Read-model is automatically notified
+        // - & THEN: update the AC write-model change with automatic update of AC read-model (e.g creation event automatically notified by the store to the read-model projections repository)
+        // Append new tenant into write model stream (store as rehydratable aggregate data)
+        this.tenantsWriteModel.add(tenant);// With notification for auto-refresh of read-model repository
 
         // Prepare and return new tenant actioned event
         return prepareCommonResponseEvent(DomainEventType.TENANT_REGISTERED, originEvent, tenant.label().getLabel(), tenant.status().isActive(), tenant.identified().value().toString());

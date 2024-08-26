@@ -10,7 +10,7 @@
 	<artifactId>translator</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
-	<name>- AC translator</name>
+	<name>- AC translators</name>
 	<modules>
 		<module>keycloak-translator</module>
 		<module>ac-ui-translator</module>

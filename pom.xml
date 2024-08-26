@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.cybnity</groupId>
 		<artifactId>techstack</artifactId>
-		<version>0.34.0</version>
+		<version>0.35.0</version>
 	</parent>
 
 	<artifactId>applications</artifactId>
@@ -125,10 +125,19 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" AVERTISSEMENT on Mac -->
-				<groupId>io.netty</groupId>
-				<artifactId>netty-all</artifactId>
-				<version>4.1.106.Final</version>
+				<!-- Test containers components supporting test mode for Cassandra, Elasticsearch, Kafka, Grafana, Influxdb, K3S, Mongodb, Solr, Keycloak, Redis -->
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>1.20.1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<!-- Test container regarding Keycloak SSO server -->
+				<groupId>com.github.dasniko</groupId>
+				<artifactId>testcontainers-keycloak</artifactId>
+				<version>3.4.0</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
