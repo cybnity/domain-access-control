@@ -1,5 +1,7 @@
 package org.cybnity.feature.accesscontrol.domain.system.service;
 
+import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.SSOAdapterKeycloakImpl;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
@@ -58,6 +60,11 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
     private final IContext context;
 
     /**
+     * Single-Sign On adapter.
+     */
+    private SSOAdapter ssoClient;
+
+    /**
      * Default constructor.
      *
      * @param context Mandatory runtime context allowing providing of settings required by the pipeline.
@@ -68,6 +75,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
         super();
         if (context == null) throw new IllegalArgumentException("Context parameter is required!");
         this.context = context;
+        this.ssoClient = new SSOAdapterKeycloakImpl(this.context);
     }
 
     @Override
@@ -100,7 +108,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
             try {
                 // PROCESSING : identify processor (e.g local capability processor, or remote proxy) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
                 // according to the type of event to process
-                TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context, featureServiceName(), featureTenantsChangesNotificationChannel);
+                TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context, featureServiceName(), featureTenantsChangesNotificationChannel, ssoClient);
                 securityFilteringStep.setNext(processingAssignmentStep);
                 pipelinedProcessSingleton = eventTypeFilteringStep;
             } catch (UnoperationalStateException e) {

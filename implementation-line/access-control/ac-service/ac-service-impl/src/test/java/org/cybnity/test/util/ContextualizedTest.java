@@ -1,4 +1,4 @@
-package org.cybnity.accesscontrol;
+package org.cybnity.test.util;
 
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.CIAMWriteModelConfigurationVariable;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.ACWriteModelConfigurationVariable;
@@ -18,8 +18,10 @@ import org.cybnity.infastructure.technical.persistence.store.impl.redis.Snapshot
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.ReadModelConfigurationVariable;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.WriteModelConfigurationVariable;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.containers.GenericContainer;
 import redis.embedded.RedisServer;
 import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
@@ -30,9 +32,8 @@ import java.util.logging.Logger;
 /**
  * Generic helped about unit test contextualized with environment variables.
  * <p>
- * Automatic configuration and start of Redis container usable during a test execution.
- * Each unit test requiring a redis container started shall extend this class.
- * EmbeddedRedisExtension.class for Redis 6.0.5 used by default
+ * Automatic configuration and start of Redis, JanusGraph, Keycloak servers usable during a test execution according to unit test instantiation configuration.
+ * Each unit test requiring optionally a Redis and/or JanusGraph and/or Keycloak server started, shall extend this class.
  */
 @ExtendWith({SystemStubsExtension.class})
 public class ContextualizedTest {
@@ -64,9 +65,14 @@ public class ContextualizedTest {
     static protected int WORKER_THREAD_POOL = 1;
 
     /**
-     * Start and stop of the server shall be manually managed by child test class.
+     * Redis instance optionally started.
      */
     protected RedisServer redisServer;
+
+    /**
+     * Keycloak instance optionally started.
+     */
+    private GenericContainer<?> keycloak;
 
     /**
      * Redis server auth password.
@@ -107,41 +113,100 @@ public class ContextualizedTest {
     /**
      * In-memory storage backend.
      */
-    public static final String STORAGE_BACKEND_TYPE = "inmemory";
+    static public final String STORAGE_BACKEND_TYPE = "inmemory";
 
     protected ISessionContext sessionCtx;
 
+    private final boolean activeRedis;
+    private final boolean activeJanusGraph;
+    private final boolean activeKeycloak;
+
+    /**
+     * True if Keycloak existing instance shall be stopped after each test execution.
+     */
+    private final boolean stopKeycloakAfterEach;
+
+    /**
+     * Default constructor.
+     *
+     * @param withRedis             True when Redis embedded server shall be started.
+     * @param withJanusGraph        True when JanusGraph embedded server shall be started.
+     * @param withKeycloak          True when Keycloak embedded server shall be started.
+     * @param stopKeycloakAfterEach True if Keycloak server instance shall be stopped after each test execution. False when none stop shall be performed.
+     */
+    public ContextualizedTest(boolean withRedis, boolean withJanusGraph, boolean withKeycloak, boolean stopKeycloakAfterEach) {
+        // Define each desired services
+        this.activeRedis = withRedis;
+        this.activeJanusGraph = withJanusGraph;
+        this.activeKeycloak = withKeycloak;
+        this.stopKeycloakAfterEach = stopKeycloakAfterEach;
+    }
+
+    /**
+     * Default constructor with Keycloak instance (when desired by parameter) not stopped after each unit test execution.
+     *
+     * @param withRedis      True when Redis embedded server shall be started.
+     * @param withJanusGraph True when JanusGraph embedded server shall be started.
+     * @param withKeycloak   True when Keycloak embedded server shall be started.
+     */
+    public ContextualizedTest(boolean withRedis, boolean withJanusGraph, boolean withKeycloak) {
+        this(withRedis, withJanusGraph, withKeycloak, /* reuse same Keycloak instance by default without stop after each unit test execution */ false);
+    }
+
     @BeforeEach
-    public void initRedisConnectionChainValues() {
-        // Initialize shared data and configurations
-        logger = Logger.getLogger(this.getClass().getName());
-        persistentObjectNamingConvention = PersistentObjectNamingConvention.NamingConventionApplicability.TENANT;
-        dataOwner = new AccessControlDomainModel();
-        // Build reusable context
-        this.context = new Context();
-        this.sessionCtx = new SessionContext(null);
+    public void initServices() throws Exception {
+        try {
+            // Initialize shared data and configurations
+            logger = Logger.getLogger(this.getClass().getName());
+            persistentObjectNamingConvention = PersistentObjectNamingConvention.NamingConventionApplicability.TENANT;
+            dataOwner = new AccessControlDomainModel();
+            // Build reusable context
+            this.context = new Context();
+            this.sessionCtx = new SessionContext(null);
 
-        // Set JanusGraph repository environment
-        setJanusGraphServer(this.context);
+            if (this.activeJanusGraph)
+                // Set JanusGraph repository environment
+                setJanusGraphServer(this.context);
 
-        // Synchronize all environment variables test values
-        initEnvVariables();
+            // Synchronize all environment variables test values
+            initEnvVariables();
 
-        // Set Redis server environment
-        setRedisServer();
+            if (this.activeRedis)
+                // Set Redis server environment
+                setRedisServer();
+
+            if (this.activeKeycloak) // Set Keycloak server environment
+                setKeycloakServer();
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     /**
      * Define runtime environment variable set.
      */
     protected void initEnvVariables() {
-        initJanusGraphEnvVariables();
-        initRedisEnvVariables();
+        if (this.activeJanusGraph)
+            initJanusGraphEnvVariables();
+        if (this.activeRedis)
+            initRedisEnvVariables();
+        if (this.activeKeycloak)
+            initKeycloakEnvVariables();
         initGatewayVariables();
     }
 
+    private void setKeycloakServer() {
+        // Get server image ready for start (singleton instance)
+        boolean reusableActivation = !stopKeycloakAfterEach; // Inverse of reuse requested by this class constructor
+        keycloak = SSOTestContainer.getKeycloakContainer(reusableActivation);
+        // Start the Keycloak server if not already running
+        SSOTestContainer.start(keycloak);
+        // Check finalized initial start
+        Assertions.assertTrue(keycloak.isRunning(), "Shall have been started via command environment variable!");
+    }
+
     private void setRedisServer() {
-        // Start Redis instance
+        // Start Redis instance (EmbeddedRedisExtension.class for Redis 6.0.5 used by default)
         // See https://redis.io/docs/management/config-file/ for more detail about supported start options
         redisServer = RedisServer.builder().port(SERVER_PORT)
                 .setting("bind 127.0.0.1 -::1") // good for local development on Windows to prevent security popups
@@ -162,9 +227,15 @@ public class ContextualizedTest {
         context.addResource(STORAGE_BACKEND_TYPE, org.cybnity.infrastructure.technical.registry.adapter.impl.janusgraph.ReadModelConfigurationVariable.JANUSGRAPH_STORAGE_BACKEND.getName(), false);
     }
 
+    private void initKeycloakEnvVariables() {
+        if (environmentVariables != null) {
+            // Define environment variables regarding server initialization
+        }
+    }
+
     private void initJanusGraphEnvVariables() {
         if (environmentVariables != null) {
-            // Define environment variables regarding write model
+            // Define environment variables regarding server initialization
             environmentVariables.set(
                     org.cybnity.infrastructure.technical.registry.adapter.impl.janusgraph.ReadModelConfigurationVariable.JANUSGRAPH_STORAGE_BACKEND.getName(),
                     STORAGE_BACKEND_TYPE);
@@ -211,14 +282,25 @@ public class ContextualizedTest {
         // Define workers environment variables
     }
 
+    /**
+     * Be care full that when a Keycloak instance have been started, it is not automatically stopped after each unit test execution.
+     * A reusable Keycloak instance previously started (according to this class's constructor defined parameter's value), shall be manually stopped by any subclass of this contextualized test.
+     */
     @AfterEach
     public void cleanValues() {
         if (snapshotsRepo != null) snapshotsRepo.freeResources();
         snapshotsRepo = null;
-        // Stop redis server used by worker
-        redisServer.stop();
+        if (this.activeRedis)
+            // Stop redis server used by worker
+            redisServer.stop();
+        if (this.stopKeycloakAfterEach) {
+            if (getKeycloak() != null)
+                // Stop keycloak server because shall not be reused by next test
+                SSOTestContainer.stop(getKeycloak());
+        }
         this.environmentVariables = null;
         this.redisServer = null;
+        this.keycloak = null;
         context = null;
         logger = null;
         dataOwner = null;
@@ -247,5 +329,14 @@ public class ContextualizedTest {
         snapshotsRepo = (supportedBySnapshotRepository) ? new SnapshotRepositoryRedisImpl(getContext()) : null;
         // Voluntary don't use instance() method to avoid singleton capability usage during this test campaign
         return (TenantsStore) TenantsStore.instance(getContext(), dataOwner, persistentObjectNamingConvention, /* with or without help by a snapshots capability provider */ snapshotsRepo);
+    }
+
+    /**
+     * Get started Keycloak instance.
+     *
+     * @return Instance or null (when none started according to the test's constructor execution defined).
+     */
+    protected GenericContainer<?> getKeycloak() {
+        return this.keycloak;
     }
 }

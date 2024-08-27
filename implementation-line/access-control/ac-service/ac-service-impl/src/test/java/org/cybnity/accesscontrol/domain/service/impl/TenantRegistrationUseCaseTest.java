@@ -1,11 +1,12 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
 import io.vertx.junit5.VertxExtension;
-import org.cybnity.accesscontrol.ContextualizedTest;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantMockHelper;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImpl;
+import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.SSOAdapterKeycloakImpl;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
@@ -21,6 +22,7 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.ChannelObser
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
+import org.cybnity.test.util.ContextualizedTest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -43,7 +45,15 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     private String serviceName;
     private Channel featureTenantsChangesNotificationChannel;
     private UISAdapter client;
+    private SSOAdapter ssoClient;
     private IMessageMapperProvider mapperFactory;
+
+    /**
+     * Default constructor.
+     */
+    public TenantRegistrationUseCaseTest() {
+        super(true, true, true);
+    }
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
@@ -55,8 +65,12 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
         this.client = new UISAdapterRedisImpl(this.sessionCtx);
+        this.ssoClient = new SSOAdapterKeycloakImpl(this.sessionCtx);
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client);
+        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client, this.ssoClient);
+
+        // Check started keycloak instance and accessible admin api
+        Assertions.assertNotNull(this.getKeycloak(), "shall have been started as defined in constructor super() call!");
     }
 
     @AfterEach

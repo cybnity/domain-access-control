@@ -7,6 +7,7 @@ import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
+import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
@@ -51,7 +52,16 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
     private final TenantTransactionCollectionsRepository tenantsReadModel;
     private final ITenantsWriteModel tenantsWriteModel;
     private final Channel tenantsChangesNotificationChannel;
-    private final UISAdapter client;
+
+    /**
+     * Connector to collaboration space.
+     */
+    private final UISAdapter uisClient;
+
+    /**
+     * Connector to UAM subdomain (e.g usable for realm management aligned with managed Tenants)
+     */
+    private final SSOAdapter ssoClient;
 
     /**
      * Default constructor.
@@ -61,10 +71,11 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
      * @param tenantsProjection                 Mandatory repository of Tenants.
      * @param serviceName                       Optional logical name of the service to activate.
      * @param tenantsChangesNotificationChannel Optional output channel to feed about changed tenants (e.g created, removed, changed).
-     * @param client                            Optional client to Users Interactions Space.
+     * @param uisClient                         Optional connector to Users Interactions Space.
+     * @param ssoClient                         Optional connector to Single-Sign On service.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    public TenantRegistration(ISessionContext context, ITenantsWriteModel tenantsStore, TenantTransactionCollectionsRepository tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter client) throws IllegalArgumentException {
+    public TenantRegistration(ISessionContext context, ITenantsWriteModel tenantsStore, TenantTransactionCollectionsRepository tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter uisClient, SSOAdapter ssoClient) throws IllegalArgumentException {
         super();
         if (tenantsStore == null) throw new IllegalArgumentException("tenantsStore parameter is required!");
         this.tenantsWriteModel = tenantsStore;
@@ -73,8 +84,9 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
         if (context == null) throw new IllegalArgumentException("Context parameter is required!");
         this.context = context;
         this.serviceName = serviceName;
-        this.client = client;
+        this.uisClient = uisClient;
         this.tenantsChangesNotificationChannel = tenantsChangesNotificationChannel;
+        this.ssoClient = ssoClient;
     }
 
     @Override
@@ -152,10 +164,10 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
 
                     if (commandResponse != null) {
                         // Notify response to command sender
-                        if (this.tenantsChangesNotificationChannel != null && this.client != null) {
+                        if (this.tenantsChangesNotificationChannel != null && this.uisClient != null) {
                             // Notify the general output channel regarding new actioned tenant
                             try {
-                                this.client.publish(commandResponse, tenantsChangesNotificationChannel, new MessageMapperFactory().getMapper(IDescribed.class, String.class));
+                                this.uisClient.publish(commandResponse, tenantsChangesNotificationChannel, new MessageMapperFactory().getMapper(IDescribed.class, String.class));
                             } catch (Exception e) {
                                 logger.log(Level.SEVERE, "Impossible notification of organization tenant registration result!", e);
                             }

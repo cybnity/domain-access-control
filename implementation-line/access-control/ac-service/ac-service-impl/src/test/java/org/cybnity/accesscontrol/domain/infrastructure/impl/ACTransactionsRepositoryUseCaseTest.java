@@ -14,7 +14,6 @@
 package org.cybnity.accesscontrol.domain.infrastructure.impl;
 
 import io.vertx.junit5.VertxExtension;
-import org.cybnity.accesscontrol.ContextualizedTest;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
@@ -30,6 +29,7 @@ import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
 import org.cybnity.infrastructure.technical.registry.adapter.api.event.DataViewEventType;
+import org.cybnity.test.util.ContextualizedTest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -49,6 +49,13 @@ public class ACTransactionsRepositoryUseCaseTest extends ContextualizedTest {
 
     private static TenantTransactionCollectionsRepository repo;
     private TenantsStore tenantsStore;
+
+    /**
+     * Default constructor.
+     */
+    public ACTransactionsRepositoryUseCaseTest() {
+        super(true, true, true);
+    }
 
     @BeforeEach
     public void initRepository() throws UnoperationalStateException {

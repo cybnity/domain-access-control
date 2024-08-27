@@ -21,16 +21,6 @@
 			<groupId>org.cybnity.application.access-control.translator</groupId>
 			<artifactId>keycloak</artifactId>
 		</dependency>
-		<dependency>
-			<!-- Keycloak Admin API client -->
-			<groupId>org.keycloak</groupId>
-			<artifactId>keycloak-admin-client</artifactId>
-		</dependency>
-		<dependency>
-			<!-- Keycloak Auth API client -->
-			<groupId>org.keycloak</groupId>
-			<artifactId>keycloak-authz-client</artifactId>
-		</dependency>
 		<!-- Test cycle dependencies -->
 		<dependency>
 			<groupId>io.netty</groupId>
@@ -40,12 +30,6 @@
 		<dependency>
 			<groupId>uk.org.webcompere</groupId>
 			<artifactId>system-stubs-jupiter</artifactId>
-		</dependency>
-		<dependency>
-			<!-- Embedded keycloak test environment -->
-			<groupId>com.github.dasniko</groupId>
-			<artifactId>testcontainers-keycloak</artifactId>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

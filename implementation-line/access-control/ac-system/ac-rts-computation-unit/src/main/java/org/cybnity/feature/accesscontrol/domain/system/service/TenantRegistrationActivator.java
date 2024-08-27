@@ -6,6 +6,7 @@ import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImp
 import org.cybnity.accesscontrol.domain.model.ITenantsWriteModel;
 import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
 import org.cybnity.accesscontrol.domain.service.impl.TenantRegistration;
+import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
 import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
@@ -33,15 +34,16 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
     /**
      * Default constructor.
      *
-     * @param client                                   Optional Users Interactions Space client interactions with other domain during event processing, and/or dead letter channel notification.
+     * @param uisConnector                             Optional Users Interactions Space connector with other domain during event processing, and/or dead letter channel notification.
      * @param context                                  Mandatory configuration context of the processing unit.
      * @param serviceName                              Optional logical name of the service to activate.
      * @param featureTenantsChangesNotificationChannel Optional channel managed by registration service for notification of Tenants changes (e.g created, removed).
-     * @throws IllegalArgumentException When mandatory parameter is missing.
+     * @param ssoConnector                             Optional connector to SSO system.
+     * @throws IllegalArgumentException    When mandatory parameter is missing.
      * @throws UnoperationalStateException When impossible instantiation of the tenant snapshots repository adapter.
      */
-    public TenantRegistrationActivator(UISAdapter client, IContext context, String serviceName, Channel featureTenantsChangesNotificationChannel) throws IllegalArgumentException, UnoperationalStateException {
-        this.client = client;
+    public TenantRegistrationActivator(UISAdapter uisConnector, IContext context, String serviceName, Channel featureTenantsChangesNotificationChannel, SSOAdapter ssoConnector) throws IllegalArgumentException, UnoperationalStateException {
+        this.client = uisConnector;
         if (context == null) throw new IllegalArgumentException("Context parameter is required!");
 
         // --- Initialization of the tenant read-model and write-model reused by the registration service ---
@@ -54,7 +56,7 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
         ITenantsWriteModel tenantsWriteModelManager = TenantsWriteModelImpl.instance(tenantDomainPersistenceLayer);
 
         // Define the application service (and collaboration components) able to process the event according to business/treatment rules
-        processor = new TenantRegistration(new SessionContext(/* none pre-registered tenant is defined or usable by the registration service*/null), tenantsWriteModelManager, tenantReadModelProjectionsProvider, serviceName, featureTenantsChangesNotificationChannel, client);
+        processor = new TenantRegistration(new SessionContext(/* none pre-registered tenant is defined or usable by the registration service*/null), tenantsWriteModelManager, tenantReadModelProjectionsProvider, serviceName, featureTenantsChangesNotificationChannel, uisConnector, ssoConnector);
     }
 
     /**

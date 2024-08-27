@@ -1,12 +1,13 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
 import io.vertx.junit5.VertxExtension;
-import org.cybnity.accesscontrol.ContextualizedTest;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantMockHelper;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImpl;
 import org.cybnity.accesscontrol.domain.service.api.ApplicationServiceOutputCause;
+import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.SSOAdapterKeycloakImpl;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
 import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
@@ -23,6 +24,7 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.ChannelObser
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
+import org.cybnity.test.util.ContextualizedTest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -44,8 +46,16 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
     private TenantTransactionCollectionsRepository tenantsRepository;
     private String serviceName;
     private Channel featureTenantsChangesNotificationChannel;
-    private UISAdapter client;
+    private UISAdapter uisClient;
     private IMessageMapperProvider mapperFactory;
+    private SSOAdapter ssoClient;
+
+    /**
+     * Default constructor.
+     */
+    public TenantRegistrationRejectionUseCaseTest() {
+        super(true, true, /* not need by registration service use case impl */ false);
+    }
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
@@ -56,9 +66,10 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
         this.sessionCtx = new SessionContext(null);
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
-        this.client = new UISAdapterRedisImpl(this.sessionCtx);
+        this.uisClient = new UISAdapterRedisImpl(this.sessionCtx);
+        this.ssoClient = new SSOAdapterKeycloakImpl(this.sessionCtx);
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client);
+        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.uisClient, this.ssoClient);
     }
 
     @AfterEach
@@ -71,7 +82,7 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
         this.sessionCtx = null;
         this.tenantRegistrationService = null;
         this.featureTenantsChangesNotificationChannel = null;
-        this.client = null;
+        this.uisClient = null;
         this.mapperFactory = null;
     }
 
@@ -138,7 +149,7 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
         // Prepare and try to execute tenant registration with same name (simulating company's platform instance re-start)
         Command cmd2 = TenantMockHelper.prepareRegisterTenantCommand(organizationName, /* Simulation attempt to force the requested creation of no active tenant creation */ Boolean.FALSE);
 
-        this.client.subscribe(outputObservers, mapperFactory.getMapper(String.class, IDescribed.class));
+        this.uisClient.subscribe(outputObservers, mapperFactory.getMapper(String.class, IDescribed.class));
 
         // Attempt to create a new tenant with the same name that shall be rejected for existing cause
         this.tenantRegistrationService.handle(cmd2); // Tenant shall have not been added into the events store
@@ -146,6 +157,6 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
         // Wait for give time to message to be processed
         Assertions.assertTrue(acceptancesCriteriaCheckResultsWaiter.await(300, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
         // Remove observers from the channels provider
-        this.client.unsubscribe(outputObservers);
+        this.uisClient.unsubscribe(outputObservers);
     }
 }

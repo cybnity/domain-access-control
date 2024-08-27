@@ -3,7 +3,7 @@ Presentation of the minimum configuration actions to implement into a started Ke
 
 # PREREQUISITE
 - A Keycloack server instance is running (started via Helm chart into a K8s cluster), supported by a Postgresql service (storage of user accounts)
-- An admin account is automatically created and ready for use (authentication ready from user=admin and password=admin) as defined in Helm project settings (see access-control-sso-system's [values.yaml file](/implementation-line/systems/charts/access-control-sso-system/values.yaml))
+- An admin account is automatically created and ready for use (authentication ready from user=admin and password=admin) as defined in Helm project settings
 - The Keycloak http access is forwarded from external of Cluster via an active Linux process ('kubectl port-forward --namespace default svc/access-control-sso-system 8080:81' shell command executed)
 - The Keycloak web application instance is accessible from web browser at http://127.0.01:8080/ via account:
     - login = admin
