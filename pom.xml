@@ -9,7 +9,7 @@
 	<artifactId>applications</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
-	<name>CYBNITY access control application</name>
+	<name>CYBNITY access control domain</name>
 
 	<!-- Required information for Maven Central Repository publishing -->
 	<description>Access control features supporting the CYBNITY defense platform solution</description>

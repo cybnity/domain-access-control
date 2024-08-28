@@ -31,6 +31,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.cybnity.application.access-control.adapters</groupId>
+				<artifactId>admin-api</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.application.access-control.adapters</groupId>
 				<artifactId>keycloak-impl</artifactId>
 				<version>${revision}</version>
 				<scope>compile</scope>

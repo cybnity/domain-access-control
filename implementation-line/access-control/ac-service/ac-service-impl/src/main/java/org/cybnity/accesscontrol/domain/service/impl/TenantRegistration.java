@@ -210,7 +210,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
         // GIVEN POTENTIAL NEW REALM TO CREATE FOR SAME TENANT NAME:
         // - Search existing realm registered (and access control settings recorded as usable via UIAM connector adapter configuration)
         // RealmResource existingRes = realm(String realmName) // existingRes equals organization named
-// TODO impl
+// TODO impl from ssoClient
 
 
         // --- NEW REALM REGISTRATION ---

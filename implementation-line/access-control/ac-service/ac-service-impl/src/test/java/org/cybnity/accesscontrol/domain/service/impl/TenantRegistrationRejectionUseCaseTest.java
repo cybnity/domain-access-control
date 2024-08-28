@@ -48,7 +48,6 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
     private Channel featureTenantsChangesNotificationChannel;
     private UISAdapter uisClient;
     private IMessageMapperProvider mapperFactory;
-    private SSOAdapter ssoClient;
 
     /**
      * Default constructor.
@@ -67,9 +66,9 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
         this.uisClient = new UISAdapterRedisImpl(this.sessionCtx);
-        this.ssoClient = new SSOAdapterKeycloakImpl(this.sessionCtx);
+        SSOAdapter ssoClient = new SSOAdapterKeycloakImpl(this.sessionCtx);
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.uisClient, this.ssoClient);
+        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.uisClient, ssoClient);
     }
 
     @AfterEach

@@ -45,7 +45,6 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     private String serviceName;
     private Channel featureTenantsChangesNotificationChannel;
     private UISAdapter client;
-    private SSOAdapter ssoClient;
     private IMessageMapperProvider mapperFactory;
 
     /**
@@ -65,9 +64,9 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
         this.client = new UISAdapterRedisImpl(this.sessionCtx);
-        this.ssoClient = new SSOAdapterKeycloakImpl(this.sessionCtx);
+        SSOAdapter ssoClient = new SSOAdapterKeycloakImpl(this.sessionCtx);
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client, this.ssoClient);
+        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client, ssoClient);
 
         // Check started keycloak instance and accessible admin api
         Assertions.assertNotNull(this.getKeycloak(), "shall have been started as defined in constructor super() call!");
