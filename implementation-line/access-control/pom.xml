@@ -42,6 +42,12 @@
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.cybnity.application.access-control.adapters</groupId>
+				<artifactId>keycloak-admin-impl</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.cybnity.application.access-control.translator</groupId>
 				<artifactId>keycloak</artifactId>
 				<version>${revision}</version>
@@ -49,7 +55,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.cybnity.application.access-control.translator</groupId>
-				<artifactId>ui-api</artifactId>
+				<artifactId>ui</artifactId>
 				<version>${revision}</version>
 				<scope>compile</scope>
 			</dependency>
@@ -84,16 +90,25 @@
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
-				<groupId>io.vertx</groupId>
-				<artifactId>vertx-web-client</artifactId>
-				<version>${vertx.version}</version>
-				<scope>test</scope>
+				<!-- Required for unit test about collaboration processes -->
+				<groupId>org.cybnity.application.access-control.system</groupId>
+				<artifactId>process-module</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>io.vertx</groupId>
 				<artifactId>vertx-rx-java3</artifactId>
 				<version>${vertx.version}</version>
 				<scope>compile</scope>
+			</dependency>
+
+			<!-- Test dependencies -->
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-web-client</artifactId>
+				<version>${vertx.version}</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

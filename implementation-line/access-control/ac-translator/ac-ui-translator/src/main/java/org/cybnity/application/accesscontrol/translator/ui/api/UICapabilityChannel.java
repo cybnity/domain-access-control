@@ -1,4 +1,4 @@
-package org.cybnity.application.accesscontrol.ui.api;
+package org.cybnity.application.accesscontrol.translator.ui.api;
 
 
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.ICapabilityChannel;

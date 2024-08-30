@@ -1,14 +1,16 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
 import io.vertx.junit5.VertxExtension;
+import org.cybnity.accesscontrol.CustomContextualizedTest;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantMockHelper;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImpl;
-import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
-import org.cybnity.application.accesscontrol.adapter.impl.keycloak.SSOAdapterKeycloakImpl;
+import org.cybnity.application.accesscontrol.adapter.api.admin.ISSOAdminAdapter;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.SSOAdminAdapterKeycloakImpl;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.UnoperationalStateException;
@@ -22,7 +24,6 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.ChannelObser
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
-import org.cybnity.test.util.ContextualizedTest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class TenantRegistrationUseCaseTest extends ContextualizedTest {
+public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
 
     private TenantsStore tenantsStore;
     private TenantRegistration tenantRegistrationService;
@@ -51,20 +52,20 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
      * Default constructor.
      */
     public TenantRegistrationUseCaseTest() {
-        super(true, true, true);
+        super(true, true, true,false,true);
     }
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
         // Create a store managing streamed messages
-        tenantsStore = getPersistenceOrientedStore(true /* With snapshots management capability activated */);
+        tenantsStore = getTenantPersistenceOrientedStore();
 
-        this.tenantsRepository = TenantTransactionCollectionsRepository.instance(getContext(), tenantsStore);
+        this.tenantsRepository = TenantTransactionCollectionsRepository.instance(context(), tenantsStore);
         this.sessionCtx = new SessionContext(null);
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
         this.client = new UISAdapterRedisImpl(this.sessionCtx);
-        SSOAdapter ssoClient = new SSOAdapterKeycloakImpl(this.sessionCtx);
+        ISSOAdminAdapter ssoClient = new SSOAdminAdapterKeycloakImpl(this.sessionCtx);
         this.mapperFactory = new ACDomainMessageMapperFactory();
         this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client, ssoClient);
 
@@ -74,8 +75,8 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
     @AfterEach
     public void clean() {
-        this.tenantsRepository.freeResources();
-        if (tenantsStore != null) tenantsStore.freeResources();
+        this.tenantsRepository.freeUpResources();
+        if (tenantsStore != null) tenantsStore.freeUpResources();
         tenantsStore = null;
         this.tenantsRepository = null;
         this.serviceName = null;
@@ -118,7 +119,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
                     // Read result of registration and verify that tenant have been created with success (notification event as new tenant created)
                     String eventType = domainEvent.type().value();
 
-                    if (org.cybnity.application.accesscontrol.ui.api.event.DomainEventType.TENANT_REGISTERED.name().equals(eventType)) {
+                    if (DomainEventType.TENANT_REGISTERED.name().equals(eventType)) {
                         // Detect only when a new tenant added notification is received
                         Collection<Attribute> spec = domainEvent.specification();
                         // Verify that added tenant have same organization (organizationName) name that tested command
@@ -196,7 +197,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
                     // Read result of registration and verify that tenant have been created with success (notification event as new tenant created)
                     String eventType = domainEvent.type().value();
 
-                    if (org.cybnity.application.accesscontrol.ui.api.event.DomainEventType.TENANT_REGISTERED.name().equals(eventType)) {
+                    if (DomainEventType.TENANT_REGISTERED.name().equals(eventType)) {
                         // Detect only when a new tenant added notification is received
                         // or an already existing tenant with same organization name have been retrieved without new creation
 

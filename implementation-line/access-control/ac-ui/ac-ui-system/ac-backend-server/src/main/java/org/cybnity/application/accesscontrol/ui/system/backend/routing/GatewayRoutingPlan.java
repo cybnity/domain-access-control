@@ -1,6 +1,6 @@
 package org.cybnity.application.accesscontrol.ui.system.backend.routing;
 
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.framework.application.vertx.common.routing.RouteRecipientList;
 

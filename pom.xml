@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.cybnity</groupId>
 		<artifactId>techstack</artifactId>
-		<version>0.36.0</version>
+		<version>0.38.0</version>
 	</parent>
 
 	<artifactId>applications</artifactId>
@@ -121,32 +121,11 @@
 		</repository>-->
 	</repositories>
 
-	<!-- Project specific additional dependency versions -->
+	<!-- Project specific additional dependency versions
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<!-- Test containers components supporting test mode for Cassandra, Elasticsearch, Kafka, Grafana, Influxdb, K3S, Mongodb, Solr, Redis or Generic containers -->
-				<groupId>org.testcontainers</groupId>
-				<artifactId>testcontainers-bom</artifactId>
-				<version>1.20.0</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<!--
-			<dependency>
-				<groupId>com.github.docker-java</groupId>
-				<artifactId>docker-java-api</artifactId>
-				<version>3.3.3</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.github.docker-java</groupId>
-				<artifactId>docker-java-transport-zerodep</artifactId>
-				<version>3.3.3</version>
-				<scope>test</scope>
-			</dependency>-->
 		</dependencies>
-	</dependencyManagement>
+	</dependencyManagement>-->
 
 	<!-- List of advise about project -->
 	<mailingLists>

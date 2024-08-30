@@ -20,7 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author olivier
  */
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableACProcessModuleCheckerUseCaseTest extends ContextualizedTest {
+public class ExecutableACProcessModuleCheckerUseCaseTest extends CustomContextualizedTest {
+
+    /**
+     * Default constructor.
+     */
+    public ExecutableACProcessModuleCheckerUseCaseTest() {
+        super(false, false, false, false, /* With snapshots management capability activated */ false);
+    }
 
     /**
      * Test that a module checker which is executed and that require some specific

@@ -14,22 +14,28 @@
 
 	<dependencies>
 		<dependency>
+			<!-- Supported API by this implementation components -->
 			<groupId>org.cybnity.application.access-control.adapters</groupId>
 			<artifactId>admin-api</artifactId>
 		</dependency>
 		<dependency>
+			<!-- Common Keycloak usage implementation components -->
 			<groupId>org.cybnity.application.access-control.adapters</groupId>
 			<artifactId>keycloak-impl</artifactId>
 		</dependency>
+
 		<!-- Test cycle dependencies -->
 		<dependency>
+			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" NOTIFICATION on Mac -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>uk.org.webcompere</groupId>
-			<artifactId>system-stubs-jupiter</artifactId>
+			<!-- Reuse of common test util features -->
+			<groupId>org.cybnity.features</groupId>
+			<artifactId>test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

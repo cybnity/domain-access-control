@@ -14,6 +14,7 @@
 package org.cybnity.accesscontrol.domain.infrastructure.impl;
 
 import io.vertx.junit5.VertxExtension;
+import org.cybnity.accesscontrol.CustomContextualizedTest;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
@@ -29,7 +30,6 @@ import org.cybnity.framework.immutable.Entity;
 import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
 import org.cybnity.infrastructure.technical.registry.adapter.api.event.DataViewEventType;
-import org.cybnity.test.util.ContextualizedTest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -45,7 +45,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ACTransactionsRepositoryUseCaseTest extends ContextualizedTest {
+public class ACTransactionsRepositoryUseCaseTest extends CustomContextualizedTest {
 
     private static TenantTransactionCollectionsRepository repo;
     private TenantsStore tenantsStore;
@@ -54,26 +54,27 @@ public class ACTransactionsRepositoryUseCaseTest extends ContextualizedTest {
      * Default constructor.
      */
     public ACTransactionsRepositoryUseCaseTest() {
-        super(true, true, true);
+        super(true, true, true, false, /* With snapshots management capability activated */true);
     }
 
     @BeforeEach
     public void initRepository() throws UnoperationalStateException {
         // Create a store managing streamed messages
-        tenantsStore = getPersistenceOrientedStore(true /* With snapshots management capability activated */);
+        tenantsStore = getTenantPersistenceOrientedStore();
 
         // Prepare a repository of a Access Control domain managing a read-model projections perimeter
-        repo = TenantTransactionCollectionsRepository.instance(getContext(), tenantsStore);
+        repo = TenantTransactionCollectionsRepository.instance(context(), tenantsStore);
     }
 
     @AfterEach
     public void cleanResources() throws UnoperationalStateException {
-        if (tenantsStore != null) tenantsStore.freeResources();
+        if (tenantsStore != null) tenantsStore.freeUpResources();
         if (repo != null) {
             repo.drop(); // Delete previous created schema and records
-            repo.freeResources();
+            repo.freeUpResources();
         }
         repo = null;
+        tenantsStore=null;
     }
 
     /**
@@ -98,7 +99,7 @@ public class ACTransactionsRepositoryUseCaseTest extends ContextualizedTest {
         // Simulate a request of tenant creation command
         Entity originCreationCommand = new DomainEntity(IdentifierStringBased.generate(null));
         //Command cmd = new ConcreteCommandEvent(originCreationCommand);
-        String aggregateLabel = "CYBNITY";
+        String aggregateLabel = "givenChangedDomainObject_whenNotifyWriteModelChangeToRepository_thenReadModelDataViewRefreshed";
         // Create a tenant instance (generating default activity status and label descriptor)
         Boolean originActivityStatus = Boolean.TRUE;
         Tenant tenant = new Tenant(originCreationCommand, IdentifierStringBased.generate(null), originActivityStatus, aggregateLabel);
@@ -112,7 +113,7 @@ public class ACTransactionsRepositoryUseCaseTest extends ContextualizedTest {
         CompletableFuture<Boolean> committed = CompletableFuture.supplyAsync(() -> {
             try {
                 // Store a Tenant created into the write-model store (which shall notify the projections repository's read-model to be refreshed)
-                tenantsStore.append(tenant, this.sessionCtx);
+                tenantsStore.append(tenant, sessionContext());
             } catch (ImmutabilityException | UnoperationalStateException e) {
                 throw new RuntimeException(e);
             }
@@ -122,7 +123,7 @@ public class ACTransactionsRepositoryUseCaseTest extends ContextualizedTest {
         if (committed.get()) {
             // Execute query based on label filtering
             Map<String, String> queryParameters = prepareQueryBasedOnLabel(aggregateLabel, TenantDataView.class.getSimpleName(), ACApplicationQueryName.TENANT_VIEW_FIND_BY_LABEL);
-            List<TenantTransactionsCollection> results = repo.queryWhere(queryParameters, sessionCtx);
+            List<TenantTransactionsCollection> results = repo.queryWhere(queryParameters, sessionContext());
 
             // Verify if a first version of the data view (projection view relative to the aggregate) have been created into the graph model
             Assertions.assertNotNull(results, "Existing data views collection should have been found!");

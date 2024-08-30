@@ -1,7 +1,7 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
-import org.cybnity.application.accesscontrol.domain.system.gateway.ContextualizedTest;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.domain.system.gateway.CustomContextualizedTest;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.application.vertx.common.routing.IEventProcessingManager;
@@ -21,8 +21,14 @@ import java.util.Collection;
  *
  * @author olivier
  */
-public class APISupportedCapabilitySelectionFilterUseCaseTest extends ContextualizedTest {
+public class APISupportedCapabilitySelectionFilterUseCaseTest extends CustomContextualizedTest {
 
+    /**
+     * Default constructor.
+     */
+    public APISupportedCapabilitySelectionFilterUseCaseTest() {
+        super(false, false, false, false, /* With snapshots management capability activated */ false);
+    }
     /**
      * Sample of supported event types equals to implementation class normally supportable scope of commands.
      */

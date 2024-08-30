@@ -3,7 +3,7 @@ package org.cybnity.accesscontrol.iam.domain.infrastructure.impl;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.AccessControlDomainGraphImpl;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.AccessControlDomainReadModelImpl;
 import org.cybnity.accesscontrol.iam.domain.model.Account;
-import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
+import org.cybnity.application.accesscontrol.translator.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Command;
@@ -63,7 +63,7 @@ public class AccountsRepository extends AbstractReadModelRepository implements I
     }
 
     @Override
-    public void freeResources() {
+    public void freeUpResources() {
 
     }
 

@@ -19,7 +19,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author olivier
  */
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableIOGatewayCheckerUseCaseTest extends ContextualizedTest {
+public class ExecutableIOGatewayCheckerUseCaseTest extends CustomContextualizedTest {
+
+
+    /**
+     * Default constructor.
+     */
+    public ExecutableIOGatewayCheckerUseCaseTest() {
+        super(false, false, false, false, /* With snapshots management capability activated */ false);
+    }
 
     /**
      * Test that a gateway checker which is executed and that require some specific

@@ -15,7 +15,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
  * @author olivier
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_8370_CM6")
-public enum ConfigurationVariable implements IReadableConfiguration {
+public enum CommonConfigurationVariable implements IReadableConfiguration {
 
     ;
 
@@ -33,7 +33,7 @@ public enum ConfigurationVariable implements IReadableConfiguration {
      *              container or operating system).
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    private ConfigurationVariable(String aName) throws IllegalArgumentException {
+    private CommonConfigurationVariable(String aName) throws IllegalArgumentException {
         if (aName == null || "".equalsIgnoreCase(aName))
             throw new IllegalArgumentException("The name of this variable shall be defined!");
         this.name = aName;

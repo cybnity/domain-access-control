@@ -17,21 +17,21 @@ import java.util.Set;
  * @author olivier
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_8370_CM6")
-public class ExecutableAdapterChecker extends ExecutableComponentChecker {
+public class ExecutableIAMAdapterChecker extends ExecutableComponentChecker {
 
     /**
      * Constructor with dedicated context to use by this checker.
      *
      * @param ctx A context or null.
      */
-    public ExecutableAdapterChecker(IContext ctx) {
+    public ExecutableIAMAdapterChecker(IContext ctx) {
         super(ctx);
     }
 
     /**
      * Default constructor.
      */
-    public ExecutableAdapterChecker() {
+    public ExecutableIAMAdapterChecker() {
         super();
     }
 

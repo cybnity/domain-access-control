@@ -1,7 +1,7 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.event.AttributeName;
 import org.cybnity.framework.application.vertx.common.routing.ProcessingUnitAnnouncesObserver;

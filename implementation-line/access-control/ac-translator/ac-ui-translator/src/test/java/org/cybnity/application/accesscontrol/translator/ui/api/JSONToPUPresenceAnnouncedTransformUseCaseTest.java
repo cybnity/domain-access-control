@@ -1,8 +1,7 @@
 package org.cybnity.application.accesscontrol.translator.ui.api;
 
 import io.lettuce.core.StreamMessage;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
-import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
+import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.framework.domain.IPresenceObservability;
 import org.cybnity.framework.domain.event.IEventType;
 import org.cybnity.framework.domain.event.ProcessingUnitPresenceAnnounced;

@@ -1,30 +1,29 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
 import io.vertx.junit5.VertxExtension;
+import org.cybnity.accesscontrol.CustomContextualizedTest;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantMockHelper;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImpl;
 import org.cybnity.accesscontrol.domain.service.api.ApplicationServiceOutputCause;
-import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
-import org.cybnity.application.accesscontrol.adapter.impl.keycloak.SSOAdapterKeycloakImpl;
+import org.cybnity.application.accesscontrol.adapter.api.admin.ISSOAdminAdapter;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.SSOAdminAdapterKeycloakImpl;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.IDescribed;
-import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.event.EventSpecification;
-import org.cybnity.framework.domain.model.SessionContext;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.ChannelObserver;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
-import org.cybnity.test.util.ContextualizedTest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -38,11 +37,10 @@ import java.util.concurrent.TimeUnit;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
+public class TenantRegistrationRejectionUseCaseTest extends CustomContextualizedTest {
 
     private TenantsStore tenantsStore;
     private TenantRegistration tenantRegistrationService;
-    private ISessionContext sessionCtx;
     private TenantTransactionCollectionsRepository tenantsRepository;
     private String serviceName;
     private Channel featureTenantsChangesNotificationChannel;
@@ -53,32 +51,30 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
      * Default constructor.
      */
     public TenantRegistrationRejectionUseCaseTest() {
-        super(true, true, /* not need by registration service use case impl */ false);
+        super(true, true, /* not need by registration service use case impl */ false,false,/* With snapshots management capability activated */true);
     }
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
         // Create a store managing streamed messages
-        tenantsStore = getPersistenceOrientedStore(true /* With snapshots management capability activated */);
+        tenantsStore = getTenantPersistenceOrientedStore();
 
-        this.tenantsRepository = TenantTransactionCollectionsRepository.instance(getContext(), tenantsStore);
-        this.sessionCtx = new SessionContext(null);
+        this.tenantsRepository = TenantTransactionCollectionsRepository.instance(context(), tenantsStore);
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
-        this.uisClient = new UISAdapterRedisImpl(this.sessionCtx);
-        SSOAdapter ssoClient = new SSOAdapterKeycloakImpl(this.sessionCtx);
+        this.uisClient = new UISAdapterRedisImpl(sessionContext());
+        ISSOAdminAdapter ssoClient = new SSOAdminAdapterKeycloakImpl(sessionContext());
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.uisClient, ssoClient);
+        this.tenantRegistrationService = new TenantRegistration(sessionContext(), TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.uisClient, ssoClient);
     }
 
     @AfterEach
     public void clean() {
-        this.tenantsRepository.freeResources();
-        if (tenantsStore != null) tenantsStore.freeResources();
+        this.tenantsRepository.freeUpResources();
+        if (tenantsStore != null) tenantsStore.freeUpResources();
         tenantsStore = null;
         this.tenantsRepository = null;
         this.serviceName = null;
-        this.sessionCtx = null;
         this.tenantRegistrationService = null;
         this.featureTenantsChangesNotificationChannel = null;
         this.uisClient = null;
@@ -116,7 +112,7 @@ public class TenantRegistrationRejectionUseCaseTest extends ContextualizedTest {
                     IDescribed domainEvent = (IDescribed) evt;
                     // Read result and verify that tenant registration have been rejected (notification event as new tenant request rejection)
                     String eventType = domainEvent.type().value();
-                    if (org.cybnity.application.accesscontrol.ui.api.event.DomainEventType.TENANT_REGISTRATION_REJECTED.name().equals(eventType)) {
+                    if (DomainEventType.TENANT_REGISTRATION_REJECTED.name().equals(eventType)) {
                         // CASE: tenant (e.g platform tenant with same name and already in an operational activity status not re-assignable) creation is not authorized AND REJECTION SHALL BE NOTIFIED
                         Collection<Attribute> spec = domainEvent.specification();
                         // Verify that rejected tenant creation is about same organization (organizationName) name that tested command

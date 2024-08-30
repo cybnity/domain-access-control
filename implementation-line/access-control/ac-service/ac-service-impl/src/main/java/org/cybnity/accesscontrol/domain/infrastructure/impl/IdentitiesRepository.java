@@ -2,7 +2,7 @@ package org.cybnity.accesscontrol.domain.infrastructure.impl;
 
 import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.AccessControlDomainGraphImpl;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.AccessControlDomainReadModelImpl;
-import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
+import org.cybnity.application.accesscontrol.translator.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Command;
@@ -63,7 +63,7 @@ public class IdentitiesRepository extends AbstractReadModelRepository implements
     }
 
     @Override
-    public void freeResources() {
+    public void freeUpResources() {
 
     }
 

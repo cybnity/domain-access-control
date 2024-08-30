@@ -7,11 +7,11 @@ import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
-import org.cybnity.feature.accesscontrol.domain.system.ContextualizedTest;
+import org.cybnity.feature.accesscontrol.domain.system.CustomContextualizedTest;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.IdentifierStringBased;
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class TenantRegistrationUseCaseTest extends ContextualizedTest {
+public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
 
     /**
      * Identifiers of deployment
@@ -55,13 +55,10 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     private IMessageMapperProvider mapperFactory;
 
     /**
-     * Enhance default environment variables with additional variables specific to the test.
+     * Default constructor.
      */
-    @Override
-    protected void initEnvVariables() {
-        super.initEnvVariables(); // Init common env values
-        // Add specific env values
-
+    public TenantRegistrationUseCaseTest() {
+        super(true, true, true, false, /* With snapshots management capability activated */ true);
     }
 
     @BeforeEach
@@ -82,7 +79,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         });
 
         // Initialize an adapter connected to contextualized Redis server (Users Interactions Space)
-        uisClient = new UISAdapterRedisImpl(getContext());
+        uisClient = new UISAdapterRedisImpl(context());
     }
 
     /**

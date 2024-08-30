@@ -19,7 +19,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.cybnity.application.access-control.translator</groupId>
-			<artifactId>ui-api</artifactId>
+			<artifactId>ui</artifactId>
 		</dependency>
 	</dependencies>
 </project>

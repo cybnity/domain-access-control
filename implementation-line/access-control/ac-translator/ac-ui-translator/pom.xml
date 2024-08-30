@@ -7,15 +7,11 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<groupId>org.cybnity.application.access-control.translator</groupId>
-	<artifactId>ui-api</artifactId>
+	<artifactId>ui</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
-	<name>-- AC UI experience API translator (impl)</name>
+	<name>-- AC UI experience translator (impl)</name>
 	<dependencies>
-		<dependency>
-			<groupId>org.cybnity.application.access-control.ui</groupId>
-			<artifactId>api</artifactId>
-		</dependency>
 		<dependency>
 			<!-- Integration with Users Interactions Space middleware -->
 			<groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>

@@ -7,10 +7,10 @@ import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
-import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
+import org.cybnity.application.accesscontrol.adapter.api.admin.ISSOAdminAdapter;
+import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
-import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
@@ -61,7 +61,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
     /**
      * Connector to UAM subdomain (e.g usable for realm management aligned with managed Tenants)
      */
-    private final SSOAdapter ssoClient;
+    private final ISSOAdminAdapter ssoClient;
 
     /**
      * Default constructor.
@@ -75,7 +75,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
      * @param ssoClient                         Optional connector to Single-Sign On service.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    public TenantRegistration(ISessionContext context, ITenantsWriteModel tenantsStore, TenantTransactionCollectionsRepository tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter uisClient, SSOAdapter ssoClient) throws IllegalArgumentException {
+    public TenantRegistration(ISessionContext context, ITenantsWriteModel tenantsStore, TenantTransactionCollectionsRepository tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter uisClient, ISSOAdminAdapter ssoClient) throws IllegalArgumentException {
         super();
         if (tenantsStore == null) throw new IllegalArgumentException("tenantsStore parameter is required!");
         this.tenantsWriteModel = tenantsStore;

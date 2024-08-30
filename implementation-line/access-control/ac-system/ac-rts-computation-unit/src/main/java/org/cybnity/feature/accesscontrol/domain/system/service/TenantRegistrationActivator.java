@@ -6,8 +6,8 @@ import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImp
 import org.cybnity.accesscontrol.domain.model.ITenantsWriteModel;
 import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
 import org.cybnity.accesscontrol.domain.service.impl.TenantRegistration;
-import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
-import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
+import org.cybnity.application.accesscontrol.adapter.api.admin.ISSOAdminAdapter;
+import org.cybnity.application.accesscontrol.translator.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.service.AbstractServiceActivator;
@@ -42,12 +42,11 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
      * @throws IllegalArgumentException    When mandatory parameter is missing.
      * @throws UnoperationalStateException When impossible instantiation of the tenant snapshots repository adapter.
      */
-    public TenantRegistrationActivator(UISAdapter uisConnector, IContext context, String serviceName, Channel featureTenantsChangesNotificationChannel, SSOAdapter ssoConnector) throws IllegalArgumentException, UnoperationalStateException {
+    public TenantRegistrationActivator(UISAdapter uisConnector, IContext context, String serviceName, Channel featureTenantsChangesNotificationChannel, ISSOAdminAdapter ssoConnector) throws IllegalArgumentException, UnoperationalStateException {
         this.client = uisConnector;
         if (context == null) throw new IllegalArgumentException("Context parameter is required!");
 
-        // --- Initialization of the tenant read-model and write-model reused by the registration service ---
-
+        // --- Initialization of the tenant read-model and write-model reusable by the Tenant registration service ---
         // Event store managing the tenant streams persistence layer
         TenantsStore tenantDomainPersistenceLayer = new TenantsStore(context, new AccessControlDomainModel(), PersistentObjectNamingConvention.NamingConventionApplicability.TENANT, new SnapshotRepositoryRedisImpl(context));
         // Repository managing the tenant read-model projections

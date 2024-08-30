@@ -1,9 +1,9 @@
 package org.cybnity.feature.accesscontrol.domain.system.service;
 
-import org.cybnity.application.accesscontrol.adapter.api.SSOAdapter;
-import org.cybnity.application.accesscontrol.adapter.impl.keycloak.SSOAdapterKeycloakImpl;
+import org.cybnity.application.accesscontrol.adapter.api.admin.ISSOAdminAdapter;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.SSOAdminAdapterKeycloakImpl;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.experience.ExecutionResource;
 import org.cybnity.framework.IContext;
@@ -62,7 +62,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
     /**
      * Single-Sign On adapter.
      */
-    private SSOAdapter ssoClient;
+    private ISSOAdminAdapter ssoClient;
 
     /**
      * Default constructor.
@@ -75,7 +75,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
         super();
         if (context == null) throw new IllegalArgumentException("Context parameter is required!");
         this.context = context;
-        this.ssoClient = new SSOAdapterKeycloakImpl(this.context);
+        this.ssoClient = new SSOAdminAdapterKeycloakImpl(this.context);
     }
 
     @Override

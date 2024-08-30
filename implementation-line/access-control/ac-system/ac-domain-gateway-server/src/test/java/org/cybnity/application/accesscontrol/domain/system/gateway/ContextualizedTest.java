@@ -77,7 +77,7 @@ public class ContextualizedTest {
      *
      * @return A context instance including environment variable names and values.
      */
-    protected IContext getContext() {
+    protected IContext context() {
         return this.context;
     }
 

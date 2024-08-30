@@ -11,9 +11,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
-import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
 import org.cybnity.framework.domain.Attribute;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * @author olivier
  */
 @ExtendWith({VertxExtension.class})
-public class PublicTenantRegistrationUseCaseTestIntegration extends ContextualizedTest {
+public class PublicTenantRegistrationIntegrationCaseTest extends BackendCustomContextualizedTest {
 
     private HttpClient client;
     private ObjectMapper mapper;
@@ -51,13 +51,27 @@ public class PublicTenantRegistrationUseCaseTestIntegration extends Contextualiz
     private Thread gatewayModule, processModule;
     private CountDownLatch waiter;
 
+    /**
+     * Default constructor.
+     */
+    public PublicTenantRegistrationIntegrationCaseTest() {
+        super(true, true, true, false, /* With snapshots management capability activated */ true);
+    }
+
     @BeforeEach
     @DisplayName("Prepare UI gateway server verticle")
-    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
+    @Timeout(value = 360, timeUnit = TimeUnit.SECONDS)
     void prepareGatewayServer(Vertx vertx, VertxTestContext testContext) {
         this.vertx = vertx;
-        // Create instance of Http client allowing communication over SockJS server
-        var options = new HttpClientOptions().setDefaultHost(SERVER_HOST).setDefaultPort(HTTP_SERVER_PORT);
+
+        // Prepare a Registration process module server
+        // TODO start standalone processing module performing use case capability
+
+        // Prepare a access control domain gateway server
+        // TODO start domain gateway ensuring business demands dispatching
+
+        // Prepare instance of Http client allowing communication over SockJS server
+        var options = new HttpClientOptions().setDefaultHost(REACTIVE_ENDPOINT_SERVER_HOST).setDefaultPort(REACTIVE_ENDPOINT_HTTP_SERVER_PORT);
         vertx.deployVerticle(AccessControlReactiveMessagingGateway.class.getName(), testContext.succeeding(id -> {
             this.client = vertx.createHttpClient(options);
             mapper = new ObjectMapperBuilder().dateFormat().enableIndentation().preserveOrder(true).build();
@@ -68,7 +82,7 @@ public class PublicTenantRegistrationUseCaseTestIntegration extends Contextualiz
 
     @AfterEach
     @DisplayName("Free test resources")
-    void freeResources() throws Exception {
+    void freeResources() {
         vertx.close();
         mapper = null;
         this.vertx = null;
@@ -78,7 +92,7 @@ public class PublicTenantRegistrationUseCaseTestIntegration extends Contextualiz
      * Test registration of new no existing organization to validate the operational integration since backend to feature module in charge of the Tenant Registration capability over the Access Control IO Gateway dynamic routing.
      */
     @Test
-    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
+    @Timeout(value = 120, timeUnit = TimeUnit.SECONDS)
     void givenNoExistingTenant_whenRegisterOrganization_thenIntegratedTenantRegistrationFeatureConfirmTreatedCommand(Vertx vertx, VertxTestContext testContext) throws Exception {
         EventBus eb = vertx.eventBus();
         // Prepare json object (RegisterOrganization command event including organization naming) from translator

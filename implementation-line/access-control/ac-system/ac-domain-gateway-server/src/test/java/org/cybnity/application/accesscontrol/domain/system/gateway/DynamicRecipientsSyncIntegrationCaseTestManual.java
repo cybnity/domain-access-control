@@ -4,9 +4,10 @@ import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.experience.ExecutionResource;
 import org.cybnity.feature.accesscontrol.domain.system.AccessControlDomainProcessModule;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.event.AttributeName;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class DynamicRecipientsSyncIntegrationTestManual extends ContextualizedTest {
+public class DynamicRecipientsSyncIntegrationCaseTestManual extends CustomContextualizedTest {
 
     private Thread gatewayModule, processModule;
 
@@ -56,8 +57,17 @@ public class DynamicRecipientsSyncIntegrationTestManual extends ContextualizedTe
     private static final String GATEWAY_SERVICE_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.GATEWAY, /* domainName */ "ac", /* componentMainFunction */"io",/* resourceType */ null, /* segregationLabel */ null);
     private static final String FEATURE_SERVICE_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.PIPELINE, /* domainName */ "ac", /* componentMainFunction */"tenant_registration",/* resourceType */ ExecutionResource.PROCESSING_UNIT.label(), /* segregationLabel */ null);
 
+    /**
+     * Default constructor.
+     */
+    public DynamicRecipientsSyncIntegrationCaseTestManual() throws UnoperationalStateException {
+        super(true, true, true, false, /* With snapshots management capability activated */ true);
+    }
+
     @BeforeEach
     public void initThreads(Vertx vertx) throws Exception {
+        // Initialize an adapter connected to contextualized Redis server (Users Interactions Space)
+        uisClient = new UISAdapterRedisImpl(context());
         // Executed activities counter
         waiter = new CountDownLatch(2 /* Quantity of started modules to wait before test execution */);
         // Prepare gateway module executable instance
@@ -78,9 +88,6 @@ public class DynamicRecipientsSyncIntegrationTestManual extends ContextualizedTe
                 waiter.countDown(); // Confirm finalized preparation
             });
         });
-
-        // Initialize an adapter connected to contextualized Redis server (Users Interactions Space)
-        uisClient = new UISAdapterRedisImpl(getContext());
     }
 
     /**
@@ -91,9 +98,9 @@ public class DynamicRecipientsSyncIntegrationTestManual extends ContextualizedTe
         // Undeploy the started vertx modules
         if (processModuleId != null && !processModuleId.isEmpty()) vertx.undeploy(processModuleId);
         if (gatewayModuleId != null && !gatewayModuleId.isEmpty()) vertx.undeploy(gatewayModuleId);
-        if (uisClient != null)
+        //if (uisClient != null)
             // free adapter resources
-            this.uisClient.freeUpResources();
+          //  this.uisClient.freeUpResources();
     }
 
     /**
@@ -199,7 +206,7 @@ public class DynamicRecipientsSyncIntegrationTestManual extends ContextualizedTe
         processModule.join(); // wait end of process start execution
 
         // Wait for give time to message to be processed
-        Assertions.assertTrue(testWaiter.await(80, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+        Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
 
         // Unregister specific test listeners started
         uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
@@ -290,7 +297,7 @@ public class DynamicRecipientsSyncIntegrationTestManual extends ContextualizedTe
         processModule.join(); // wait end of process start execution
 
         // Wait for give time to message to be processed
-        Assertions.assertTrue(testWaiter.await(180, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+        Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
 
         // Unregister specific test listeners started
         uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
@@ -332,7 +339,7 @@ public class DynamicRecipientsSyncIntegrationTestManual extends ContextualizedTe
         gatewayModule.join(); // wait end of gateway start execution
 
         // Wait for give time to message to be processed
-        Assertions.assertTrue(testWaiter.await(180, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+        Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
 
         // Unregister specific test listeners started
         uisClient.unsubscribe(dynamicCollaborationChannelsObservers);

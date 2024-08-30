@@ -4,6 +4,8 @@ import io.vertx.core.Vertx;
 import org.cybnity.framework.IReadableConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -17,8 +19,16 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author olivier
  */
+@ExtendWith({SystemStubsExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableBackendCheckerUseCaseTest extends ContextualizedTest {
+public class ExecutableBackendCheckerUseCaseTest extends BackendCustomContextualizedTest {
+
+    /**
+     * Default constructor.
+     */
+    public ExecutableBackendCheckerUseCaseTest() {
+        super(false, false, false, false, /* With snapshots management capability activated */ false);
+    }
 
     /**
      * Test that a backend checker which is executed and that require some specific

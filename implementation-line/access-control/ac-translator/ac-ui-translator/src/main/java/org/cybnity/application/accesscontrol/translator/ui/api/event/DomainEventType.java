@@ -1,4 +1,4 @@
-package org.cybnity.application.accesscontrol.ui.api.event;
+package org.cybnity.application.accesscontrol.translator.ui.api.event;
 
 import org.cybnity.framework.domain.event.IEventType;
 

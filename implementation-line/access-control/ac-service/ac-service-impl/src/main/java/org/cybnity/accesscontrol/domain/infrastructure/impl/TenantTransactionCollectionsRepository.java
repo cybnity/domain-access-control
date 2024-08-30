@@ -5,7 +5,7 @@ import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.AccessCo
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
-import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
+import org.cybnity.application.accesscontrol.translator.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
@@ -74,12 +74,8 @@ public class TenantTransactionCollectionsRepository extends AbstractReadModelRep
      * Close the graph model.
      */
     @Override
-    public void freeResources() {
-        try {
-            this.graphModel().freeResources();
-        } catch (UnoperationalStateException e) {
-            throw new RuntimeException(e);
-        }
+    public void freeUpResources() {
+        this.graphModel().freeUpResources();
     }
 
     @Override
@@ -224,6 +220,7 @@ public class TenantTransactionCollectionsRepository extends AbstractReadModelRep
 
     /**
      * Drop graph model schema and data.
+     *
      * @throws UnoperationalStateException When problem during graph model drop.
      */
     @Override

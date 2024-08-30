@@ -7,7 +7,7 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
-import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
+import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractChannelMessageRouter;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
