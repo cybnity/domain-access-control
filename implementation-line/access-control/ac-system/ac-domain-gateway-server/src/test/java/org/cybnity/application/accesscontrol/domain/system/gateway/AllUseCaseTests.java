@@ -11,6 +11,6 @@ import org.junit.platform.suite.api.Suite;
  * @author olivier
  */
 @Suite
-@SelectClasses({ExecutableIOGatewayCheckerUseCaseTest.class, APISupportedCapabilitySelectionFilterUseCaseTest.class, DynamicRecipientsSyncIntegrationCaseTestManual.class})
+@SelectClasses({ExecutableIOGatewayCheckerUseCaseTest.class, APISupportedCapabilitySelectionFilterUseCaseTest.class, DynamicRecipientsSyncIntegrationCaseTest.class})
 public class AllUseCaseTests {
 }

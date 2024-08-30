@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class DynamicRecipientsSyncIntegrationCaseTestManual extends CustomContextualizedTest {
+public class DynamicRecipientsSyncIntegrationCaseTest extends CustomContextualizedTest {
 
     private Thread gatewayModule, processModule;
 
@@ -60,7 +60,7 @@ public class DynamicRecipientsSyncIntegrationCaseTestManual extends CustomContex
     /**
      * Default constructor.
      */
-    public DynamicRecipientsSyncIntegrationCaseTestManual() throws UnoperationalStateException {
+    public DynamicRecipientsSyncIntegrationCaseTest() throws UnoperationalStateException {
         super(true, true, true, false, /* With snapshots management capability activated */ true);
     }
 
