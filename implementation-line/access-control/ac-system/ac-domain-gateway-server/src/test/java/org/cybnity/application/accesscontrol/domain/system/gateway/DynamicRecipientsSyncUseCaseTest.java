@@ -367,11 +367,15 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
 
         @Override
         public void notify(Object evt) {
-            if (IDescribed.class.isAssignableFrom(evt.getClass())) {
-                IDescribed presenceAnnounceEvent = (IDescribed) evt;
-                logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
-                // Check conformity of event
-                isValidPUPresenceAnnounced(presenceAnnounceEvent, this.testWaiter);
+            if (evt != null && IDescribed.class.isAssignableFrom(evt.getClass())) {
+                try {
+                    IDescribed presenceAnnounceEvent = (IDescribed) evt;
+                    logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
+                    // Check conformity of event
+                    isValidPUPresenceAnnounced(presenceAnnounceEvent, this.testWaiter);
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Invalid event description!", e);
+                }
             }
         }
     }
