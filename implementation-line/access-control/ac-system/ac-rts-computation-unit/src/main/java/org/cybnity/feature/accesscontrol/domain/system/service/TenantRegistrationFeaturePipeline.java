@@ -62,7 +62,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
     /**
      * Single-Sign On adapter.
      */
-    private ISSOAdminAdapter ssoClient;
+    private final ISSOAdminAdapter ssoClient;
 
     /**
      * Default constructor.

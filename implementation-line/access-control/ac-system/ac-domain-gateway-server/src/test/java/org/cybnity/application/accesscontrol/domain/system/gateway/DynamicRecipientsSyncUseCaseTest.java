@@ -99,9 +99,9 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
         // Undeploy the started vertx modules
         if (processModuleId != null && !processModuleId.isEmpty()) vertx.undeploy(processModuleId);
         if (gatewayModuleId != null && !gatewayModuleId.isEmpty()) vertx.undeploy(gatewayModuleId);
-        //if (uisClient != null)
-        // free adapter resources
-        //  this.uisClient.freeUpResources();
+        if (uisClient != null)
+            // free adapter resources
+            this.uisClient.freeUpResources();
     }
 
     /**
@@ -180,38 +180,41 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
      */
     @Test
     public void givenStartedGateway_whenFeaturePUStart_thenRecipientsListRegistered(Vertx vertx, VertxTestContext testContext) throws Exception {
-        // Prepare helper for test time wait regarding all presence announced
-        // --- process module tenant registration processing unit pipeline
-        // --- gateway module io pipeline
-        CountDownLatch testWaiter = new CountDownLatch(2 /* Qty of presences of process module included */);
-
-        // Prepare a listener of features process module's announces like normally made by the domain gateway (simulate gateway server-side)
-        ChannelObserver processModuleAnnouncesListener = new ProcessModuleAnnouncesListener(testWaiter);
-
-        // Prepare a listener of the confirmed recipients changes like normally made by the process module (simulate process server-side)
-        ChannelObserver gatewayRoutingPlanChangesListener = new GatewayRoutingPlanChangesListener(testWaiter);
-
-        // Define test specific observers set
         Collection<ChannelObserver> dynamicCollaborationChannelsObservers = new ArrayList<>();
-        dynamicCollaborationChannelsObservers.add(processModuleAnnouncesListener);
-        dynamicCollaborationChannelsObservers.add(gatewayRoutingPlanChangesListener);
-        // Register all consumers of observed channels
-        uisClient.subscribe(dynamicCollaborationChannelsObservers, messageMapperProvider().getMapper(String.class, IDescribed.class));
+        try {
+            // Prepare helper for test time wait regarding all presence announced
+            // --- process module tenant registration processing unit pipeline
+            // --- gateway module io pipeline
+            CountDownLatch testWaiter = new CountDownLatch(2 /* Qty of presences of process module included */);
 
-        // Stop ordered modules according to:
-        // --- Start GATEWAY FIRSTLY
-        gatewayModule.start();
-        gatewayModule.join(); // wait end of gateway start execution
-        // --- Start PROCESS MODULE SECONDLY
-        processModule.start();
-        processModule.join(); // wait end of process start execution
+            // Prepare a listener of features process module's announces like normally made by the domain gateway (simulate gateway server-side)
+            final ChannelObserver processModuleAnnouncesListener = new ProcessModuleAnnouncesListener(testWaiter);
 
-        // Wait for give time to message to be processed
-        Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+            // Prepare a listener of the confirmed recipients changes like normally made by the process module (simulate process server-side)
+            final ChannelObserver gatewayRoutingPlanChangesListener = new GatewayRoutingPlanChangesListener(testWaiter);
 
-        // Unregister specific test listeners started
-        uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
-        testContext.completeNow();
+            // Define test specific observers set
+            dynamicCollaborationChannelsObservers.add(processModuleAnnouncesListener);
+            dynamicCollaborationChannelsObservers.add(gatewayRoutingPlanChangesListener);
+            // Register all consumers of observed channels
+            uisClient.subscribe(dynamicCollaborationChannelsObservers, messageMapperProvider().getMapper(String.class, IDescribed.class));
+
+            // Stop ordered modules according to:
+            // --- Start GATEWAY FIRSTLY
+            gatewayModule.start();
+            gatewayModule.join(); // wait end of gateway start execution
+            // --- Start PROCESS MODULE SECONDLY
+            processModule.start();
+            processModule.join(); // wait end of process start execution
+
+            // Wait for give time to message to be processed
+            Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+
+            testContext.completeNow();
+        } finally {
+            // Unregister specific test listeners started
+            uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
+        }
     }
 
     /**
@@ -219,91 +222,93 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
      */
     @Test
     public void givenActiveFeaturePUWithActiveRegisteredRoutingPaths_whenPUStopped_thenUnavailabilityAnnounceCollectedByGateway(Vertx vertx, VertxTestContext testContext) throws Exception {
-        // Prepare helper for test time wait regarding unavailability notification
-        // --- gateway module io pipeline started
-        // --- process module tenant registration processing unit pipeline started
-        // --- process module PU stopped
-        CountDownLatch testWaiter = new CountDownLatch(3);
+        Collection<ChannelObserver> dynamicCollaborationChannelsObservers = new ArrayList<>();
+        try {
+            // Prepare helper for test time wait regarding unavailability notification
+            // --- gateway module io pipeline started
+            // --- process module tenant registration processing unit pipeline started
+            // --- process module PU stopped
+            CountDownLatch testWaiter = new CountDownLatch(3);
 
-        // Prepare a listener of features process module announced
-        ChannelObserver processModuleAnnouncesListener = new ProcessModuleAnnouncesListener(testWaiter);
+            // Prepare a listener of features process module announced
+            final ChannelObserver processModuleAnnouncesListener = new ProcessModuleAnnouncesListener(testWaiter);
 
-        // Prepare a listener of the confirmed recipients changes
-        ChannelObserver gatewayRoutingPlanChangesListener = new GatewayRoutingPlanChangesListener(testWaiter);
+            // Prepare a listener of the confirmed recipients changes
+            final ChannelObserver gatewayRoutingPlanChangesListener = new GatewayRoutingPlanChangesListener(testWaiter);
 
-        final Runnable action = () -> {
-            // Execute the stop of the module by undeploy process
-            vertx.undeploy(processModuleId);
-            processModuleId = null;
-        };
+            final Runnable action = () -> {
+                // Execute the stop of the module by undeploy process
+                vertx.undeploy(processModuleId);
+                processModuleId = null;
+            };
 
-        // Prepare a listener of the notified stopped feature normally notifying the gateway module
-        ChannelObserver featureModuleStopListener = new ChannelObserver() {
-            @Override
-            public Channel observed() {
-                return domainIOGatewayControlChannel;
-            }
+            // Prepare a listener of the notified stopped feature normally notifying the gateway module
+            final ChannelObserver featureModuleStopListener = new ChannelObserver() {
+                @Override
+                public Channel observed() {
+                    return domainIOGatewayControlChannel;
+                }
 
-            @Override
-            public String observationPattern() {
-                return null;
-            }
+                @Override
+                public String observationPattern() {
+                    return null;
+                }
 
-            @Override
-            public void notify(Object event) {
-                if (IDescribed.class.isAssignableFrom(event.getClass())) {
-                    IDescribed presenceAnnounceEvent = (IDescribed) event;
-                    // Process module announce have been received
-                    logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
+                @Override
+                public void notify(Object event) {
+                    if (IDescribed.class.isAssignableFrom(event.getClass())) {
+                        IDescribed presenceAnnounceEvent = (IDescribed) event;
+                        // Process module announce have been received
+                        logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
 
-                    // --- CHECK VALID ANNOUNCE ABOUT UNAVAILABILITY ---
-                    Assertions.assertTrue(presenceAnnounceEvent instanceof ProcessingUnitPresenceAnnounced, "Should be announced over a standardized event type!");
-                    ProcessingUnitPresenceAnnounced evt = (ProcessingUnitPresenceAnnounced) presenceAnnounceEvent;
-                    Assertions.assertNotNull(evt.serviceName());
+                        // --- CHECK VALID ANNOUNCE ABOUT UNAVAILABILITY ---
+                        Assertions.assertTrue(presenceAnnounceEvent instanceof ProcessingUnitPresenceAnnounced, "Should be announced over a standardized event type!");
+                        ProcessingUnitPresenceAnnounced evt = (ProcessingUnitPresenceAnnounced) presenceAnnounceEvent;
+                        Assertions.assertNotNull(evt.serviceName());
 
-                    // Detect if it's a module start or end of operational status
-                    if (IPresenceObservability.PresenceState.AVAILABLE.name().equals(evt.presenceStatus().value())) {
-                        Collection<Attribute> att = presenceAnnounceEvent.specification();
-                        Attribute nameAttr = EventSpecification.findSpecificationByName(ProcessingUnitPresenceAnnounced.SpecificationAttribute.SERVICE_NAME.name(), att);
-                        // Considerate only feature processing unit
-                        if (nameAttr != null && FEATURE_SERVICE_NAME.equals(nameAttr.value())) {
-                            // Now undeploy the confirmed started PU
-                            // via stop of module
-                            action.run();
+                        // Detect if it's a module start or end of operational status
+                        if (IPresenceObservability.PresenceState.AVAILABLE.name().equals(evt.presenceStatus().value())) {
+                            Collection<Attribute> att = presenceAnnounceEvent.specification();
+                            Attribute nameAttr = EventSpecification.findSpecificationByName(ProcessingUnitPresenceAnnounced.SpecificationAttribute.SERVICE_NAME.name(), att);
+                            // Considerate only feature processing unit
+                            if (nameAttr != null && FEATURE_SERVICE_NAME.equals(nameAttr.value())) {
+                                // Now undeploy the confirmed started PU
+                                // via stop of module
+                                action.run();
+                            }
+                        } else {
+                            // Detect that event is about a stopped module
+
+                            // Confirm the success received announce of presence end
+                            testWaiter.countDown();
                         }
-                    } else {
-                        // Detect that event is about a stopped module
-
-                        // Confirm the success received announce of presence end
-                        testWaiter.countDown();
                     }
                 }
-            }
-        };
+            };
 
-        // Define test specific observers set
-        Collection<ChannelObserver> dynamicCollaborationChannelsObservers = new ArrayList<>();
-        dynamicCollaborationChannelsObservers.add(processModuleAnnouncesListener);
-        dynamicCollaborationChannelsObservers.add(gatewayRoutingPlanChangesListener);
-        dynamicCollaborationChannelsObservers.add(featureModuleStopListener);
+            // Define test specific observers set
+            dynamicCollaborationChannelsObservers.add(processModuleAnnouncesListener);
+            dynamicCollaborationChannelsObservers.add(gatewayRoutingPlanChangesListener);
+            dynamicCollaborationChannelsObservers.add(featureModuleStopListener);
 
-        // Register all consumers of observed channels
-        uisClient.subscribe(dynamicCollaborationChannelsObservers, messageMapperProvider().getMapper(String.class, IDescribed.class));
+            // Register all consumers of observed channels
+            uisClient.subscribe(dynamicCollaborationChannelsObservers, messageMapperProvider().getMapper(String.class, IDescribed.class));
 
-        // --- Start GATEWAY FIRSTLY
-        gatewayModule.start();
-        gatewayModule.join(); // wait end of gateway start execution
-        // --- Start PROCESS MODULE SECONDLY
-        processModule.start();
-        processModule.join(); // wait end of process start execution
+            // --- Start GATEWAY FIRSTLY
+            gatewayModule.start();
+            gatewayModule.join(); // wait end of gateway start execution
+            // --- Start PROCESS MODULE SECONDLY
+            processModule.start();
+            processModule.join(); // wait end of process start execution
 
-        // Wait for give time to message to be processed
-        Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+            // Wait for give time to message to be processed
+            Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
 
-        // Unregister specific test listeners started
-        uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
-
-        testContext.completeNow();
+            testContext.completeNow();
+        } finally {
+            // Unregister specific test listeners started
+            uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
+        }
     }
 
     /**
@@ -313,39 +318,41 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
      */
     @Test
     public void givenFeaturePUStartedBeforeGateway_whenGatewayStarted_thenAutoReRegistrationAttemptSuccessfullyEstablishedByGateway(Vertx vertx, VertxTestContext testContext) throws Exception {
-        // Prepare helper for test time wait regarding unavailability notification
-        // --- process module tenant registration processing unit pipeline started
-        // --- gateway module io pipeline started and gateway module auto-requesting new routing paths refresh
-        CountDownLatch testWaiter = new CountDownLatch(2);
-
-        // Prepare a listener of features process module announced
-        ChannelObserver processModuleAnnouncesListener = new ProcessModuleAnnouncesListener(testWaiter);
-
-        // Prepare a listener of the confirmed recipients changes
-        ChannelObserver gatewayRoutingPlanChangesListener = new GatewayRoutingPlanChangesListener(testWaiter);
-
-        // Define test specific observers set
         Collection<ChannelObserver> dynamicCollaborationChannelsObservers = new ArrayList<>();
-        dynamicCollaborationChannelsObservers.add(processModuleAnnouncesListener);
-        dynamicCollaborationChannelsObservers.add(gatewayRoutingPlanChangesListener);
+        try {
+            // Prepare helper for test time wait regarding unavailability notification
+            // --- process module tenant registration processing unit pipeline started
+            // --- gateway module io pipeline started and gateway module auto-requesting new routing paths refresh
+            CountDownLatch testWaiter = new CountDownLatch(2);
 
-        // Register all consumers of observed channels
-        uisClient.subscribe(dynamicCollaborationChannelsObservers, messageMapperProvider().getMapper(String.class, IDescribed.class));
+            // Prepare a listener of features process module announced
+            final ChannelObserver processModuleAnnouncesListener = new ProcessModuleAnnouncesListener(testWaiter);
 
-        // --- Start FEATURE PROCESS MODULE FIRSTLY
-        processModule.start();
-        processModule.join(); // wait end of process start execution
-        // --- Start GATEWAY MODULE SECONDLY
-        gatewayModule.start();
-        gatewayModule.join(); // wait end of gateway start execution
+            // Prepare a listener of the confirmed recipients changes
+            final ChannelObserver gatewayRoutingPlanChangesListener = new GatewayRoutingPlanChangesListener(testWaiter);
 
-        // Wait for give time to message to be processed
-        Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+            // Define test specific observers set
+            dynamicCollaborationChannelsObservers.add(processModuleAnnouncesListener);
+            dynamicCollaborationChannelsObservers.add(gatewayRoutingPlanChangesListener);
 
-        // Unregister specific test listeners started
-        uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
+            // Register all consumers of observed channels
+            uisClient.subscribe(dynamicCollaborationChannelsObservers, messageMapperProvider().getMapper(String.class, IDescribed.class));
 
-        testContext.completeNow();
+            // --- Start FEATURE PROCESS MODULE FIRSTLY
+            processModule.start();
+            processModule.join(); // wait end of process start execution
+            // --- Start GATEWAY MODULE SECONDLY
+            gatewayModule.start();
+            gatewayModule.join(); // wait end of gateway start execution
+
+            // Wait for give time to message to be processed
+            Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
+
+            testContext.completeNow();
+        } finally {
+            // Unregister specific test listeners started
+            uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
+        }
     }
 
     private class ProcessModuleAnnouncesListener implements ChannelObserver {
