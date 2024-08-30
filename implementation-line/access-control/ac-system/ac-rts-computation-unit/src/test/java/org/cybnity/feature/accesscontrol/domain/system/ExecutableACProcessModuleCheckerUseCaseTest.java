@@ -97,8 +97,7 @@ public class ExecutableACProcessModuleCheckerUseCaseTest extends CustomContextua
         // Try backend module (Verticle deployment) start
         vertx.deployVerticle(new AccessControlDomainProcessModule()).onComplete(handler -> {
             String result = handler.result();
-            boolean isFailed = handler.failed();
-            assertTrue(isFailed, "Start shall have been not executed for cause of undefined environment variable (result: " + result + ")!");
+            assertFalse(handler.succeeded(), "Start shall have been not executed for cause of undefined environment variable (result: " + result + ")!");
         });
     }
 }
