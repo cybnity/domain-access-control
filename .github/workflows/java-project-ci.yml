@@ -35,7 +35,7 @@ on:
     # execute only when reviewed files or java sub-projects
     paths:
     - 'pom.xml'
-    - 'implementations-line/**'
+    - 'implementation-line/**'
     - 'systems-line/**'
 
   pull_request_target:
@@ -49,7 +49,7 @@ on:
     # execute only when reviewed files or java sub-projects
     paths:
       - 'pom.xml'
-      - 'implementations-line/**'
+      - 'implementation-line/**'
       - 'systems-line/**'
 
 # The commit stage workflow run is made up of one or more jobs that can run sequentially or in parallel
