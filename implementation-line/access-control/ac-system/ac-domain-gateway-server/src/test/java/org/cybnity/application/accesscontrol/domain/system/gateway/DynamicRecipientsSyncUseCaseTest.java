@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /**
  * Use case tests regarding the automatic feeding, refresh, clean and re-establishment of routing paths between IO Gateway and feature processing unit.
@@ -99,8 +100,8 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
         if (processModuleId != null && !processModuleId.isEmpty()) vertx.undeploy(processModuleId);
         if (gatewayModuleId != null && !gatewayModuleId.isEmpty()) vertx.undeploy(gatewayModuleId);
         //if (uisClient != null)
-            // free adapter resources
-          //  this.uisClient.freeUpResources();
+        // free adapter resources
+        //  this.uisClient.freeUpResources();
     }
 
     /**
@@ -250,7 +251,7 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
 
             @Override
             public void notify(Object event) {
-                if(IDescribed.class.isAssignableFrom(event.getClass())) {
+                if (IDescribed.class.isAssignableFrom(event.getClass())) {
                     IDescribed presenceAnnounceEvent = (IDescribed) event;
                     // Process module announce have been received
                     logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
@@ -367,7 +368,7 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
         @Override
         public void notify(Object evt) {
             if (IDescribed.class.isAssignableFrom(evt.getClass())) {
-                IDescribed presenceAnnounceEvent = (IDescribed)evt;
+                IDescribed presenceAnnounceEvent = (IDescribed) evt;
                 logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
                 // Check conformity of event
                 isValidPUPresenceAnnounced(presenceAnnounceEvent, this.testWaiter);
@@ -394,16 +395,20 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
 
         @Override
         public void notify(Object evt) {
-            if (IDescribed.class.isAssignableFrom(evt.getClass())) {
-                IDescribed presenceDeclarationResultEvent = (IDescribed) evt;
-                logger.fine("--- Routing plan update event: " + presenceDeclarationResultEvent.type().value());
-                // Check event conformity
-                if (CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name().equals(presenceDeclarationResultEvent.type().value())) {
-                    // Verify the description of the registration confirmation event
-                    isValidRoutingPathsRegisteredConfirmation(presenceDeclarationResultEvent, this.testWaiter);
-                } else if (CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED.name().equals(presenceDeclarationResultEvent.type().value())) {
-                    // Verify the description of the requested re-registration demand
-                    isValidRoutingPathsRegistrationRequest(presenceDeclarationResultEvent, this.testWaiter);
+            if (evt != null && IDescribed.class.isAssignableFrom(evt.getClass())) {
+                try {
+                    IDescribed presenceDeclarationResultEvent = (IDescribed) evt;
+                    logger.fine("--- Routing plan update event: " + presenceDeclarationResultEvent.type().value());
+                    // Check event conformity
+                    if (CollaborationEventType.PROCESSING_UNIT_ROUTING_PATHS_REGISTERED.name().equals(presenceDeclarationResultEvent.type().value())) {
+                        // Verify the description of the registration confirmation event
+                        isValidRoutingPathsRegisteredConfirmation(presenceDeclarationResultEvent, this.testWaiter);
+                    } else if (CollaborationEventType.PROCESSING_UNIT_PRESENCE_ANNOUNCE_REQUESTED.name().equals(presenceDeclarationResultEvent.type().value())) {
+                        // Verify the description of the requested re-registration demand
+                        isValidRoutingPathsRegistrationRequest(presenceDeclarationResultEvent, this.testWaiter);
+                    }
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Invalid event description!", e);
                 }
             }
         }

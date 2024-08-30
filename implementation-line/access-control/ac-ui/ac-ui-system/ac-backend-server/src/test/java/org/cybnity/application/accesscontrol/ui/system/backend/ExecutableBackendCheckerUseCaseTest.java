@@ -86,8 +86,10 @@ public class ExecutableBackendCheckerUseCaseTest extends BackendCustomContextual
 
         // Try backend module (Verticle deployment) start
         vertx.deployVerticle(new AccessControlReactiveMessagingGateway())
-                .onComplete(res -> {
-                    assertFalse(res.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
+                .onSuccess(res -> {
+                    fail("Start shall have been not executed for cause of undefined environment variable!");
+                }).onFailure(e -> {
+                    assertNotNull(e, "Start Shall have been rejected");
                 });
     }
 }
