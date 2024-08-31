@@ -32,7 +32,7 @@ import java.util.logging.Level;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
+public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualizedTest {
 
     private Thread gatewayModule, processModule;
 
@@ -61,7 +61,7 @@ public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
     /**
      * Default constructor.
      */
-    public DynamicRecipientsSyncUseCaseTest() throws UnoperationalStateException {
+    public DynamicRecipientsSyncUseCaseTestManual() throws UnoperationalStateException {
         super(true, true, true, false, /* With snapshots management capability activated */ true);
     }
 

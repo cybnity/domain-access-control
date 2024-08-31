@@ -85,8 +85,7 @@ public class ExecutableIOGatewayCheckerUseCaseTest extends CustomContextualizedT
 
         // Try backend module (Verticle deployment) start
         vertx.deployVerticle(new AccessControlDomainIOGateway()).onComplete(handler -> {
-            String result = handler.result();
-            assertFalse(handler.succeeded(), "Start shall have been not executed for cause of undefined environment variable (result: " + result + ")!");
+            assertFalse(handler.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
         });
     }
 }

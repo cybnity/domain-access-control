@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * @author olivier
  */
 @ExtendWith({VertxExtension.class})
-public class PublicTenantRegistrationUseCaseTest extends BackendCustomContextualizedTest {
+public class PublicTenantRegistrationUseCaseTestManual extends BackendCustomContextualizedTest {
 
     private HttpClient client;
     private ObjectMapper mapper;
@@ -54,7 +54,7 @@ public class PublicTenantRegistrationUseCaseTest extends BackendCustomContextual
     /**
      * Default constructor.
      */
-    public PublicTenantRegistrationUseCaseTest() {
+    public PublicTenantRegistrationUseCaseTestManual() {
         super(true, true, true, false, /* With snapshots management capability activated */ true);
     }
 
