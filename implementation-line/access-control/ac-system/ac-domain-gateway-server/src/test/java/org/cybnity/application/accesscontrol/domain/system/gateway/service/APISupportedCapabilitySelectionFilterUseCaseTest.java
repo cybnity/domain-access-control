@@ -12,6 +12,7 @@ import org.cybnity.framework.domain.event.CommandFactory;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import java.util.Collection;
  *
  * @author olivier
  */
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class APISupportedCapabilitySelectionFilterUseCaseTest extends CustomContextualizedTest {
 
     /**

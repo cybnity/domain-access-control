@@ -1,10 +1,12 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import io.vertx.core.Vertx;
+import io.vertx.junit5.VertxExtension;
 import org.cybnity.framework.IReadableConfiguration;
 import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -18,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author olivier
  */
+@ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class ExecutableIOGatewayCheckerUseCaseTest extends CustomContextualizedTest {
-
 
     /**
      * Default constructor.

@@ -3,7 +3,6 @@ package org.cybnity.accesscontrol.domain.infrastructure.impl;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.IReadableConfiguration;
 import org.cybnity.framework.UnoperationalStateException;
-import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.infrastructure.IDomainStore;
 import org.cybnity.framework.domain.infrastructure.ISnapshotRepository;
 import org.cybnity.framework.domain.infrastructure.SnapshotProcessEventStreamPersistenceBased;
@@ -66,7 +65,7 @@ public class TenantsStore extends DomainResourceStoreRedisImpl implements IDomai
     }
 
     @Override
-    public void append(Tenant tenant, ISessionContext ctx) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException {
+    public void append(Tenant tenant, IContext ctx) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException {
         if (tenant != null) {
             this.append(tenant);
         }
@@ -108,7 +107,7 @@ public class TenantsStore extends DomainResourceStoreRedisImpl implements IDomai
     }
 
     @Override
-    public Tenant findEventFrom(Identifier identifier, ISessionContext ctx) throws IllegalArgumentException, UnoperationalStateException {
+    public Tenant findEventFrom(Identifier identifier, IContext ctx) throws IllegalArgumentException, UnoperationalStateException {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         return findEventFrom(identifier);
     }

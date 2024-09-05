@@ -12,6 +12,7 @@ import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEvent
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
+import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.application.ApplicationService;
@@ -43,7 +44,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
     /**
      * Runtime context provider of service configuration.
      */
-    private final ISessionContext context;
+    private final IContext context;
 
     /**
      * Logical name of this executed service.
@@ -75,7 +76,7 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
      * @param ssoClient                         Optional connector to Single-Sign On service.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    public TenantRegistration(ISessionContext context, ITenantsWriteModel tenantsStore, TenantTransactionCollectionsRepository tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter uisClient, ISSOAdminAdapter ssoClient) throws IllegalArgumentException {
+    public TenantRegistration(IContext context, ITenantsWriteModel tenantsStore, TenantTransactionCollectionsRepository tenantsProjection, String serviceName, Channel tenantsChangesNotificationChannel, UISAdapter uisClient, ISSOAdminAdapter ssoClient) throws IllegalArgumentException {
         super();
         if (tenantsStore == null) throw new IllegalArgumentException("tenantsStore parameter is required!");
         this.tenantsWriteModel = tenantsStore;

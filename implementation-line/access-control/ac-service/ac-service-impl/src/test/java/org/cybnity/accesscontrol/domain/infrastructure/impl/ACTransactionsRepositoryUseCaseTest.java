@@ -13,7 +13,6 @@
 // limitations under the License.
 package org.cybnity.accesscontrol.domain.infrastructure.impl;
 
-import io.vertx.junit5.VertxExtension;
 import org.cybnity.accesscontrol.CustomContextualizedTest;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
@@ -31,7 +30,6 @@ import org.cybnity.framework.immutable.Identifier;
 import org.cybnity.framework.immutable.ImmutabilityException;
 import org.cybnity.infrastructure.technical.registry.adapter.api.event.DataViewEventType;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -43,7 +41,6 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Test of implemented repository relative to a perimeter of Tenant projections.
  */
-@ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class ACTransactionsRepositoryUseCaseTest extends CustomContextualizedTest {
 
@@ -113,7 +110,7 @@ public class ACTransactionsRepositoryUseCaseTest extends CustomContextualizedTes
         CompletableFuture<Boolean> committed = CompletableFuture.supplyAsync(() -> {
             try {
                 // Store a Tenant created into the write-model store (which shall notify the projections repository's read-model to be refreshed)
-                tenantsStore.append(tenant, sessionContext());
+                tenantsStore.append(tenant, context());
             } catch (ImmutabilityException | UnoperationalStateException e) {
                 throw new RuntimeException(e);
             }
@@ -123,7 +120,7 @@ public class ACTransactionsRepositoryUseCaseTest extends CustomContextualizedTes
         if (committed.get()) {
             // Execute query based on label filtering
             Map<String, String> queryParameters = prepareQueryBasedOnLabel(aggregateLabel, TenantDataView.class.getSimpleName(), ACApplicationQueryName.TENANT_VIEW_FIND_BY_LABEL);
-            List<TenantTransactionsCollection> results = repo.queryWhere(queryParameters, sessionContext());
+            List<TenantTransactionsCollection> results = repo.queryWhere(queryParameters, context());
 
             // Verify if a first version of the data view (projection view relative to the aggregate) have been created into the graph model
             Assertions.assertNotNull(results, "Existing data views collection should have been found!");

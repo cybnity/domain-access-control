@@ -6,7 +6,6 @@ import org.cybnity.application.accesscontrol.translator.ui.api.AccessControlDoma
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Command;
-import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.infrastructure.IDomainRepository;
 import org.cybnity.framework.domain.infrastructure.IDomainStore;
 import org.cybnity.framework.domain.model.IDomainModel;
@@ -68,37 +67,37 @@ public class IdentitiesRepository extends AbstractReadModelRepository implements
     }
 
     @Override
-    public SocialEntity nextIdentity(ISessionContext ctx) {
+    public SocialEntity nextIdentity(IContext ctx) {
         return null;
     }
 
     @Override
-    public SocialEntity factOfId(Identifier identifier, ISessionContext ctx) {
+    public SocialEntity factOfId(Identifier identifier, IContext ctx) {
         return null;
     }
 
     @Override
-    public boolean remove(SocialEntity socialEntity, ISessionContext ctx) {
+    public boolean remove(SocialEntity socialEntity, IContext ctx) {
         return false;
     }
 
     @Override
-    public void removeAll(Collection<SocialEntity> collection, ISessionContext ctx) {
+    public void removeAll(Collection<SocialEntity> collection, IContext ctx) {
 
     }
 
     @Override
-    public SocialEntity save(SocialEntity socialEntity, ISessionContext ctx) {
+    public SocialEntity save(SocialEntity socialEntity, IContext ctx) {
         return null;
     }
 
     @Override
-    public void saveAll(Collection<SocialEntity> collection, ISessionContext ctx) {
+    public void saveAll(Collection<SocialEntity> collection,IContext ctx) {
 
     }
 
     @Override
-    public List<SocialEntity> queryWhere(Map<String, String> map, ISessionContext iSessionContext) {
+    public List<SocialEntity> queryWhere(Map<String, String> map, IContext iSessionContext) {
         return null;
     }
 

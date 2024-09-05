@@ -1,6 +1,5 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
-import io.vertx.junit5.VertxExtension;
 import org.cybnity.accesscontrol.CustomContextualizedTest;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantMockHelper;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
@@ -25,7 +24,6 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapp
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Behavior unit test regarding the registration rejection cases. This test scope is not considering the integration concerns with repositories or event sourcing collaboration actions (based on mocked services).
  */
-@ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class TenantRegistrationRejectionUseCaseTest extends CustomContextualizedTest {
 
@@ -51,7 +48,7 @@ public class TenantRegistrationRejectionUseCaseTest extends CustomContextualized
      * Default constructor.
      */
     public TenantRegistrationRejectionUseCaseTest() {
-        super(true, true, /* not need by registration service use case impl */ false,false,/* With snapshots management capability activated */true);
+        super(true, true, /* not need by registration service use case impl */ false, false,/* With snapshots management capability activated */true);
     }
 
     @BeforeEach
@@ -62,23 +59,16 @@ public class TenantRegistrationRejectionUseCaseTest extends CustomContextualized
         this.tenantsRepository = TenantTransactionCollectionsRepository.instance(context(), tenantsStore);
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
-        this.uisClient = new UISAdapterRedisImpl(sessionContext());
-        ISSOAdminAdapter ssoClient = new SSOAdminAdapterKeycloakImpl(sessionContext());
+        this.uisClient = new UISAdapterRedisImpl(context());
+        ISSOAdminAdapter ssoClient = new SSOAdminAdapterKeycloakImpl(context());
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantRegistrationService = new TenantRegistration(sessionContext(), TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.uisClient, ssoClient);
+        this.tenantRegistrationService = new TenantRegistration(context(), TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.uisClient, ssoClient);
     }
 
     @AfterEach
     public void clean() {
-        this.tenantsRepository.freeUpResources();
+        if (tenantsRepository != null) this.tenantsRepository.freeUpResources();
         if (tenantsStore != null) tenantsStore.freeUpResources();
-        tenantsStore = null;
-        this.tenantsRepository = null;
-        this.serviceName = null;
-        this.tenantRegistrationService = null;
-        this.featureTenantsChangesNotificationChannel = null;
-        this.uisClient = null;
-        this.mapperFactory = null;
     }
 
     /**

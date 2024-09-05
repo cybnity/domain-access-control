@@ -1,5 +1,6 @@
 package org.cybnity.application.accesscontrol.ui.system.backend;
 
+import org.cybnity.tool.test.InfrastructureContextualizedTest;
 import org.junit.jupiter.api.TestInstance;
 
 /**
@@ -11,7 +12,7 @@ public class BackendCustomContextualizedTest extends CustomContextualizedTest {
     /**
      * Port of backend http server exposing reactive services for front end.
      */
-    static Integer REACTIVE_ENDPOINT_HTTP_SERVER_PORT = 8082;
+    static Integer REACTIVE_ENDPOINT_HTTP_SERVER_PORT = InfrastructureContextualizedTest.GATEWAY_HTTP_SERVER_PORT;
 
     /**
      * System address

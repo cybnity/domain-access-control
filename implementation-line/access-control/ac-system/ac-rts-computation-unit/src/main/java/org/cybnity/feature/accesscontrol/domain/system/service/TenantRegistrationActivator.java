@@ -13,7 +13,6 @@ import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.service.AbstractServiceActivator;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.IDescribed;
-import org.cybnity.framework.domain.model.SessionContext;
 import org.cybnity.infastructure.technical.persistence.store.impl.redis.PersistentObjectNamingConvention;
 import org.cybnity.infastructure.technical.persistence.store.impl.redis.SnapshotRepositoryRedisImpl;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
@@ -55,7 +54,7 @@ public class TenantRegistrationActivator extends AbstractServiceActivator {
         ITenantsWriteModel tenantsWriteModelManager = TenantsWriteModelImpl.instance(tenantDomainPersistenceLayer);
 
         // Define the application service (and collaboration components) able to process the event according to business/treatment rules
-        processor = new TenantRegistration(new SessionContext(/* none pre-registered tenant is defined or usable by the registration service*/null), tenantsWriteModelManager, tenantReadModelProjectionsProvider, serviceName, featureTenantsChangesNotificationChannel, uisConnector, ssoConnector);
+        processor = new TenantRegistration(context, tenantsWriteModelManager, tenantReadModelProjectionsProvider, serviceName, featureTenantsChangesNotificationChannel, uisConnector, ssoConnector);
     }
 
     /**

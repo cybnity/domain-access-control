@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,23 +37,16 @@ import java.util.concurrent.TimeUnit;
  * @author olivier
  */
 @ExtendWith({VertxExtension.class})
-public class PublicTenantRegistrationUseCaseTestManual extends BackendCustomContextualizedTest {
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+public class PublicTenantRegistrationUseCaseTest extends BackendCustomContextualizedTest {
 
     private HttpClient client;
     private ObjectMapper mapper;
-    private Vertx vertx;
-
-    /**
-     * Identifiers of deployment
-     */
-    private String gatewayModuleId, processModuleId;
-    private Thread gatewayModule, processModule;
-    private CountDownLatch waiter;
 
     /**
      * Default constructor.
      */
-    public PublicTenantRegistrationUseCaseTestManual() {
+    public PublicTenantRegistrationUseCaseTest() {
         super(true, true, true, false, /* With snapshots management capability activated */ true);
     }
 
@@ -62,8 +54,6 @@ public class PublicTenantRegistrationUseCaseTestManual extends BackendCustomCont
     @DisplayName("Prepare UI gateway server verticle")
     @Timeout(value = 360, timeUnit = TimeUnit.SECONDS)
     void prepareGatewayServer(Vertx vertx, VertxTestContext testContext) {
-        this.vertx = vertx;
-
         // Prepare a Registration process module server
         // TODO start standalone processing module performing use case capability
 
@@ -78,14 +68,6 @@ public class PublicTenantRegistrationUseCaseTestManual extends BackendCustomCont
             logger.fine("Access control messaging gateway server prepared");
             testContext.completeNow();
         }));
-    }
-
-    @AfterEach
-    @DisplayName("Free test resources")
-    void freeResources() {
-        vertx.close();
-        mapper = null;
-        this.vertx = null;
     }
 
     /**

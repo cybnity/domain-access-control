@@ -84,7 +84,7 @@ public class TenantTransactionCollectionsRepository extends AbstractReadModelRep
     }
 
     @Override
-    public List<TenantTransactionsCollection> queryWhere(Map<String, String> searchCriteria, ISessionContext ctx) throws IllegalArgumentException, UnsupportedOperationException, UnoperationalStateException {
+    public List<TenantTransactionsCollection> queryWhere(Map<String, String> searchCriteria, IContext ctx) throws IllegalArgumentException, UnsupportedOperationException, UnoperationalStateException {
         if (searchCriteria != null) {
             // Identify the query name based on query type (projection that support the query parameters and specific data path/structure)
             String queryName = searchCriteria.get(queryNameBasedOn());
@@ -155,36 +155,36 @@ public class TenantTransactionCollectionsRepository extends AbstractReadModelRep
     }
 
     @Override
-    public TenantTransactionsCollection nextIdentity(ISessionContext ctx) {
+    public TenantTransactionsCollection nextIdentity(IContext ctx) {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         return null;
     }
 
     @Override
-    public TenantTransactionsCollection factOfId(Identifier identifier, ISessionContext ctx) {
+    public TenantTransactionsCollection factOfId(Identifier identifier, IContext ctx) {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         return null;
     }
 
     @Override
-    public boolean remove(TenantTransactionsCollection tenant, ISessionContext ctx) {
+    public boolean remove(TenantTransactionsCollection tenant, IContext ctx) {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         return false;
     }
 
     @Override
-    public void removeAll(Collection<TenantTransactionsCollection> collection, ISessionContext ctx) {
+    public void removeAll(Collection<TenantTransactionsCollection> collection, IContext ctx) {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
     }
 
     @Override
-    public TenantTransactionsCollection save(TenantTransactionsCollection tenant, ISessionContext ctx) {
+    public TenantTransactionsCollection save(TenantTransactionsCollection tenant, IContext ctx) {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         return null;
     }
 
     @Override
-    public void saveAll(Collection<TenantTransactionsCollection> collection, ISessionContext ctx) {
+    public void saveAll(Collection<TenantTransactionsCollection> collection, IContext ctx) {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
     }
 

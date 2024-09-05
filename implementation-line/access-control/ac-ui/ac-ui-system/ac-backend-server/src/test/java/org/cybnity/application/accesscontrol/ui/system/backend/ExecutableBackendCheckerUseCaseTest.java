@@ -1,11 +1,11 @@
 package org.cybnity.application.accesscontrol.ui.system.backend;
 
 import io.vertx.core.Vertx;
+import io.vertx.junit5.VertxExtension;
 import org.cybnity.framework.IReadableConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author olivier
  */
-@ExtendWith({SystemStubsExtension.class})
+@ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class ExecutableBackendCheckerUseCaseTest extends BackendCustomContextualizedTest {
 

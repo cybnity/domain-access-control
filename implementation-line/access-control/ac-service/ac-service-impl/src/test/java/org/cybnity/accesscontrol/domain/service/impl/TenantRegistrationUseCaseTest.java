@@ -1,6 +1,5 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
-import io.vertx.junit5.VertxExtension;
 import org.cybnity.accesscontrol.CustomContextualizedTest;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantMockHelper;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
@@ -14,9 +13,11 @@ import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEvent
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.UnoperationalStateException;
-import org.cybnity.framework.domain.*;
+import org.cybnity.framework.domain.Attribute;
+import org.cybnity.framework.domain.Command;
+import org.cybnity.framework.domain.IDescribed;
+import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.event.EventSpecification;
-import org.cybnity.framework.domain.model.SessionContext;
 import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.BaseConstants;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
@@ -25,7 +26,6 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapp
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,13 +35,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Behavior unit test regarding the registration cases. This test scope is not considering the integration concerns with repositories or event sourcing collaboration actions (based on mocked services).
  */
-@ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
 
     private TenantsStore tenantsStore;
     private TenantRegistration tenantRegistrationService;
-    private ISessionContext sessionCtx;
     private TenantTransactionCollectionsRepository tenantsRepository;
     private String serviceName;
     private Channel featureTenantsChangesNotificationChannel;
@@ -52,7 +50,7 @@ public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
      * Default constructor.
      */
     public TenantRegistrationUseCaseTest() {
-        super(true, true, true,false,true);
+        super(true, true, true, false, true);
     }
 
     @BeforeEach
@@ -61,13 +59,12 @@ public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
         tenantsStore = getTenantPersistenceOrientedStore();
 
         this.tenantsRepository = TenantTransactionCollectionsRepository.instance(context(), tenantsStore);
-        this.sessionCtx = new SessionContext(null);
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
-        this.client = new UISAdapterRedisImpl(this.sessionCtx);
-        ISSOAdminAdapter ssoClient = new SSOAdminAdapterKeycloakImpl(this.sessionCtx);
+        this.client = new UISAdapterRedisImpl(context());
+        ISSOAdminAdapter ssoClient = new SSOAdminAdapterKeycloakImpl(context());
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client, ssoClient);
+        this.tenantRegistrationService = new TenantRegistration(context(), TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client, ssoClient);
 
         // Check started keycloak instance and accessible admin api
         Assertions.assertNotNull(this.getKeycloak(), "shall have been started as defined in constructor super() call!");
@@ -75,16 +72,8 @@ public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
 
     @AfterEach
     public void clean() {
-        this.tenantsRepository.freeUpResources();
+        if (tenantsRepository != null) tenantsRepository.freeUpResources();
         if (tenantsStore != null) tenantsStore.freeUpResources();
-        tenantsStore = null;
-        this.tenantsRepository = null;
-        this.serviceName = null;
-        this.sessionCtx = null;
-        this.tenantRegistrationService = null;
-        this.featureTenantsChangesNotificationChannel = null;
-        this.client = null;
-        this.mapperFactory = null;
     }
 
     /**

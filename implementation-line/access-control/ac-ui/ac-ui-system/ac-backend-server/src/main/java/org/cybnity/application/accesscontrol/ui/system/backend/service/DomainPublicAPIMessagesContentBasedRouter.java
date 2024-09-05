@@ -75,6 +75,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
      */
     public DomainPublicAPIMessagesContentBasedRouter() throws UnoperationalStateException {
+        super();
         try {
             // Prepare client configured for interactions with the UIS
             // according to the defined environment variables (autonomous connection from worker to UIS)

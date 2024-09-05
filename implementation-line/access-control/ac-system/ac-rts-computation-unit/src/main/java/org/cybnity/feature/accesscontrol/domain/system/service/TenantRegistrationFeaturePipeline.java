@@ -55,27 +55,36 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
     private FactBaseHandler pipelinedProcessSingleton;
 
     /**
-     * Runtime context.
-     */
-    private final IContext context;
-
-    /**
      * Single-Sign On adapter.
      */
-    private final ISSOAdminAdapter ssoClient;
+    private ISSOAdminAdapter ssoClient;
+
+    /**
+     * Default constructor used by Vertx deployment process.
+     *
+     * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the UIS or DIS).
+     */
+    public TenantRegistrationFeaturePipeline() throws UnoperationalStateException {
+        super();
+        initSSOClient();
+    }
 
     /**
      * Default constructor.
      *
-     * @param context Mandatory runtime context allowing providing of settings required by the pipeline.
-     * @throws IllegalArgumentException    When mandatory parameter is missing.
-     * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the UIS or DIS).
+     * @param context Optional runtime context allowing providing of settings required by the pipeline.
+     * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the UIS or DIS or SSO system).
      */
-    public TenantRegistrationFeaturePipeline(IContext context) throws IllegalArgumentException, UnoperationalStateException {
-        super();
-        if (context == null) throw new IllegalArgumentException("Context parameter is required!");
-        this.context = context;
-        this.ssoClient = new SSOAdminAdapterKeycloakImpl(this.context);
+    public TenantRegistrationFeaturePipeline(IContext context) throws UnoperationalStateException {
+        super(context);
+        initSSOClient();
+    }
+
+    /**
+     * Initialized a connector to Single-Sign One system.When problem of context configuration (e.g missing environment variable defined to join the SSO system).
+     */
+    private void initSSOClient() throws UnoperationalStateException {
+        this.ssoClient = new SSOAdminAdapterKeycloakImpl(context());
     }
 
     @Override
@@ -108,7 +117,7 @@ public class TenantRegistrationFeaturePipeline extends AbstractEndpointPipelineI
             try {
                 // PROCESSING : identify processor (e.g local capability processor, or remote proxy) to activate as responsible to realize the treatment of the event (e.g command interpretation and business rules execution)
                 // according to the type of event to process
-                TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context, featureServiceName(), featureTenantsChangesNotificationChannel, ssoClient);
+                TenantRegistrationActivator processingAssignmentStep = new TenantRegistrationActivator(uisClient, context(), featureServiceName(), featureTenantsChangesNotificationChannel, ssoClient);
                 securityFilteringStep.setNext(processingAssignmentStep);
                 pipelinedProcessSingleton = eventTypeFilteringStep;
             } catch (UnoperationalStateException e) {

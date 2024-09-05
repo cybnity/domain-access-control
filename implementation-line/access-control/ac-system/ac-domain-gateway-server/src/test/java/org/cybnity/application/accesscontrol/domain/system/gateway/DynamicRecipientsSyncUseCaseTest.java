@@ -18,7 +18,10 @@ import org.cybnity.framework.domain.event.EventSpecification;
 import org.cybnity.framework.domain.event.ProcessingUnitPresenceAnnounced;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.*;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
@@ -32,7 +35,7 @@ import java.util.logging.Level;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualizedTest {
+public class DynamicRecipientsSyncUseCaseTest extends CustomContextualizedTest {
 
     private Thread gatewayModule, processModule;
 
@@ -61,8 +64,8 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
     /**
      * Default constructor.
      */
-    public DynamicRecipientsSyncUseCaseTestManual() throws UnoperationalStateException {
-        super(true, true, true, false, /* With snapshots management capability activated */ true);
+    public DynamicRecipientsSyncUseCaseTest() throws UnoperationalStateException {
+        super(true, true, false, false, /* With snapshots management capability activated */ true);
     }
 
     @BeforeEach
@@ -71,6 +74,17 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
         uisClient = new UISAdapterRedisImpl(context());
         // Executed activities counter
         waiter = new CountDownLatch(2 /* Quantity of started modules to wait before test execution */);
+
+        // Prepare domain capability process module executable instance
+        processModule = new Thread(() -> {
+            // Start a feature processing unit
+            vertx.deployVerticle(AccessControlDomainProcessModule.class.getName()).onSuccess(id2 -> {
+                processModuleId = id2;
+                logger.fine("Domain capabilities Process Module is started and should have registered its routing paths in AC domain IO gateway");
+                waiter.countDown(); // Confirm finalized preparation
+            });
+        });
+
         // Prepare gateway module executable instance
         gatewayModule = new Thread(() -> {
             // Start domain IO Gateway
@@ -80,28 +94,6 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
                 waiter.countDown(); // Confirm finalized preparation
             });
         });
-        // Prepare domain capability process module executable instance
-        processModule = new Thread(() -> {
-            // Start a feature processing unit
-            vertx.deployVerticle(AccessControlDomainProcessModule.class.getName()).onSuccess(id2 -> {
-                logger.fine("Domain capabilities Process Module is started and should have registered its routing paths in AC domain IO gateway");
-                processModuleId = id2;
-                waiter.countDown(); // Confirm finalized preparation
-            });
-        });
-    }
-
-    /**
-     * Stop and undeploy the prepared/started vertx
-     */
-    @AfterEach
-    public void stopThreads(Vertx vertx) {
-        // Undeploy the started vertx modules
-        if (processModuleId != null && !processModuleId.isEmpty()) vertx.undeploy(processModuleId);
-        if (gatewayModuleId != null && !gatewayModuleId.isEmpty()) vertx.undeploy(gatewayModuleId);
-        if (uisClient != null)
-            // free adapter resources
-            this.uisClient.freeUpResources();
     }
 
     /**
@@ -185,7 +177,7 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
             // Prepare helper for test time wait regarding all presence announced
             // --- process module tenant registration processing unit pipeline
             // --- gateway module io pipeline
-            CountDownLatch testWaiter = new CountDownLatch(2 /* Qty of presences of process module included */);
+            final CountDownLatch testWaiter = new CountDownLatch(2 /* Qty of presences of process module included */);
 
             // Prepare a listener of features process module's announces like normally made by the domain gateway (simulate gateway server-side)
             final ChannelObserver processModuleAnnouncesListener = new ProcessModuleAnnouncesListener(testWaiter);
@@ -209,12 +201,11 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
 
             // Wait for give time to message to be processed
             Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
-
-            testContext.completeNow();
         } finally {
             // Unregister specific test listeners started
             uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
         }
+        testContext.completeNow();
     }
 
     /**
@@ -256,7 +247,7 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
 
                 @Override
                 public void notify(Object event) {
-                    if (IDescribed.class.isAssignableFrom(event.getClass())) {
+                    if (event != null && IDescribed.class.isAssignableFrom(event.getClass())) {
                         IDescribed presenceAnnounceEvent = (IDescribed) event;
                         // Process module announce have been received
                         logger.fine("--- Presence event: " + presenceAnnounceEvent.type().value());
@@ -303,12 +294,11 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
 
             // Wait for give time to message to be processed
             Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
-
-            testContext.completeNow();
         } finally {
             // Unregister specific test listeners started
             uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
         }
+        testContext.completeNow();
     }
 
     /**
@@ -347,12 +337,11 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
 
             // Wait for give time to message to be processed
             Assertions.assertTrue(testWaiter.await(360, TimeUnit.SECONDS), "Timeout reached before collaboration messages treated!");
-
-            testContext.completeNow();
         } finally {
             // Unregister specific test listeners started
             uisClient.unsubscribe(dynamicCollaborationChannelsObservers);
         }
+        testContext.completeNow();
     }
 
     private class ProcessModuleAnnouncesListener implements ChannelObserver {

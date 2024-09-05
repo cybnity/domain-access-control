@@ -7,7 +7,6 @@ import org.cybnity.application.accesscontrol.translator.ui.api.AccessControlDoma
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Command;
-import org.cybnity.framework.domain.ISessionContext;
 import org.cybnity.framework.domain.infrastructure.IDomainRepository;
 import org.cybnity.framework.domain.infrastructure.IDomainStore;
 import org.cybnity.framework.domain.model.IDomainModel;
@@ -68,37 +67,37 @@ public class AccountsRepository extends AbstractReadModelRepository implements I
     }
 
     @Override
-    public Account nextIdentity(ISessionContext iSessionContext) {
+    public Account nextIdentity(IContext iSessionContext) {
         return null;
     }
 
     @Override
-    public Account factOfId(Identifier identifier, ISessionContext iSessionContext) {
+    public Account factOfId(Identifier identifier, IContext iSessionContext) {
         return null;
     }
 
     @Override
-    public boolean remove(Account account, ISessionContext iSessionContext) {
+    public boolean remove(Account account, IContext iSessionContext) {
         return false;
     }
 
     @Override
-    public void removeAll(Collection<Account> collection, ISessionContext iSessionContext) {
+    public void removeAll(Collection<Account> collection,IContext iSessionContext) {
 
     }
 
     @Override
-    public Account save(Account account, ISessionContext iSessionContext) {
+    public Account save(Account account, IContext iSessionContext) {
         return null;
     }
 
     @Override
-    public void saveAll(Collection<Account> collection, ISessionContext iSessionContext) {
+    public void saveAll(Collection<Account> collection, IContext iSessionContext) {
 
     }
 
     @Override
-    public List<Account> queryWhere(Map<String, String> map, ISessionContext iSessionContext) {
+    public List<Account> queryWhere(Map<String, String> map, IContext iSessionContext) {
         return null;
     }
 
