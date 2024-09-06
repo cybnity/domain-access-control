@@ -130,7 +130,7 @@ Several servers are developed as executable domain components, which are contain
 - Domain Gateway Server
   - For example, to start auto-generated docker image (by Maven) into a Minikube platform, execute command line `kubectl run cybnity-ac-domain-gateway --image=cybnity/access-control-domain-gateway --image-pull-policy=Never`
 - Real-Time Stream Computation Unit
-  - For example, to start docker image as Pod in Minikube, execute command line `kubectl run cybnity-ac-domain-rts-process --image=cybnity/access-control-process-module --image-pull-policy=Never`
+  - For example, to start docker image as Pod in Kubernetes context, execute command line `kubectl run cybnity-ac-domain-rts-process --image=cybnity/access-control-process-module --image-pull-policy=Never`
 
 ### Reusable Provisioning System Projects
 Perimeter: some infrastructure third-party software (e.g Keycloak, Postgresql) are available on the market as template of provisioning helping to quickly customize the runtime (provisioning of pre-configured Docker image) into a Kubernetes platform. Some infrastructure components are reused by CYBNITY as infrastructure systems with customization of the prepared templates of their images helmization.
