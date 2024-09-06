@@ -129,21 +129,26 @@ The source codes managed in theses sub-projects (Maven projects) are supporting 
   }
 }%%
 flowchart LR
-    access_control_rts_computation_unit("_&lt;&lt;System&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**system**&nbsp;<br>artifactId: **process-module**")
-    access_control_domain_gateway_server("_&lt;&lt;System&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**system**&nbsp;<br>artifactId: **domain-gateway-server**")
-    access_backend_server("_&lt;&lt;UI system&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui.system**&nbsp;<br>artifactId: **backend-server**")
-    access_frontend_server("_&lt;&lt;UI system&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui.system**&nbsp;<br>artifactId: **frontend-server**")
-    access_control_adapter_keycloak_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **keycloak-impl**")
-    access_control_adapter_admin_api("_&lt;&lt;Adapter API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **admin-api**")
-    access_control_adapter_keycloak_admin_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **keycloak-admin-impl**")
-    access_control_adapter_api("_&lt;&lt;Adapter API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **api**")
-    access_control_domain_model("_&lt;&lt;Domain model&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **domain**")
-    access_control_service_api("_&lt;&lt;Service API&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **service-api**")
-    access_control_ui_translator("_&lt;&lt;Translator&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**translator**&nbsp;<br>artifactId: **ui**")
-    access_control_ui_api("_&lt;&lt;UI API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui**&nbsp;<br>artifactId: **api**")
-    access_control_service_impl("_&lt;&lt;Service&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **service-impl**")
-    access_control_keycloak_translator("_&lt;&lt;Translator&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**translator**&nbsp;<br>artifactId: **keycloak**")
-  
+  access_control_rts_computation_unit("_&lt;&lt;System&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**system**&nbsp;<br>artifactId: **process-module**")
+  access_control_domain_gateway_server("_&lt;&lt;System&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**system**&nbsp;<br>artifactId: **domain-gateway-server**")
+  access_backend_server("_&lt;&lt;UI system&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui.system**&nbsp;<br>artifactId: **backend-server**")
+  access_frontend_server("_&lt;&lt;UI system&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui.system**&nbsp;<br>artifactId: **frontend-server**")
+  access_control_adapter_keycloak_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **keycloak-impl**")
+  access_control_adapter_admin_api("_&lt;&lt;Adapter API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **admin-api**")
+  access_control_adapter_keycloak_admin_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **keycloak-admin-impl**")
+  access_control_adapter_api("_&lt;&lt;Adapter API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **api**")
+  access_control_domain_model("_&lt;&lt;Domain model&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **domain**")
+  access_control_service_api("_&lt;&lt;Service API&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **service-api**")
+  access_control_ui_translator("_&lt;&lt;Translator&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**translator**&nbsp;<br>artifactId: **ui**")
+  access_control_ui_api("_&lt;&lt;UI API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui**&nbsp;<br>artifactId: **api**")
+  access_control_service_impl("_&lt;&lt;Service&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **service-impl**")
+  access_control_keycloak_translator("_&lt;&lt;Translator&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**translator**&nbsp;<br>artifactId: **keycloak**")
+  fwk_support("_&lt;&lt;Framework&gt;&gt;_<br>groupId: org.cybnity.**framework**&nbsp;<br>artifactId: **support**")
+  fwk_domain("_&lt;&lt;Framework&gt;&gt;_<br>groupId: org.cybnity.**framework**&nbsp;<br>artifactId: **domain**")
+  vertx_common("_&lt;&lt;Framework&gt;&gt;_<br>groupId: org.cybnity.**framework**&nbsp;<br>artifactId: **vertx-common**")
+  redis_store("_&lt;&lt;Feature&gt;&gt;_<br>groupId: org.cybnity.features.technical.**persistence**&nbsp;<br>artifactId: **redis-store**")
+  janusgraph_repository("_&lt;&lt;Feature&gt;&gt;_<br>groupId: org.cybnity.features.technical.**persistence**&nbsp;<br>artifactId: **janusgraph-repository**")
+  redis_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.infrastructure.integration.**uis.adapters**&nbsp;<br>artifactId: **redis-impl**")
 
   access_backend_server -.-> access_control_ui_api & access_control_ui_translator
   access_control_service_impl -.-> access_control_adapter_admin_api
@@ -159,8 +164,10 @@ flowchart LR
 
   classDef module fill:#0e2a43, color:#fff
   classDef lib fill:#fff, stroke:##0e2a43, color:##0e2a43
+  classDef external fill:#fff, stroke:#e5302a, color:#e5302a, stroke-dasharray: 5 5
   class access_control_ui_api,access_control_ui_translator,access_control_keycloak_translator,access_control_service_api,access_control_service_impl,access_control_domain_model,access_control_adapter_admin_api,access_control_adapter_api,access_control_adapter_keycloak_admin_impl,access_control_adapter_keycloak_impl lib;
-  class access_backend_server,access_frontend_server,access_control_rts_computation_unit,access_control_domain_gateway_server module
+  class access_backend_server,access_frontend_server,access_control_rts_computation_unit,access_control_domain_gateway_server module;
+  class fwk_domain,redis_store,janusgraph_repository,redis_impl,vertx_common,fwk_support external;
 
 ```
 
