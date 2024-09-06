@@ -98,6 +98,72 @@ The source codes managed in theses sub-projects (Maven projects) are supporting 
 - Domain Service API library
 - Domain Service Implementation module
 
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+        'background': '#ffffff',
+        'fontFamily': 'arial',
+        'fontSize': '13px',
+        'primaryColor': '#fff',
+        'primaryTextColor': '#0e2a43',
+        'primaryBorderColor': '#0e2a43',
+        'secondaryColor': '#fff',
+        'secondaryTextColor': '#fff',
+        'secondaryBorderColor': '#fff',
+        'tertiaryColor': '#fff',
+        'tertiaryTextColor': '#fff',
+        'tertiaryBorderColor': '#fff',
+        'edgeLabelBackground':'#fff',
+        'lineColor': '#0e2a43',
+        'titleColor': '#fff',
+        'textColor': '#fff',
+        'lineColor': '#0e2a43',
+        'nodeTextColor': '#fff',
+        'nodeBorder': '#0e2a43',
+        'noteTextColor': '#fff',
+        'noteBorderColor': '#fff'
+    },
+    'flowchart': { 'curve': 'monotoneX', 'htmlLabels': 'true', 'wrappingWidth': '400' }
+  }
+}%%
+flowchart LR
+    access_control_rts_computation_unit("_&lt;&lt;System&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**system**&nbsp;<br>artifactId: **process-module**")
+    access_control_domain_gateway_server("_&lt;&lt;System&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**system**&nbsp;<br>artifactId: **domain-gateway-server**")
+    access_backend_server("_&lt;&lt;UI system&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui.system**&nbsp;<br>artifactId: **backend-server**")
+    access_frontend_server("_&lt;&lt;UI system&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui.system**&nbsp;<br>artifactId: **frontend-server**")
+    access_control_adapter_keycloak_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **keycloak-impl**")
+    access_control_adapter_admin_api("_&lt;&lt;Adapter API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **admin-api**")
+    access_control_adapter_keycloak_admin_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **keycloak-admin-impl**")
+    access_control_adapter_api("_&lt;&lt;Adapter API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **api**")
+    access_control_domain_model("_&lt;&lt;Domain model&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **domain**")
+    access_control_service_api("_&lt;&lt;Service API&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **service-api**")
+    access_control_ui_translator("_&lt;&lt;Translator&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**translator**&nbsp;<br>artifactId: **ui**")
+    access_control_ui_api("_&lt;&lt;UI API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui**&nbsp;<br>artifactId: **api**")
+    access_control_service_impl("_&lt;&lt;Service&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **service-impl**")
+    access_control_keycloak_translator("_&lt;&lt;Translator&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**translator**&nbsp;<br>artifactId: **keycloak**")
+  
+
+  access_backend_server -.-> access_control_ui_api & access_control_ui_translator
+  access_control_service_impl -.-> access_control_adapter_admin_api
+  access_control_service_impl -.-> access_control_service_api & access_control_adapter_api & access_control_ui_api & access_control_domain_model
+  access_control_adapter_keycloak_admin_impl -.-> access_control_adapter_admin_api
+  access_control_adapter_keycloak_admin_impl -.-> access_control_adapter_keycloak_impl
+  access_control_adapter_keycloak_impl -.-> access_control_adapter_api
+  access_control_service_api -.-> access_control_ui_translator
+  access_control_domain_gateway_server -.-> access_control_ui_translator
+  access_control_rts_computation_unit -.-> access_control_adapter_keycloak_admin_impl & access_control_service_impl
+  access_control_adapter_api -.-> access_control_ui_translator
+  access_control_adapter_keycloak_impl -.-> access_control_keycloak_translator
+
+  classDef module fill:#0e2a43, color:#fff
+  classDef lib fill:#fff, stroke:##0e2a43, color:##0e2a43
+  class access_control_ui_api,access_control_ui_translator,access_control_keycloak_translator,access_control_service_api,access_control_service_impl,access_control_domain_model,access_control_adapter_admin_api,access_control_adapter_api,access_control_adapter_keycloak_admin_impl,access_control_adapter_keycloak_impl lib;
+  class access_backend_server,access_frontend_server,access_control_rts_computation_unit,access_control_domain_gateway_server module
+
+```
+
 ## INFRASTRUCTURE COMPONENTS
 The source code managed in this area are about the infrastructure components supporting the features and applications modules.
 - Keycloak SSO server
