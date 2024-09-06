@@ -7,11 +7,11 @@ import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
-import org.cybnity.feature.accesscontrol.domain.system.ContextualizedTest;
+import org.cybnity.feature.accesscontrol.domain.system.CustomContextualizedTest;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.IdentifierStringBased;
@@ -21,7 +21,6 @@ import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapp
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Stream;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -39,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class TenantRegistrationUseCaseTest extends ContextualizedTest {
+public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
 
     /**
      * Identifiers of deployment
@@ -55,13 +54,10 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     private IMessageMapperProvider mapperFactory;
 
     /**
-     * Enhance default environment variables with additional variables specific to the test.
+     * Default constructor.
      */
-    @Override
-    protected void initEnvVariables() {
-        super.initEnvVariables(); // Init common env values
-        // Add specific env values
-
+    public TenantRegistrationUseCaseTest() {
+        super(true, true, false, false, /* With snapshots management capability activated */ true);
     }
 
     @BeforeEach
@@ -72,6 +68,9 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         // Prepare the definition of the feature pipeline entrypoint channel
         featureEndpointChannel = new Stream(UICapabilityChannel.access_control_tenant_registration.shortName());
 
+        // Initialize an adapter connected to contextualized Redis server (Users Interactions Space)
+        uisClient = new UISAdapterRedisImpl(context());
+
         // Prepare feature module executable instance
         featureModule = new Thread(() -> {
             // Start feature pipeline module
@@ -80,21 +79,6 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
                 logger.fine("Tenant Registration feature pipeline is started");
             });
         });
-
-        // Initialize an adapter connected to contextualized Redis server (Users Interactions Space)
-        uisClient = new UISAdapterRedisImpl(getContext());
-    }
-
-    /**
-     * Stop and undeploy the prepared/started vertx
-     */
-    @AfterEach
-    public void stopThreads(Vertx vertx) {
-        // Undeploy the started vertx modules
-        if (featureModuleId != null && !featureModuleId.isEmpty()) vertx.undeploy(featureModuleId);
-        if (uisClient != null)
-            // free adapter resources
-            this.uisClient.freeUpResources();
     }
 
     /**
@@ -104,7 +88,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenNoExistingTenant_whenRegisterTenant_thenTenantActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID newly defined in Identity server and tenant domain as usable for new user account creation
-
+// TODO coding of use case test and acceptance rules (don't forget to activate start of keycloak required by registration process)
         // UTILITIES PREPARATION
         // Creation of parallel observer of SSO server admin event relative to new realm creation confirmations
 
@@ -131,6 +115,8 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         checkpoint.flag();
         checkpoint.flag();
         checkpoint.flag();
+
+        testContext.completeNow();
     }
 
     /**
@@ -140,7 +126,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenExistingTenantNotActivatedAndAuthorizedReassignment_whenRegisterTenant_thenTenantActioned(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID is reassigned as dedicated to new user account creation
-
+// TODO coding of use case test and acceptance rules(don't forget to activate start of keycloak required by registration process)
         // UTILITIES PREPARATION
         // Creation of parallel observer of SSO server admin event relative to new realm creation confirmations
         // Configuration of the feature to authorize the dynamic Real re-assigning of existing tenant to new requester when is not used
@@ -166,6 +152,8 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         checkpoint.flag();
         checkpoint.flag();
         checkpoint.flag();
+
+        testContext.completeNow();
     }
 
     /**
@@ -175,7 +163,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenExistingTenantNotActivatedAndNotAuthorizedReassignment_whenRegisterTenant_thenTenantReused(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: organizationActioned about tenantID is not reassigned but is usable for new user account creation
-
+// TODO coding of use case test and acceptance rules(don't forget to activate start of keycloak required by registration process)
         // UTILITIES PREPARATION
         // Configuration of the feature to NOT authorize the dynamic Real re-assigning of existing tenant to new requester when is not used
 
@@ -197,6 +185,8 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
 
         checkpoint.flag();
         checkpoint.flag();
+
+        testContext.completeNow();
     }
 
     /**
@@ -206,7 +196,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     void givenExistingTenantActivated_whenRegisterTenant_thenTenantRegistrationRejected(Vertx vertx, VertxTestContext testContext) throws Exception {
         // USE CASE TEST SCENARIO: rejected creation for cause of existing named tenant that is already used by previous register
-
+// TODO coding of use case test and acceptance rules(don't forget to activate start of keycloak required by registration process)
         // START FEATURE MODULE
         featureModule.start();
         featureModule.join(); // wait end of module start execution
@@ -223,9 +213,10 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
         // CHECKPOINT: Verify the conformity of cause of organization creation rejected
         Checkpoint checkpoint = testContext.checkpoint(2); // Set the qty of check required to be flagged with success by this test
 
+        checkpoint.flag();
+        checkpoint.flag();
 
-        checkpoint.flag();
-        checkpoint.flag();
+        testContext.completeNow();
     }
 
     /**

@@ -12,6 +12,6 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
  *
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_AC_4")
-public interface Implicit extends AuthorizationType {
+public interface Implicit extends IAuthorizationType {
 
 }

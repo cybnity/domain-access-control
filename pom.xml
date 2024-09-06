@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>org.cybnity</groupId>
 		<artifactId>techstack</artifactId>
-		<version>0.32.0</version>
+		<version>0.38.0</version>
 	</parent>
 
 	<artifactId>applications</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
-	<name>CYBNITY access control application</name>
+	<name>CYBNITY access control domain</name>
 
 	<!-- Required information for Maven Central Repository publishing -->
 	<description>Access control features supporting the CYBNITY defense platform solution</description>
@@ -121,18 +121,11 @@
 		</repository>-->
 	</repositories>
 
-	<!-- Project specific additional dependency versions -->
+	<!-- Project specific additional dependency versions
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" AVERTISSEMENT on Mac -->
-				<groupId>io.netty</groupId>
-				<artifactId>netty-all</artifactId>
-				<version>4.1.106.Final</version>
-				<scope>test</scope>
-			</dependency>
 		</dependencies>
-	</dependencyManagement>
+	</dependencyManagement>-->
 
 	<!-- List of advise about project -->
 	<mailingLists>

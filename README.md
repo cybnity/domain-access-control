@@ -89,16 +89,96 @@ The source codes managed in theses sub-projects are providing capabilities to fi
 ## APPLICATION COMPONENTS
 The source codes managed in theses sub-projects (Maven projects) are supporting the features (as micro-service components constituing the business capabilities provided by the application domain) provided by the bounded context:
 - [Adapter libraries](/implementation-line/access-control/ac-adapter)
-  - API library
-  - Implementation library
-- Adapter Translator library
-- [Domain Model library](/implementation-line/access-control/ac-domain-model)
-- Domain Service API library
-- Domain Service Implementation module
+  - Adapter API libraries
+  - Adapter implementation components
+- [Adapter translator libraries](/implementation-line/access-control/ac-translator)
+  - UI translator library
+  - Keycloak translator library
+- [Domain model library](/implementation-line/access-control/ac-domain-model)
+- [Domain service libraries](/implementation-line/access-control/ac-service)
+  - Service API library
+  - Service implementation module
+- [System modules](/implementation-line/access-control/ac-system/docs)
+  - Gateway application module
+  - RTS computation unit
+
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+        'background': '#ffffff',
+        'fontFamily': 'arial',
+        'fontSize': '13px',
+        'primaryColor': '#fff',
+        'primaryTextColor': '#0e2a43',
+        'primaryBorderColor': '#0e2a43',
+        'secondaryColor': '#fff',
+        'secondaryTextColor': '#fff',
+        'secondaryBorderColor': '#fff',
+        'tertiaryColor': '#fff',
+        'tertiaryTextColor': '#fff',
+        'tertiaryBorderColor': '#fff',
+        'edgeLabelBackground':'#fff',
+        'lineColor': '#0e2a43',
+        'titleColor': '#fff',
+        'textColor': '#fff',
+        'lineColor': '#0e2a43',
+        'nodeTextColor': '#fff',
+        'nodeBorder': '#0e2a43',
+        'noteTextColor': '#fff',
+        'noteBorderColor': '#fff'
+    },
+    'flowchart': { 'curve': 'monotoneX', 'htmlLabels': 'true', 'wrappingWidth': '400' }
+  }
+}%%
+flowchart LR
+  access_control_rts_computation_unit("_&lt;&lt;System&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**system**&nbsp;<br>artifactId: **process-module**")
+  access_control_domain_gateway_server("_&lt;&lt;System&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**system**&nbsp;<br>artifactId: **domain-gateway-server**")
+  access_backend_server("_&lt;&lt;UI system&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui.system**&nbsp;<br>artifactId: **backend-server**")
+  access_frontend_server("_&lt;&lt;UI system&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui.system**&nbsp;<br>artifactId: **frontend-server**")
+  access_control_adapter_keycloak_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **keycloak-impl**")
+  access_control_adapter_admin_api("_&lt;&lt;Adapter API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **admin-api**")
+  access_control_adapter_keycloak_admin_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **keycloak-admin-impl**")
+  access_control_adapter_api("_&lt;&lt;Adapter API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**adapters**&nbsp;<br>artifactId: **api**")
+  access_control_domain_model("_&lt;&lt;Domain model&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **domain**")
+  access_control_service_api("_&lt;&lt;Service API&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **service-api**")
+  access_control_ui_translator("_&lt;&lt;Translator&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**translator**&nbsp;<br>artifactId: **ui**")
+  access_control_ui_api("_&lt;&lt;UI API&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**ui**&nbsp;<br>artifactId: **api**")
+  access_control_service_impl("_&lt;&lt;Service&gt;&gt;_<br>groupId: org.cybnity.application.**access-control**&nbsp;<br>artifactId: **service-impl**")
+  access_control_keycloak_translator("_&lt;&lt;Translator&gt;&gt;_<br>groupId: org.cybnity.application.access-control.**translator**&nbsp;<br>artifactId: **keycloak**")
+  fwk_support("_&lt;&lt;Framework&gt;&gt;_<br>groupId: org.cybnity.**framework**&nbsp;<br>artifactId: **support**")
+  fwk_domain("_&lt;&lt;Framework&gt;&gt;_<br>groupId: org.cybnity.**framework**&nbsp;<br>artifactId: **domain**")
+  vertx_common("_&lt;&lt;Framework&gt;&gt;_<br>groupId: org.cybnity.**framework**&nbsp;<br>artifactId: **vertx-common**")
+  redis_store("_&lt;&lt;Feature&gt;&gt;_<br>groupId: org.cybnity.features.technical.**persistence**&nbsp;<br>artifactId: **redis-store**")
+  janusgraph_repository("_&lt;&lt;Feature&gt;&gt;_<br>groupId: org.cybnity.features.technical.**persistence**&nbsp;<br>artifactId: **janusgraph-repository**")
+  redis_impl("_&lt;&lt;Adapter&gt;&gt;_<br>groupId: org.cybnity.infrastructure.integration.**uis.adapters**&nbsp;<br>artifactId: **redis-impl**")
+
+  access_backend_server -.-> access_control_ui_api & access_control_ui_translator
+  access_control_service_impl -.-> access_control_adapter_admin_api
+  access_control_service_impl -.-> access_control_service_api & access_control_adapter_api & access_control_ui_api & access_control_domain_model
+  access_control_adapter_keycloak_admin_impl -.-> access_control_adapter_admin_api
+  access_control_adapter_keycloak_admin_impl -.-> access_control_adapter_keycloak_impl
+  access_control_adapter_keycloak_impl -.-> access_control_adapter_api
+  access_control_service_api -.-> access_control_ui_translator
+  access_control_domain_gateway_server -.-> access_control_ui_translator
+  access_control_rts_computation_unit -.-> access_control_adapter_keycloak_admin_impl & access_control_service_impl
+  access_control_adapter_api -.-> access_control_ui_translator
+  access_control_adapter_keycloak_impl -.-> access_control_keycloak_translator
+
+  classDef module fill:#0e2a43, color:#fff
+  classDef lib fill:#fff, stroke:##0e2a43, color:##0e2a43
+  classDef external fill:#fff, stroke:#e5302a, color:#e5302a, stroke-dasharray: 5 5
+  class access_control_ui_api,access_control_ui_translator,access_control_keycloak_translator,access_control_service_api,access_control_service_impl,access_control_domain_model,access_control_adapter_admin_api,access_control_adapter_api,access_control_adapter_keycloak_admin_impl,access_control_adapter_keycloak_impl lib;
+  class access_backend_server,access_frontend_server,access_control_rts_computation_unit,access_control_domain_gateway_server module;
+  class fwk_domain,redis_store,janusgraph_repository,redis_impl,vertx_common,fwk_support external;
+
+```
 
 ## INFRASTRUCTURE COMPONENTS
-The source code managed in this area are about the infrastructure components supporting the features and applications modules.
-- Keycloak SSO server
+The source code managed in the [Adapter translator libraries](/implementation-line/access-control/ac-adapter) area are about the infrastructure components supporting the integration capabilities:
+- [Keycloak Admin Rest API adapter](/implementation-line/access-control/ac-adapter/ac-adapter-keycloak-admin-impl) to Keycloak server
+- [Keycloak SSO API adapter](/implementation-line/access-control/ac-adapter/ac-adapter-keycloak-impl) to Keycloak SSO server
 
 # DEPLOYMENT VIEW (Systems & Applications)
 ## PURPOSE
@@ -121,18 +201,25 @@ The managed source files are stored in the deployment-view sub-folder like:
 
 ## DEPLOYABLE & RUNNABLE MODULES
 Several systems are built as executable modules, containerized (Docker images) and that are ready for deployment via provisioning management solution (e.g Helm charts):
+- [Gateway Server](/implementation-line/access-control/ac-system/ac-domain-gateway-server)
+- [Process Server](/implementation-line/access-control/ac-system/ac-rts-computation-unit)
 - [Backend Server](/implementation-line/access-control/ac-ui/ac-ui-system/ac-backend-server)
 - [Frontend Server](/implementation-line/access-control/ac-ui/ac-ui-system/ac-frontend-server)
 
 Several servers are developed as executable domain components, which are containerized and ready for deployment via provisioning management solution:
 - Domain Gateway Server
-  - For example, to start auto-generated docker image (by Maven) into a Minikube platform, execute command line `kubectl run cybnity-ac-domain-gateway --image=cybnity/access-control-domain-gateway --image-pull-policy=Never`
+  - For example, to start auto-generated docker image (by Maven) into a Kubernetes context, execute command line `kubectl run cybnity-ac-domain-gateway --image=cybnity/access-control-domain-gateway --image-pull-policy=Never`
 - Real-Time Stream Computation Unit
-  - For example, to start docker image as Pod in Minikube, execute command line `kubectl run cybnity-ac-domain-rts-process --image=cybnity/access-control-process-module --image-pull-policy=Never`
+  - For example, to start docker image as Pod in Kubernetes context, execute command line `kubectl run cybnity-ac-domain-rts-process --image=cybnity/access-control-process-module --image-pull-policy=Never`
 
 ### Reusable Provisioning System Projects
-Perimeter: some infrastructure third-party software (e.g Keycloak, Postgresql) are available on the market as template of provisioning helping to quickly customize the runtime (provisioning of pre-configured Docker image) into a Kubernetes platform. Some infrastructure components are reused by CYBNITY as infrastructure systems with customization of the prepared templates of their images helmization.
+Perimeter: some infrastructure third-party software (e.g Keycloak, Postgresql, Redis, JanusGraph, Cassandra) are available on the market as template of provisioning helping to quickly customize the runtime (provisioning of pre-configured Docker image) into a Kubernetes platform. Some infrastructure systems are reused by CYBNITY as infrastructure systems with customization of the prepared templates of their images helmization.
 
 Project type: Helm implementation structures.
 
-Description: several generic infrastructure projects required by the CYBNITY implementation architecture are managed into the helm charts repository supporting the provisioning of Keycloak server over Helm chart implementation.
+Description: several generic infrastructure projects required by the CYBNITY implementation architecture are managed __into the CYBNITY helm charts repository__ supporting the provisioning of servers over Helm chart implementation.
+
+The infrastructure servers reused by the Access Control domain are:
+- SSO service: Keycloak server
+- UIS service: Redis server
+- Knowledge repository service: JanusGraph server with Cassandra

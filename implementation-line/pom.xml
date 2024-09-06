@@ -33,20 +33,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.9.3</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.cucumber</groupId>
-                <artifactId>cucumber-bom</artifactId>
-                <version>7.12.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
 			<!-- Foundation project dependencies -->
 			<dependency>
 				<groupId>org.cybnity.framework</groupId>
@@ -83,6 +69,19 @@
 				<groupId>org.cybnity.features.technical.persistence</groupId>
 				<artifactId>redis-store</artifactId>
 				<version>${foundation.compatibility.version}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.features.technical.persistence</groupId>
+				<artifactId>janusgraph-repository</artifactId>
+				<version>${foundation.compatibility.version}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.cybnity.features</groupId>
+				<artifactId>test</artifactId>
+				<version>${foundation.compatibility.version}</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

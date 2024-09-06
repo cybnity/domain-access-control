@@ -20,7 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author olivier
  */
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableACProcessModuleCheckerUseCaseTest extends ContextualizedTest {
+public class ExecutableACProcessModuleCheckerUseCaseTest extends CustomContextualizedTest {
+
+    /**
+     * Default constructor.
+     */
+    public ExecutableACProcessModuleCheckerUseCaseTest() {
+        super(false, false, false, false, /* With snapshots management capability activated */ false);
+    }
 
     /**
      * Test that a module checker which is executed and that require some specific
@@ -88,9 +95,8 @@ public class ExecutableACProcessModuleCheckerUseCaseTest extends ContextualizedT
         Vertx vertx = Vertx.vertx();
 
         // Try backend module (Verticle deployment) start
-        vertx.deployVerticle(new AccessControlDomainProcessModule())
-                .onComplete(res -> {
-                    assertFalse(res.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
-                });
+        vertx.deployVerticle(new AccessControlDomainProcessModule()).onComplete(handler -> {
+            assertFalse(handler.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
+        });
     }
 }

@@ -10,6 +10,7 @@ import org.cybnity.application.accesscontrol.ui.system.backend.service.DomainPub
 import org.cybnity.framework.Context;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
+import org.cybnity.framework.domain.IHealthControl;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.NamingConventionHelper;
 
 import java.util.HashMap;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
  * Gateway ensuring deployment of supervision http routing (e.g supporting health control) and workers pool of domain capabilities handlers.
  * This component implement the Access Control Layer (ACL) regarding the domain UI capabilities (as UI API) over event bus protocol supported as domain's entry points.
  */
-public class AccessControlReactiveMessagingGateway extends AbstractVerticle {
+public class AccessControlReactiveMessagingGateway extends AbstractVerticle implements IHealthControl {
 
     /**
      * List of identifiers regarding deployed verticles.
@@ -123,6 +124,7 @@ public class AccessControlReactiveMessagingGateway extends AbstractVerticle {
         }
     }
 
+    @Override
     public void checkHealthyState() throws UnoperationalStateException {
         if (healthyChecker == null)
             healthyChecker = new ExecutableBackendChecker(context);

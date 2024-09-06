@@ -66,14 +66,14 @@ public class IdentitiesStore extends DomainResourceStoreRedisImpl implements IDo
     }
 
     @Override
-    public void append(SocialEntity socialEntity, ISessionContext ctx) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException {
+    public void append(SocialEntity socialEntity, IContext ctx) throws IllegalArgumentException, ImmutabilityException, UnoperationalStateException {
         if (socialEntity != null) {
             this.append(socialEntity);
         }
     }
 
     @Override
-    public SocialEntity findEventFrom(Identifier identifier, ISessionContext ctx) throws IllegalArgumentException, UnoperationalStateException {
+    public SocialEntity findEventFrom(Identifier identifier, IContext ctx) throws IllegalArgumentException, UnoperationalStateException {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         return findEventFrom(identifier);
     }

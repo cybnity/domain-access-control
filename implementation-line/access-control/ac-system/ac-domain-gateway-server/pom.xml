@@ -25,7 +25,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.cybnity.application.access-control.translator</groupId>
-			<artifactId>ui-api</artifactId>
+			<artifactId>ui</artifactId>
 		</dependency>
 
 		<!-- Test utilities -->
@@ -42,24 +42,21 @@
 			<artifactId>vertx-web-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>uk.org.webcompere</groupId>
-			<artifactId>system-stubs-jupiter</artifactId>
-		</dependency>
-		<dependency>
-			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" AVERTISSEMENT on Mac -->
+			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" NOTIFICATION on Mac -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<!-- Embedded Redis test server (https://github.com/signalapp/embedded-redis) -->
-			<groupId>org.signal</groupId>
-			<artifactId>embedded-redis</artifactId>
+			<!-- Reuse of common test util features -->
+			<groupId>org.cybnity.features</groupId>
+			<artifactId>test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<!-- Required for unit test about collaboration processes -->
 			<groupId>org.cybnity.application.access-control.system</groupId>
 			<artifactId>process-module</artifactId>
-			<version>${revision}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

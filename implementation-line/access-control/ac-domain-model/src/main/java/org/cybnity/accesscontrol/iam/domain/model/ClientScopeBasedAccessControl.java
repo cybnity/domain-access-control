@@ -12,5 +12,5 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_AC_3")
 public class ClientScopeBasedAccessControl extends AuthorizationPolicy {
 
-    private ScopeAttribute scope;
+    private IScopeAttribute scope;
 }

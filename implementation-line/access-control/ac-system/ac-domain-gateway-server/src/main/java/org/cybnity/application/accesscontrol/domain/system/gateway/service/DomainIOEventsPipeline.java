@@ -1,7 +1,8 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway.service;
 
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
+import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.event.AttributeName;
 import org.cybnity.framework.application.vertx.common.routing.ProcessingUnitAnnouncesObserver;
@@ -60,12 +61,22 @@ public class DomainIOEventsPipeline extends AbstractEndpointPipelineImpl {
     private FactBaseHandler pipelinedProcessSingleton;
 
     /**
-     * Default constructor.
+     * Default constructor used by Vertx deployment process.
      *
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the UIS or DIS).
      */
     public DomainIOEventsPipeline() throws UnoperationalStateException {
         super();
+    }
+
+    /**
+     * Default constructor.
+     *
+     * @param ctx Optional current context. When not defined, a new context is automatically created.
+     * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the UIS or DIS).
+     */
+    public DomainIOEventsPipeline(IContext ctx) throws UnoperationalStateException {
+        super(ctx);
     }
 
     @Override

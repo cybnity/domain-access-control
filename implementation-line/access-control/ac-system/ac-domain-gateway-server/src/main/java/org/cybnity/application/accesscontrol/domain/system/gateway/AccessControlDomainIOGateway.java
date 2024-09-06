@@ -73,4 +73,9 @@ public class AccessControlDomainIOGateway extends AbstractProcessModuleImpl {
 
         return featureWorkerTypes;
     }
+
+    @Override
+    public void freeUpResources() {
+
+    }
 }

@@ -7,12 +7,14 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<groupId>org.cybnity.application.access-control</groupId>
-	<artifactId>adapter</artifactId>
+	<artifactId>adapters</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
-	<name>- AC domain adapter</name>
+	<name>- AC domain adapters</name>
 	<modules>
 		<module>ac-adapter-api</module>
-		<module>ac-adapter-impl</module>
+		<module>ac-adapter-admin-api</module>
+		<module>ac-adapter-keycloak-impl</module>
+		<module>ac-adapter-keycloak-admin-impl</module>
 	</modules>
 </project>

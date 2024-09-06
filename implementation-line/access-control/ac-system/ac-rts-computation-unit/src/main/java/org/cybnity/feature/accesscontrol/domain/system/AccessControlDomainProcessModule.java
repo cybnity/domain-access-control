@@ -86,4 +86,8 @@ public class AccessControlDomainProcessModule extends AbstractProcessModuleImpl 
         return featureWorkerTypes;
     }
 
+    @Override
+    public void freeUpResources() {
+
+    }
 }

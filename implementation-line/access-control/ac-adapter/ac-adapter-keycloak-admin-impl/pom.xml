@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>adapters</artifactId>
+		<groupId>org.cybnity.application.access-control</groupId>
+		<version>${revision}</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<groupId>org.cybnity.application.access-control.adapters</groupId>
+	<artifactId>keycloak-admin-impl</artifactId>
+	<version>${revision}</version>
+	<packaging>jar</packaging>
+	<name>-- AC Keycloak admin adapter (impl)</name>
+
+	<dependencies>
+		<dependency>
+			<!-- Supported API by this implementation components -->
+			<groupId>org.cybnity.application.access-control.adapters</groupId>
+			<artifactId>admin-api</artifactId>
+		</dependency>
+		<dependency>
+			<!-- Common Keycloak usage implementation components -->
+			<groupId>org.cybnity.application.access-control.adapters</groupId>
+			<artifactId>keycloak-impl</artifactId>
+		</dependency>
+
+		<!-- Test cycle dependencies -->
+		<dependency>
+			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" NOTIFICATION on Mac -->
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- Reuse of common test util features -->
+			<groupId>org.cybnity.features</groupId>
+			<artifactId>test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

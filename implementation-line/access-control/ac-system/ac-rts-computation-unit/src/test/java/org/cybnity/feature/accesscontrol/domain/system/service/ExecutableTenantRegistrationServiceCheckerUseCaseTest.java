@@ -2,7 +2,7 @@ package org.cybnity.feature.accesscontrol.domain.system.service;
 
 import org.cybnity.accesscontrol.domain.service.api.TenantRegistrationServiceConfigurationVariable;
 import org.cybnity.accesscontrol.domain.service.impl.ExecutableTenantRegistrationServiceChecker;
-import org.cybnity.feature.accesscontrol.domain.system.ContextualizedTest;
+import org.cybnity.feature.accesscontrol.domain.system.CustomContextualizedTest;
 import org.cybnity.framework.IReadableConfiguration;
 import org.cybnity.framework.immutable.utility.ExecutableComponentChecker;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author olivier
  */
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableTenantRegistrationServiceCheckerUseCaseTest extends ContextualizedTest {
+public class ExecutableTenantRegistrationServiceCheckerUseCaseTest extends CustomContextualizedTest {
+
+    /**
+     * Default constructor.
+     */
+    public ExecutableTenantRegistrationServiceCheckerUseCaseTest() {
+        super(false, false, false, false, /* With snapshots management capability activated */ false);
+    }
 
     /**
      * Test that a module checker which is executed and that require some specific

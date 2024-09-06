@@ -1,36 +1,31 @@
 package org.cybnity.accesscontrol.domain.service.impl;
 
-import io.vertx.junit5.VertxExtension;
-import org.cybnity.accesscontrol.ContextualizedTest;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsReadModelImpl;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsStore;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.TenantsWriteModelImpl;
+import org.cybnity.accesscontrol.CustomContextualizedTest;
 import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantMockHelper;
-import org.cybnity.accesscontrol.ciam.domain.infrastructure.impl.mock.TenantTransactionsRepositoryMock;
-import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantTransactionProjection;
-import org.cybnity.accesscontrol.domain.service.api.ciam.ITenantsReadModel;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantTransactionCollectionsRepository;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsWriteModelImpl;
+import org.cybnity.application.accesscontrol.adapter.api.admin.ISSOAdminAdapter;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.SSOAdminAdapterKeycloakImpl;
 import org.cybnity.application.accesscontrol.translator.ui.api.ACDomainMessageMapperFactory;
-import org.cybnity.application.accesscontrol.ui.api.AccessControlDomainModel;
-import org.cybnity.application.accesscontrol.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.UICapabilityChannel;
+import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.framework.UnoperationalStateException;
-import org.cybnity.framework.domain.*;
+import org.cybnity.framework.domain.Attribute;
+import org.cybnity.framework.domain.Command;
+import org.cybnity.framework.domain.IDescribed;
+import org.cybnity.framework.domain.IdentifierStringBased;
 import org.cybnity.framework.domain.event.EventSpecification;
-import org.cybnity.framework.domain.infrastructure.ISnapshotRepository;
-import org.cybnity.framework.domain.model.IDomainModel;
-import org.cybnity.framework.domain.model.SessionContext;
 import org.cybnity.framework.domain.model.Tenant;
 import org.cybnity.framework.immutable.BaseConstants;
-import org.cybnity.infastructure.technical.persistence.store.impl.redis.PersistentObjectNamingConvention;
-import org.cybnity.infastructure.technical.persistence.store.impl.redis.SnapshotRepositoryRedisImpl;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.Channel;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.ChannelObserver;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.IMessageMapperProvider;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.UISAdapter;
 import org.cybnity.infrastructure.technical.message_bus.adapter.impl.redis.UISAdapterRedisImpl;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,72 +35,45 @@ import java.util.concurrent.TimeUnit;
 /**
  * Behavior unit test regarding the registration cases. This test scope is not considering the integration concerns with repositories or event sourcing collaboration actions (based on mocked services).
  */
-@ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class TenantRegistrationUseCaseTest extends ContextualizedTest {
-
-    private ISnapshotRepository snapshotsRepo;
-    private IDomainModel dataOwner;
-    private PersistentObjectNamingConvention.NamingConventionApplicability persistentObjectNamingConvention;
+public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
 
     private TenantsStore tenantsStore;
     private TenantRegistration tenantRegistrationService;
-    private ISessionContext sessionCtx;
-    private TenantTransactionsRepositoryMock tenantsRepository;
+    private TenantTransactionCollectionsRepository tenantsRepository;
     private String serviceName;
     private Channel featureTenantsChangesNotificationChannel;
     private UISAdapter client;
     private IMessageMapperProvider mapperFactory;
-    private ITenantsReadModel tenantsReadModel;
+
+    /**
+     * Default constructor.
+     */
+    public TenantRegistrationUseCaseTest() {
+        super(true, true, true, false, true);
+    }
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
-        dataOwner = new AccessControlDomainModel();
-        persistentObjectNamingConvention = PersistentObjectNamingConvention.NamingConventionApplicability.TENANT;
         // Create a store managing streamed messages
-        tenantsStore = getPersistenceOrientedStore(true /* With snapshots management capability activated */);
+        tenantsStore = getTenantPersistenceOrientedStore();
 
-        this.tenantsRepository = TenantTransactionsRepositoryMock.instance();
-        this.sessionCtx = new SessionContext(null);
+        this.tenantsRepository = TenantTransactionCollectionsRepository.instance(context(), tenantsStore);
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
-        this.client = new UISAdapterRedisImpl(this.sessionCtx);
+        this.client = new UISAdapterRedisImpl(context());
+        ISSOAdminAdapter ssoClient = new SSOAdminAdapterKeycloakImpl(context());
         this.mapperFactory = new ACDomainMessageMapperFactory();
-        this.tenantsReadModel = new TenantsReadModelImpl(this.tenantsStore, this.tenantsRepository, this.tenantsStore);
-        this.tenantRegistrationService = new TenantRegistration(sessionCtx, TenantsWriteModelImpl.instance(tenantsStore), (ITenantTransactionProjection) tenantsReadModel.getProjection(ITenantTransactionProjection.class), serviceName, featureTenantsChangesNotificationChannel, this.client);
+        this.tenantRegistrationService = new TenantRegistration(context(), TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client, ssoClient);
+
+        // Check started keycloak instance and accessible admin api
+        Assertions.assertNotNull(this.getKeycloak(), "shall have been started as defined in constructor super() call!");
     }
 
     @AfterEach
     public void clean() {
-        if (tenantsStore != null) tenantsStore.freeResources();
-        tenantsStore = null;
-        persistentObjectNamingConvention = null;
-        dataOwner = null;
-        if (snapshotsRepo != null) snapshotsRepo.freeResources();
-        snapshotsRepo = null;
-        this.tenantsRepository.catalogOfIdentifiedCollections().clear();
-        this.tenantsRepository = null;
-        this.serviceName = null;
-        this.sessionCtx = null;
-        this.tenantRegistrationService = null;
-        this.featureTenantsChangesNotificationChannel = null;
-        this.client = null;
-        this.mapperFactory = null;
-        this.tenantsReadModel = null;
-    }
-
-
-    /**
-     * Get a persistence store implementation with or without support of snapshots capabilities.
-     *
-     * @param supportedBySnapshotRepository True when snapshots usage shall be configured into the returned store.
-     * @return A store.
-     * @throws UnoperationalStateException When impossible instantiation of the Redis adapter.
-     */
-    private TenantsStore getPersistenceOrientedStore(boolean supportedBySnapshotRepository) throws UnoperationalStateException {
-        snapshotsRepo = (supportedBySnapshotRepository) ? new SnapshotRepositoryRedisImpl(getContext()) : null;
-        // Voluntary don't use instance() method to avoid singleton capability usage during this test campaign
-        return new TenantsStore(getContext(), dataOwner, persistentObjectNamingConvention, /* with or without help by a snapshots capability provider */ snapshotsRepo);
+        if (tenantsRepository != null) tenantsRepository.freeUpResources();
+        if (tenantsStore != null) tenantsStore.freeUpResources();
     }
 
     /**
@@ -140,7 +108,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
                     // Read result of registration and verify that tenant have been created with success (notification event as new tenant created)
                     String eventType = domainEvent.type().value();
 
-                    if (org.cybnity.application.accesscontrol.ui.api.event.DomainEventType.TENANT_REGISTERED.name().equals(eventType)) {
+                    if (DomainEventType.TENANT_REGISTERED.name().equals(eventType)) {
                         // Detect only when a new tenant added notification is received
                         Collection<Attribute> spec = domainEvent.specification();
                         // Verify that added tenant have same organization (organizationName) name that tested command
@@ -218,7 +186,7 @@ public class TenantRegistrationUseCaseTest extends ContextualizedTest {
                     // Read result of registration and verify that tenant have been created with success (notification event as new tenant created)
                     String eventType = domainEvent.type().value();
 
-                    if (org.cybnity.application.accesscontrol.ui.api.event.DomainEventType.TENANT_REGISTERED.name().equals(eventType)) {
+                    if (DomainEventType.TENANT_REGISTERED.name().equals(eventType)) {
                         // Detect only when a new tenant added notification is received
                         // or an already existing tenant with same organization name have been retrieved without new creation
 

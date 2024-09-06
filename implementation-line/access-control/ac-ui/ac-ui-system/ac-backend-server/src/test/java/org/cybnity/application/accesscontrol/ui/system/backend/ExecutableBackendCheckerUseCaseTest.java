@@ -1,9 +1,11 @@
 package org.cybnity.application.accesscontrol.ui.system.backend;
 
 import io.vertx.core.Vertx;
+import io.vertx.junit5.VertxExtension;
 import org.cybnity.framework.IReadableConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -17,8 +19,16 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author olivier
  */
+@ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableBackendCheckerUseCaseTest extends ContextualizedTest {
+public class ExecutableBackendCheckerUseCaseTest extends BackendCustomContextualizedTest {
+
+    /**
+     * Default constructor.
+     */
+    public ExecutableBackendCheckerUseCaseTest() {
+        super(false, false, false, false, /* With snapshots management capability activated */ false);
+    }
 
     /**
      * Test that a backend checker which is executed and that require some specific
@@ -76,8 +86,10 @@ public class ExecutableBackendCheckerUseCaseTest extends ContextualizedTest {
 
         // Try backend module (Verticle deployment) start
         vertx.deployVerticle(new AccessControlReactiveMessagingGateway())
-                .onComplete(res -> {
-                    assertFalse(res.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
+                .onSuccess(res -> {
+                    fail("Start shall have been not executed for cause of undefined environment variable!");
+                }).onFailure(e -> {
+                    assertNotNull(e, "Start Shall have been rejected");
                 });
     }
 }

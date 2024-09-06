@@ -12,10 +12,4 @@
     <version>${revision}</version>
     <packaging>jar</packaging>
     <name>-- AC UI api (spec)</name>
-    <dependencies>
-        <dependency>
-            <groupId>org.cybnity.infrastructure.integration.uis.adapters</groupId>
-            <artifactId>api</artifactId>
-        </dependency>
-    </dependencies>
 </project>

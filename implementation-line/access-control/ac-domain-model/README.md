@@ -75,6 +75,14 @@ Several components of specification or implementation are supporting the domain 
 ## STRUCTURE MODELS
 Several sub-packages are implemented according to the specialization of sub-domains.
 
+### AC DOMAIN
+The package `org.cybnity.accesscontrol.domain.model` provide common components regarding the access control domain.
+
+| Class Type | Motivation                                                                                                                                                                                                                                                                                                                                                                                                               |
+|:-----------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <<Tenant>> | Represent an organization subscription that allow to define a scope of multi-tenant application regarding a named organization which facilitates the users and organization's systems registrations.<br>NOTE: this high-level object is provided by the CYBNITY framework domain by default from `org.cybnity.framework.domain.model` package. So reused class type is not over-specified into the Access Control domain |
+
+
 ### IAM SUB-PACKAGE
 The package `org.cybnity.accesscontrol.iam.domain.model` provide standard components regarding the access control of any type, as Identity & Access Management (IAM) features and domain objects.
 

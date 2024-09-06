@@ -7,7 +7,7 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
-import org.cybnity.application.accesscontrol.ui.api.event.DomainEventType;
+import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.TenantRegistrationAttributeName;
 import org.cybnity.application.accesscontrol.ui.system.backend.AbstractChannelMessageRouter;
 import org.cybnity.application.accesscontrol.ui.system.backend.routing.CollaborationChannel;
@@ -75,6 +75,7 @@ public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMe
      * @throws UnoperationalStateException When problem of context configuration (e.g missing environment variable defined to join the Users Interactions Space).
      */
     public DomainPublicAPIMessagesContentBasedRouter() throws UnoperationalStateException {
+        super();
         try {
             // Prepare client configured for interactions with the UIS
             // according to the defined environment variables (autonomous connection from worker to UIS)

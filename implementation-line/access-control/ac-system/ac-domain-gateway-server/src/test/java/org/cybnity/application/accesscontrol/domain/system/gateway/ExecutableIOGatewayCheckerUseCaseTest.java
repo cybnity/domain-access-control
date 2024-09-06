@@ -1,10 +1,12 @@
 package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import io.vertx.core.Vertx;
+import io.vertx.junit5.VertxExtension;
 import org.cybnity.framework.IReadableConfiguration;
 import org.cybnity.framework.application.vertx.common.AppConfigurationVariable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -18,8 +20,16 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author olivier
  */
+@ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableIOGatewayCheckerUseCaseTest extends ContextualizedTest {
+public class ExecutableIOGatewayCheckerUseCaseTest extends CustomContextualizedTest {
+
+    /**
+     * Default constructor.
+     */
+    public ExecutableIOGatewayCheckerUseCaseTest() {
+        super(false, false, false, false, /* With snapshots management capability activated */ false);
+    }
 
     /**
      * Test that a gateway checker which is executed and that require some specific
@@ -76,9 +86,8 @@ public class ExecutableIOGatewayCheckerUseCaseTest extends ContextualizedTest {
         Vertx vertx = Vertx.vertx();
 
         // Try backend module (Verticle deployment) start
-        vertx.deployVerticle(new AccessControlDomainIOGateway())
-                .onComplete(res -> {
-                    assertFalse(res.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
-                });
+        vertx.deployVerticle(new AccessControlDomainIOGateway()).onComplete(handler -> {
+            assertFalse(handler.succeeded(), "Start shall have been not executed for cause of undefined environment variable!");
+        });
     }
 }
