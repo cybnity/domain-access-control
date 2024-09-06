@@ -89,7 +89,6 @@ public class DynamicRecipientsSyncUseCaseTestManual extends CustomContextualized
         gatewayModule = new Thread(() -> {
             // Start domain IO Gateway
             vertx.deployVerticle(AccessControlDomainIOGateway.class.getName()).onSuccess(id -> {
-                gatewayModuleId = id;
                 logger.fine("Domain IO Gateway is started without recipient lists defined");
                 waiter.countDown(); // Confirm finalized preparation
             });
