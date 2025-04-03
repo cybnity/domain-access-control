@@ -20,3 +20,5 @@ buildNumber.properties
 .flattened-pom.xml
 implementation-line/.flattened-pom.xml
 implementation-line/.flattened-pom.xml
+implementation-line/access-control/ac-adapter/ac-adapter-api/api.iml
+implementation-line/access-control/ac-ui/ac-ui-system/ac-backend-server/backend-server.iml
