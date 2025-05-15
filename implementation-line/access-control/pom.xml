@@ -183,6 +183,12 @@
 								<name>cybnity/${module.system.image.name}</name>
 								<alias>${module.system.image.name}</alias>
 								<build>
+									<!-- Definition of targeted platform supported by image to build (e.g built of Linux based image from a Mac server ) -->
+									<buildx>
+										<platforms>
+											<platform>${docker.platforms}</platform>
+										</platforms>
+									</buildx>
 									<!-- The CYBNITY JRE container standard base image (Trusted Execution Environment) extended -->
 									<from>${docker.java.tee.image.name}</from>
 									<maintainer>CYBNITY Core Team</maintainer>
