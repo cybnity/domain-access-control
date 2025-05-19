@@ -136,6 +136,9 @@
 				<docker.useColor>true</docker.useColor>
 				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
 				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
+
+				<!-- Docker platform supported for build of Docker images (e.g linux/amd64 on x86 CPU; or linux/arm64 on Mac M4 CPU) -->
+				<docker.platforms>linux/amd64,linux/arm64</docker.platforms>
 			</properties>
 		</profile>
 
@@ -159,6 +162,9 @@
 				<docker.useColor>true</docker.useColor>
 				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
 				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
+
+				<!-- Docker platform supported for build of Docker images (e.g linux/amd64 on x86 CPU; or linux/arm64 on Mac M4 CPU) -->
+				<docker.platforms></docker.platforms>
 			</properties>
 		</profile>
 
@@ -210,6 +216,9 @@
 				<docker.imagePullPolicy>IfNotPresent</docker.imagePullPolicy>
 				<docker.useColor>true</docker.useColor>
 				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
+
+				<!-- Docker platform supported for build of Docker images (e.g linux/amd64 on x86 CPU; or linux/arm64 on Mac M4 CPU) -->
+				<docker.platforms></docker.platforms>
 			</properties>
 			<build>
 				<plugins>
@@ -247,6 +256,9 @@
 				<docker.imagePullPolicy>IfNotPresent</docker.imagePullPolicy>
 				<docker.useColor>true</docker.useColor>
 				<docker.images.tag.suffix>-alpha</docker.images.tag.suffix>
+
+				<!-- Docker platform supported for build of Docker images (e.g linux/amd64 on x86 CPU; or linux/arm64 on Mac M4 CPU) -->
+				<docker.platforms></docker.platforms>
 			</properties>
 			<build>
 				<plugins>
@@ -325,6 +337,9 @@
 				<docker.imagePullPolicy>IfNotPresent</docker.imagePullPolicy>
 				<docker.useColor>true</docker.useColor>
 				<docker.images.tag.suffix>-beta</docker.images.tag.suffix>
+
+				<!-- Docker platform supported for build of Docker images (e.g linux/amd64 on x86 CPU; or linux/arm64 on Mac M4 CPU) -->
+				<docker.platforms></docker.platforms>
 			</properties>
 			<build>
 				<plugins>
