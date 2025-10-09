@@ -2,7 +2,7 @@
 Presentation of the minimum configuration actions to implement into a started Keycloak instance (provided as access-control-sso-system module hosted into a Kubernetes cluster).
 
 # PREREQUISITE
-- A Keycloack server instance is running (started via Helm chart into a K8s cluster), supported by a Postgresql service (storage of user accounts)
+- A Keycloak server instance is running (started via Helm chart into a K8s cluster), supported by a Postgresql service (storage of user accounts)
 - An admin account is automatically created and ready for use (authentication ready from user=admin and password=admin) as defined in Helm project settings
 - The Keycloak http access is forwarded from external of Cluster via an active Linux process ('kubectl port-forward --namespace default svc/access-control-sso-system 8080:81' shell command executed)
 - The Keycloak web application instance is accessible from web browser at http://127.0.01:8080/ via account:
@@ -10,7 +10,7 @@ Presentation of the minimum configuration actions to implement into a started Ke
     - password = admin
 
 # INTEGRATION WITH FRONTEND UI
-Manage several tasks from the accessed Keycloak's adminisation console.
+Manage several tasks from the accessed Keycloak's administration console.
 
 ## REALM REGISTRATION
 Create a Realm similar to a TenantId relative to an organization (e.g named cybnity) from the top-left select menu with click on `Create Realm` button and switch on the new created real area.
