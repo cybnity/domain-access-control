@@ -5,7 +5,6 @@ on:
   push:
     # execution when ...
     branches:
-      - 'feature*'
       - 'main'
       - 'integration'
       - 'staging'
