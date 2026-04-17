@@ -52,7 +52,7 @@ jobs:
         run: |
           echo "AWS credentials and project variables read"
           echo "BRANCH_NAME=$CI_REF_NAME" >> $GITHUB_ENV
-          echo "REPO=$CI_REPOSITORY" >> $GITHUB_ENV
+          echo "REPO=$CI_REPOSITORY_NAME" >> $GITHUB_ENV
           aws sts get-caller-identity
 
       # See doc at https://github.com/fredydlemus/s3-backup
