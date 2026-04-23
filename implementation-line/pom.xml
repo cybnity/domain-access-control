@@ -26,7 +26,7 @@
 		<docker.nodejs.image.name>node:16.17.0-bullseye</docker.nodejs.image.name>
 
 		<!-- Docker platform supported for build of Docker images (e.g linux/amd64 on x86 CPU; or linux/arm64 on Mac M4 CPU) -->
-		<docker.platforms>linux/amd64,linux/arm64</docker.platforms>
+		<docker.platforms>linux/amd64,linux/arm64,linux/arm64v8</docker.platforms>
 	</properties>
 
 	<modules>
@@ -110,14 +110,23 @@
         </dependency>
 	</dependencies>
 
-	<build>
+	<reporting>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.6</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<!-- select reports -->
+							<report>index</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 		</plugins>
-	</build>
+	</reporting>
 
 	<profiles>
 		<profile>
@@ -138,7 +147,7 @@
 				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
 
 				<!-- Docker platform supported for build of Docker images (e.g linux/amd64 on x86 CPU; or linux/arm64 on Mac M4 CPU) -->
-				<docker.platforms>linux/amd64,linux/arm64</docker.platforms>
+				<docker.platforms>linux/amd64,linux/arm64,linux/arm64v8</docker.platforms>
 			</properties>
 		</profile>
 
@@ -164,7 +173,7 @@
 				<docker.images.healtcheck.port>8080</docker.images.healtcheck.port>
 
 				<!-- Docker platform supported for build of Docker images (e.g linux/amd64 on x86 CPU; or linux/arm64 on Mac M4 CPU) -->
-				<docker.platforms></docker.platforms>
+				<docker.platforms>linux/amd64,linux/arm64,linux/arm64v8</docker.platforms>
 			</properties>
 		</profile>
 
