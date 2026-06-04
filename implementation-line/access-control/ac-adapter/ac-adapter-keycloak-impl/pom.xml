@@ -22,6 +22,12 @@
 			<groupId>org.cybnity.application.access-control.translator</groupId>
 			<artifactId>keycloak</artifactId>
 		</dependency>
+		<dependency>
+			<!-- Keycloak authorization client -->
+			<!-- See https://www.keycloak.org/securing-apps/authz-client documentation -->
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-authz-client</artifactId>
+		</dependency>
 
 		<!-- Test cycle dependencies -->
 		<dependency>

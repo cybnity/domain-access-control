@@ -41,7 +41,10 @@ public class ExecutableAdminAdapterChecker extends ExecutableComponentChecker {
         Set<IReadableConfiguration> required = new HashSet<>();
 
         // - required
-        //required.add(ConfigurationVariable.JANUSGRAPH_STORAGE_BACKEND);
+
+        // For Keycloak Admin REST API client instantiation
+        // TODO Keycloak http url including server port, administration account login and password
+        required.add(AdminConfigurationVariable.REALM_MASTER_NAME);
 
         return required;
     }

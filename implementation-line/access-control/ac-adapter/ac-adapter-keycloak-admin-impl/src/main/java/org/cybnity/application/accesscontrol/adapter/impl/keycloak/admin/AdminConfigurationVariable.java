@@ -17,7 +17,10 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_8370_CM6")
 public enum AdminConfigurationVariable implements IReadableConfiguration {
 
-    ;
+    /**
+     * Name of Keycloak default master realm (e.g defined by default into the Keycloak server coonfiguration for server administration) allowing administration of extended realms.
+     */
+    REALM_MASTER_NAME("REALM_MASTER_NAME");
 
     /**
      * Name of this environment variable currently hosted by the system environment.
@@ -33,7 +36,7 @@ public enum AdminConfigurationVariable implements IReadableConfiguration {
      *              container or operating system).
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
-    private AdminConfigurationVariable(String aName) throws IllegalArgumentException {
+    AdminConfigurationVariable(String aName) throws IllegalArgumentException {
         if (aName == null || "".equalsIgnoreCase(aName))
             throw new IllegalArgumentException("The name of this variable shall be defined!");
         this.name = aName;

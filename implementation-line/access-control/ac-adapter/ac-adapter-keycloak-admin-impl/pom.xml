@@ -22,6 +22,20 @@
 			<!-- Common Keycloak usage implementation components -->
 			<groupId>org.cybnity.application.access-control.adapters</groupId>
 			<artifactId>keycloak-impl</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<!-- Keycloak Admin REST client -->
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-admin-client</artifactId>
+			<version>26.0.9</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<!-- Keycloak authorization client -->
+			<!-- See https://www.keycloak.org/securing-apps/authz-client documentation -->
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-authz-client</artifactId>
 		</dependency>
 
 		<!-- Test cycle dependencies -->

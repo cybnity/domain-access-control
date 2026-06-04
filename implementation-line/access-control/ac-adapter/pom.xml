@@ -17,4 +17,21 @@
 		<module>ac-adapter-keycloak-impl</module>
 		<module>ac-adapter-keycloak-admin-impl</module>
 	</modules>
+
+	<properties>
+		<keycloak.authz-client.version>26.0.9</keycloak.authz-client.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- Keycloak authorization client -->
+				<!-- See https://www.keycloak.org/securing-apps/authz-client documentation -->
+				<groupId>org.keycloak</groupId>
+				<artifactId>keycloak-authz-client</artifactId>
+				<version>${keycloak.authz-client.version}</version>
+				<scope>compile</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
