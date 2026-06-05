@@ -62,11 +62,4 @@ public class SSOAdminAdapterKeycloakImpl implements ISSOAdminAdapter {
         healthyChecker.checkOperableState();
     }
 
-    @Override
-    public Tenant createTenant(String tenantLabel) throws IllegalArgumentException {
-        if (tenantLabel == null || tenantLabel.isEmpty()) throw new IllegalArgumentException("Tenant label parameter is required!");
-        // TODO create Keycloak realm instance over keycloak-authz-client connector
-        // https://www.keycloak.org/securing-apps/authz-client documentation
-        throw new IllegalArgumentException("to implement!");
-    }
 }

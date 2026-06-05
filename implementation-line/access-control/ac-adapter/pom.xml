@@ -14,6 +14,7 @@
 	<modules>
 		<module>ac-adapter-api</module>
 		<module>ac-adapter-admin-api</module>
+		<module>keycloak-domain-ontology-impl</module>
 		<module>ac-adapter-keycloak-impl</module>
 		<module>ac-adapter-keycloak-admin-impl</module>
 	</modules>

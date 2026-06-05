@@ -1,8 +1,10 @@
 package org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin;
 
 import org.cybnity.application.accesscontrol.adapter.api.admin.IAccessAdminAdapter;
+import org.cybnity.application.accesscontrol.adapter.api.admin.OperationException;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
+import org.cybnity.framework.domain.model.Tenant;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.ServerInfoResource;
@@ -118,5 +120,36 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
                 .password("admin")
                 .build();
         return keycloakAdminClient;
+    }
+
+    @Override
+    public Tenant createTenant(String tenantLabel) throws IllegalArgumentException, OperationException {
+        if (tenantLabel == null || tenantLabel.isEmpty())
+            throw new IllegalArgumentException("Tenant label parameter is required!");
+        // TODO Creation of tenant to code
+
+        // Create Keycloak realm instance over keycloak-authz-client connector
+        // https://www.keycloak.org/securing-apps/authz-client documentation
+        throw new OperationException("to implement!");
+    }
+
+    @Override
+    public boolean deleteTenant(String tenantLabel, boolean force) {
+        // TODO deletion of tenant to code
+
+        // Check tenantLabel defined and requiring treatment
+        if (tenantLabel == null || tenantLabel.isEmpty())
+            return false; // Return false because null or empty label is non conformity call
+
+        // Search existing Keycloak realm with same name
+        // When not found realm with same label, confirme deletion as effective (=current state of unexisting realm with same name)
+
+        // When realm found, check if important dependent sub-data are existing (e.g; user accounts)
+        // If none important sub-data found: delete the realm instance and confirm executed deletion
+
+        // If forcing required: delete the realm including all any sub-informations
+        // If forcing not required: don't execute deletion and confirm not executed for cause of existing important sub-data
+
+        return false;
     }
 }

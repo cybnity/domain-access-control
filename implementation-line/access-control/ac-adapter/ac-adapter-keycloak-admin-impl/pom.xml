@@ -31,13 +31,6 @@
 			<version>26.0.9</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<!-- Keycloak authorization client -->
-			<!-- See https://www.keycloak.org/securing-apps/authz-client documentation -->
-			<groupId>org.keycloak</groupId>
-			<artifactId>keycloak-authz-client</artifactId>
-		</dependency>
-
 		<!-- Test cycle dependencies -->
 		<dependency>
 			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" NOTIFICATION on Mac -->

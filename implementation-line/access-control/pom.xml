@@ -48,6 +48,12 @@
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.cybnity.application.access-control.adapters</groupId>
+				<artifactId>keycloak-domain-ontology-impl</artifactId>
+				<version>${revision}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.cybnity.application.access-control.translator</groupId>
 				<artifactId>keycloak</artifactId>
 				<version>${revision}</version>
