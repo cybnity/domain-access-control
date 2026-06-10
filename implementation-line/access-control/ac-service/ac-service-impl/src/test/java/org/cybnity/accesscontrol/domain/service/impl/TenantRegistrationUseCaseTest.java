@@ -57,7 +57,6 @@ public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
-        initServerClientsEnvironmentVariables();
         // Create a store managing streamed messages
         tenantsStore = getTenantPersistenceOrientedStore();
 
@@ -79,6 +78,7 @@ public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
     public void clean() {
         if (tenantsRepository != null) tenantsRepository.freeUpResources();
         if (tenantsStore != null) tenantsStore.freeUpResources();
+        // TODO add eventual Keycloak stop action
     }
 
     /**
