@@ -53,6 +53,7 @@ public class TenantRegistrationRejectionUseCaseTest extends CustomContextualized
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
+        initServerClientsEnvironmentVariables();
         // Create a store managing streamed messages
         tenantsStore = getTenantPersistenceOrientedStore();
 

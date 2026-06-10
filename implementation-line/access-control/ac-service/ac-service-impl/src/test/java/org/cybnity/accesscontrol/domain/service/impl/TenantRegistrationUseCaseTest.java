@@ -50,23 +50,28 @@ public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
      * Default constructor.
      */
     public TenantRegistrationUseCaseTest() {
-        super(true, true, true, false, true);
+
+        super(true, true, true, true, true);
+
     }
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
+        initServerClientsEnvironmentVariables();
         // Create a store managing streamed messages
         tenantsStore = getTenantPersistenceOrientedStore();
 
         this.tenantsRepository = TenantTransactionCollectionsRepository.instance(context(), tenantsStore);
         this.serviceName = "TenantRegistrationService";
         this.featureTenantsChangesNotificationChannel = new Channel(UICapabilityChannel.access_control_tenants_changes.shortName());
+
         this.client = new UISAdapterRedisImpl(context());
         ISSOAdminAdapter ssoClient = new SSOAdminAdapterKeycloakImpl(context());
         this.mapperFactory = new ACDomainMessageMapperFactory();
         this.tenantRegistrationService = new TenantRegistration(context(), TenantsWriteModelImpl.instance(tenantsStore), tenantsRepository, serviceName, featureTenantsChangesNotificationChannel, this.client, ssoClient);
 
         // Check started keycloak instance and accessible admin api
+        // TODO code to implement regarding requirement configuration for keycloak instance start
         Assertions.assertNotNull(this.getKeycloak(), "shall have been started as defined in constructor super() call!");
     }
 
