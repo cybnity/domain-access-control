@@ -44,7 +44,7 @@ public class ExecutableAdminAdapterChecker extends ExecutableComponentChecker {
 
         // For Keycloak Admin REST API client instantiation
         // TODO Keycloak http url including server port, administration account login and password
-        required.add(AdminConfigurationVariable.REALM_MASTER_NAME);
+        //required.add(AdminConfigurationVariable.REALM_MASTER_NAME);
 
         return required;
     }
