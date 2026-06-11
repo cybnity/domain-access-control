@@ -130,15 +130,16 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
             throw new IllegalArgumentException("Tenant label parameter is required!");
         // Create Keycloak realm instance over keycloak-authz-client connector
         // https://www.keycloak.org/securing-apps/authz-client documentation
+
         // TODO Creation of tenant to code into Keycloak over its Admin client
         // TODO create Realm object into Keycloak and get instance state including configuration elements (e.g; potential technical settings allowing its technical identification or usage options to synchronize into Tenant object for CYBNITY domain)
-        Realm instance = new Realm("");
+        Realm.Status currentState = Realm.Status.REALM_DISABLED; // TEMP DATA VALUE
+        String retrievedName = tenantLabel;// TEMP TEST VALUE
+        Realm instance = new Realm(retrievedName, currentState);
 
         // Transform created Realm instance (Keycloak ontology based) into CYBNITY Access Control DTO (including eventual configuration elements state)
         RealmMapper mapper = new KeycloakMapperFactory().createRealmMapper();
-        TenantDTO dto = mapper.toDTO(instance);
-
-        throw new OperationException("to implement!");
+        return mapper.toDTO(instance);
     }
 
     @Override

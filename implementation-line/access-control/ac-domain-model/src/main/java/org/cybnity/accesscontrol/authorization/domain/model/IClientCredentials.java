@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Represent type of authorization usable only when client is equals to resource
  * owner (without authorization to obtain from user).
- * 
+ *
  * @author olivier
  *
  */

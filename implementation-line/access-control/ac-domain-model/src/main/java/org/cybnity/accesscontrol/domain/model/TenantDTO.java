@@ -1,7 +1,6 @@
 package org.cybnity.accesscontrol.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.cybnity.framework.domain.SerializedResource;
 import org.cybnity.framework.domain.ValueObject;
 import org.cybnity.framework.immutable.IHistoricalFact;
 import org.cybnity.framework.immutable.IVersionable;
@@ -43,6 +42,11 @@ public class TenantDTO extends ValueObject<Serializable> implements IVersionable
     private String label;
 
     /**
+     * The current status of this tenant.
+     */
+    private Status currentStatus;
+
+    /**
      * Default constructor of empty transport object.
      */
     public TenantDTO() {
@@ -54,22 +58,15 @@ public class TenantDTO extends ValueObject<Serializable> implements IVersionable
     /**
      * Constructor of tenant that is named by a label.
      *
-     * @param label Name of the tenant.
+     * @param label         Name of the tenant.
+     * @param currentStatus Known statue of the tenant.
      */
-    public TenantDTO(String label) {
+    public TenantDTO(String label, Status currentStatus) {
         super();
         // Create immutable time of this dto creation
         this.occurredOn = OffsetDateTime.now();
         this.setLabel(label);
-    }
-
-    /**
-     * Default implementation of dto time when it was created.
-     */
-    @Override
-    public OffsetDateTime occurredAt() {
-        // Return copy of the fact time
-        return OffsetDateTime.parse(this.occurredOn.toString());
+        this.currentStatus = currentStatus;
     }
 
     /**
@@ -83,7 +80,7 @@ public class TenantDTO extends ValueObject<Serializable> implements IVersionable
 
     @Override
     public Serializable immutable() throws ImmutabilityException {
-        return new TenantDTO(this.label);
+        return new TenantDTO(this.label, this.currentStatus);
     }
 
     /**
@@ -103,8 +100,9 @@ public class TenantDTO extends ValueObject<Serializable> implements IVersionable
             ArrayList<String> contributors = new ArrayList<>();
             if (this.label != null && !this.label.isEmpty())
                 contributors.add(this.label); // name of the tenant
-            contributors.add(this.occurredAt().toString()); // Specific time when this DTO created
-            return contributors.toArray(new String[contributors.size()]);
+            contributors.add(this.occurredAt().toString()); // Specific time when this DTO version (a dto instance created at a different moment can be considered as different technically for hashcode)
+            if (this.currentStatus != null) contributors.add(this.currentStatus.toString());
+            return contributors.toArray(new String[0]);
         } catch (Exception ie) {
             // In case of null pointer exception
             return new String[]{};
@@ -127,6 +125,66 @@ public class TenantDTO extends ValueObject<Serializable> implements IVersionable
      */
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    /**
+     * Get the current status of the tenant.
+     *
+     * @return A status or null when unknown.
+     */
+    public Status getCurrentStatus() {
+        return currentStatus;
+    }
+
+    /**
+     * Define the current state of the tenant.
+     *
+     * @param currentStatus A status.
+     */
+    public void setCurrentStatus(Status currentStatus) {
+        this.currentStatus = currentStatus;
+    }
+
+    /**
+     * Get the time about the version of the tenant.
+     *
+     * @return A date equals to the moment when the DTO version of the tenant have been created.
+     */
+    public OffsetDateTime getOccurredOn() {
+        return occurredAt();
+    }
+
+    /**
+     * Define the date when the tenant represented by this DTO is considered as a timed version.
+     *
+     * @param occurredOn A date.
+     */
+    public void setOccurredOn(OffsetDateTime occurredOn) {
+        this.occurredOn = occurredOn;
+    }
+
+    /**
+     * Default implementation of dto time when it was created.
+     */
+    @Override
+    public OffsetDateTime occurredAt() {
+        // Return copy of the fact time
+        return OffsetDateTime.parse(this.occurredOn.toString());
+    }
+
+    /**
+     * State relative to a Tenant lifecycle.
+     */
+    public enum Status {
+        /**
+         * Active state of a tenant which is operational and managed.
+         */
+        TENANT_ENABLED,
+
+        /**
+         * Inactive state of a tenant which is existing but that is not operational (e.g; temporary disabled for maintenance operations and/or security concern).
+         */
+        TENANT_DISABLED;
     }
 
 }

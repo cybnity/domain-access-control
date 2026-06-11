@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Represent type of authorization usable by server-side client application (e.g
  * front UI or backend server module).
- * 
+ *
  * @author olivier
  *
  */

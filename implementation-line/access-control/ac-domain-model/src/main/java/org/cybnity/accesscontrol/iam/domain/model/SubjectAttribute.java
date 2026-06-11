@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Attribute describing a subject who is demanding access (e.g role, group
  * membership, competency, user id, email address...).
- * 
+ *
  * @author olivier
  *
  */
@@ -20,13 +20,13 @@ public abstract class SubjectAttribute {
 
     /**
      * Default constructor based on a scope.
-     * 
+     *
      * @param scope Mandatory scope of this subject description criteria.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      */
     public SubjectAttribute(IScopeAttribute scope) throws IllegalArgumentException {
-	if (scope == null)
-	    throw new IllegalArgumentException("Mandatory scope parameter shall be defined!");
-	this.scope = scope;
+        if (scope == null)
+            throw new IllegalArgumentException("Mandatory scope parameter shall be defined!");
+        this.scope = scope;
     }
 }

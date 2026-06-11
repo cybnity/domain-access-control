@@ -26,17 +26,26 @@ public class RealmMapper implements KeycloakOntologyMapper {
     /**
      * Translate a Realm object including all its contents, into a TenantDTO version
      *
-     * @param realm
-     * @return
-     * @throws IllegalArgumentException
+     * @param realm Mandatory object to transform.
+     * @return Translated version of the original object.
+     * @throws IllegalArgumentException When any mandatory parameter is missing.
      */
     public TenantDTO toDTO(Realm realm) throws IllegalArgumentException {
-// TODO to implement
+        if (realm == null) throw new IllegalArgumentException("Realm is required!");
+
+        // TODO to implement about each existing attributes to feed into the target instance
         return null;
     }
 
-    public Realm toDomain(TenantDTO dto) {
-// TODO to implement
+    /**
+     *
+     * @param dto Mandatory object to transform.
+     * @return Translated version of the original object.
+     * @throws IllegalArgumentException When any mandatory parameter is missing.
+     */
+    public Realm toDomain(TenantDTO dto) throws IllegalArgumentException {
+        if (dto == null) throw new IllegalArgumentException("Tenant is required!");
+        // TODO to implement about each existing attributes to feed into the target instance
         return null;
 
     }

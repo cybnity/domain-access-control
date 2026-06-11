@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Represent a policy strategy type usable for a system control (e.g basic
  * network module). Is ideal for least privilege and need to know approach.
- * 
+ *
  * @author olivier
  *
  */

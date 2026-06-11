@@ -5,7 +5,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Provider of policies regarding protectable resources.
- * 
+ *
  * @author olivier
  *
  */

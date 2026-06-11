@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Common attribute related to the current time and location from where access
  * is requested, type of communication channel, or client type.
- * 
+ *
  * @author olivier
  *
  */

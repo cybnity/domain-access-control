@@ -5,7 +5,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Represents an OIDC authorization
- * 
+ *
  * @author olivier
  *
  */

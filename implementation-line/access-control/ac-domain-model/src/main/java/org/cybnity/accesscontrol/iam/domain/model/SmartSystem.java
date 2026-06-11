@@ -40,12 +40,6 @@ public class SmartSystem extends SocialEntity {
             .composeCanonicalVersionHash(SmartSystem.class).hashCode();
 
     /**
-     * Attribute type managed via command event allowing change of this aggregate, and/or allowing notification of information changed via a promoted event type.
-     */
-    public enum Attribute implements IAttribute {
-    }
-
-    /**
      * Default constructor.
      * During the construction, a SMART_SYSTEM_CREATED domain event is automatically added to the lifecycle changes history container.
      *
@@ -144,6 +138,15 @@ public class SmartSystem extends SocialEntity {
     }
 
     /**
+     * Get the serial version UID of this class type.
+     *
+     * @return A serial version UID.
+     */
+    public static long serialVersionUID() {
+        return serialVersionUID;
+    }
+
+    /**
      * Specific and redefined implementation of change re-hydration.
      *
      * @param change Mandatory change to apply on subject according to the change type (e.g attribute add, upgrade, delete operation).
@@ -167,14 +170,6 @@ public class SmartSystem extends SocialEntity {
         return String.valueOf(serialVersionUID);
     }
 
-    /**
-     * Get the serial version UID of this class type.
-     * @return A serial version UID.
-     */
-    public static long serialVersionUID() {
-        return serialVersionUID;
-    }
-
     @Override
     public Serializable immutable() throws ImmutabilityException {
         LinkedHashSet<Identifier> ids = new LinkedHashSet<>(this.identifiers());
@@ -190,5 +185,11 @@ public class SmartSystem extends SocialEntity {
     @Override
     public Set<String> handledCommandTypeVersions() {
         return new LinkedHashSet<>(); // None type of Command is currently handled by this object
+    }
+
+    /**
+     * Attribute type managed via command event allowing change of this aggregate, and/or allowing notification of information changed via a promoted event type.
+     */
+    public enum Attribute implements IAttribute {
     }
 }

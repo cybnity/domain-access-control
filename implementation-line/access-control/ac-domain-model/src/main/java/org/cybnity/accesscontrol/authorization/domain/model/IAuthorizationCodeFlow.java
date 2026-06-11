@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Represent an OIDC algorithm type for mobile application, web app, backend
  * token API used, and including 2 steps of realization.
- * 
+ *
  * @author olivier
  *
  */

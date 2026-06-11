@@ -7,7 +7,7 @@ import java.util.Collection;
 
 /**
  * Represents an OAuth2 JWT Token as exchange format.
- * 
+ *
  * @author olivier
  *
  */
@@ -18,33 +18,33 @@ public class JWTToken {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param token Optional original token.
      */
     public JWTToken(IDToken token) {
-	this.token = token;
+        this.token = token;
     }
 
     /**
      * Get the user claims which is owner of this token.
-     * 
+     *
      * @return Claims or null.
      */
     public Collection<IClaim> userClaims() {
-	if (this.token != null)
-	    return this.token.userClaims();
-	return null;
+        if (this.token != null)
+            return this.token.userClaims();
+        return null;
     }
 
     /**
      * Get the user habiliations allowed to the owner of this token.
-     * 
+     *
      * @return Current allowed accreditations or null.
      */
     public Collection<IAccreditation> userHabilitations() {
-	if (this.token != null)
-	    return this.token.userHabilitations();
-	return null;
+        if (this.token != null)
+            return this.token.userHabilitations();
+        return null;
     }
 
 }

@@ -5,7 +5,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Represents a refresh token of an access token.
- * 
+ *
  * @author olivier
  *
  */

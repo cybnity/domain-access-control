@@ -5,7 +5,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Represent a policy strategy type applicable during a defined time period.
- * 
+ *
  * @author olivier
  *
  */

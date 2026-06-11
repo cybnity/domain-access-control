@@ -15,37 +15,53 @@ public class Realm {
     /**
      * Label without any space.
      */
-    private String name;
+    private final String name;
+
+    /**
+     * The current status of this realm.
+     */
+    private final Status currentStatus;
 
     /**
      * Default constructor that apply formatting to ensure that label respect the formatting rules.
      *
-     * @param aName Mandatory label.
+     * @param aName         Mandatory label.
+     * @param currentStatus Optional known operational status of the realm.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public Realm(String aName)
+    public Realm(String aName, Status currentStatus)
             throws IllegalArgumentException {
-        this.name = conformityFormat(aName);// Set label reformatted
+        this.name = applyKeycloakRealmLabelFormatRequirements(aName);// Set label reformatted
+        this.currentStatus = currentStatus;
     }
 
     /**
-     * Apply rule of reformat on a label.
-     * Remove any space or special character.
+     * Apply rules of formatting on a label as required by Keycloak domain.
+     * (e.g.; remove any space or special character to be usable into an URL path).
      *
      * @param label Mandatory label to reformat.
      * @return The reformatted label.
      * @throws IllegalArgumentException When parameter is missing, null, or empty.
      */
-    public String conformityFormat(String label) throws IllegalArgumentException {
+    public String applyKeycloakRealmLabelFormatRequirements(String label) throws IllegalArgumentException {
         if (label == null || label.isEmpty())
             throw new IllegalArgumentException("The name parameter is required!");
 
         // Remove any existing space
         return label.trim();
 
-        // Remove any special character
+        // Remove any potential special character
         // TODO implement a regex to remove any special character potentially included into the label
 
+    }
+
+    /**
+     * Get the current status of this realm.
+     *
+     * @return A status or null when unknown.
+     */
+    public Status currentStatus() {
+        return currentStatus;
     }
 
     /**
@@ -55,6 +71,21 @@ public class Realm {
      */
     public String name() {
         return name;
+    }
+
+    /**
+     * State relative to a realm lifecycle.
+     */
+    public enum Status {
+        /**
+         * Active state of a realm which is operational and managed by Keycloak.
+         */
+        REALM_ENABLED,
+
+        /**
+         * Inactive state of a realm which is existing in Keycloak but that is not operational (e.g; temporary disabled for maintenance operations and/or security concern).
+         */
+        REALM_DISABLED;
     }
 
 }

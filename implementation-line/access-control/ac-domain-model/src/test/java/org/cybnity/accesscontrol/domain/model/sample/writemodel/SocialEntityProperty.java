@@ -24,15 +24,6 @@ public class SocialEntityProperty extends MutableProperty {
     private static final long serialVersionUID = 1L;
     private OffsetDateTime versionedAt;
 
-    /**
-     * Keys set regarding the multiple attribute defining this complex
-     * social entity, and that each change need to be versioned/treated as a single
-     * atomic fact.
-     */
-    public enum PropertyAttributeKey {
-        Name, LocationCity, LocationCountry
-    }
-
     public SocialEntityProperty(Entity propertyOwner, HashMap<String, Object> propertyCurrentValue, HistoryState status)
             throws IllegalArgumentException {
         super(propertyOwner, propertyCurrentValue, status);
@@ -97,5 +88,14 @@ public class SocialEntityProperty extends MutableProperty {
     @Override
     public String versionHash() {
         return new VersionConcreteStrategy().composeCanonicalVersionHash(getClass());
+    }
+
+    /**
+     * Keys set regarding the multiple attribute defining this complex
+     * social entity, and that each change need to be versioned/treated as a single
+     * atomic fact.
+     */
+    public enum PropertyAttributeKey {
+        Name, LocationCity, LocationCountry
     }
 }

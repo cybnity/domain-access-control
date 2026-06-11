@@ -40,44 +40,17 @@ import java.util.logging.Level;
 public class Account extends Aggregate {
 
     /**
+     * Version of this class
+     */
+    private static final long serialVersionUID = new VersionConcreteStrategy().composeCanonicalVersionHash(Account.class).hashCode();
+    /**
      * Owner entity (identifier) of this account.
      */
     private EntityReference owner;
-
     /**
      * Tenant entity (identifier) where this account can be used.
      */
     private EntityReference tenant;
-
-    /**
-     * Version of this class
-     */
-    private static final long serialVersionUID = new VersionConcreteStrategy().composeCanonicalVersionHash(Account.class).hashCode();
-
-    /**
-     * Attribute type managed via command event allowing change of this aggregate, and/or allowing notification of information changed via a promoted event type.
-     */
-    public enum Attribute implements IAttribute {
-        /**
-         * Identifier of the account owner reference.
-         */
-        OWNER_REFERENCE_ID,
-
-        /**
-         * Type of identifier that is supported as account owner reference.
-         */
-        OWNER_REFERENCE_IDENTIFIER_NAME,
-
-        /**
-         * Identifier of the tenant reference where this account is usable.
-         */
-        TENANT_REFERENCE_ID,
-
-        /**
-         * Type of identifier that is supported as tenant reference.
-         */
-        TENANT_REFERENCE_IDENTIFIER_NAME,
-    }
 
     /**
      * Default constructor.
@@ -213,6 +186,15 @@ public class Account extends Aggregate {
         }
 
         throw new IllegalArgumentException("Impossible re-hydration of account instance from changes history!");
+    }
+
+    /**
+     * Get the serial version UID of this class type.
+     *
+     * @return A serial version UID.
+     */
+    public static long serialVersionUID() {
+        return serialVersionUID;
     }
 
     /**
@@ -389,10 +371,27 @@ public class Account extends Aggregate {
     }
 
     /**
-     * Get the serial version UID of this class type.
-     * @return A serial version UID.
+     * Attribute type managed via command event allowing change of this aggregate, and/or allowing notification of information changed via a promoted event type.
      */
-    public static long serialVersionUID() {
-        return serialVersionUID;
+    public enum Attribute implements IAttribute {
+        /**
+         * Identifier of the account owner reference.
+         */
+        OWNER_REFERENCE_ID,
+
+        /**
+         * Type of identifier that is supported as account owner reference.
+         */
+        OWNER_REFERENCE_IDENTIFIER_NAME,
+
+        /**
+         * Identifier of the tenant reference where this account is usable.
+         */
+        TENANT_REFERENCE_ID,
+
+        /**
+         * Type of identifier that is supported as tenant reference.
+         */
+        TENANT_REFERENCE_IDENTIFIER_NAME,
     }
 }

@@ -5,7 +5,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Attribute that represent a scope of authorization.
- * 
+ *
  * @author olivier
  *
  */
@@ -14,7 +14,7 @@ public interface IScopeAttribute {
 
     /**
      * Get the logical name of this scope.
-     * 
+     *
      * @return A name.
      */
     String name();

@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Combination of attributes describing what user want to perform (e.g read,
  * write, any action type regarding a resource).
- * 
+ *
  * @author olivier
  *
  */

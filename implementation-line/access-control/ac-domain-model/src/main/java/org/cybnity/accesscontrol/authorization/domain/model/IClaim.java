@@ -5,7 +5,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * User claim.
- * 
+ *
  * @author olivier
  *
  */
