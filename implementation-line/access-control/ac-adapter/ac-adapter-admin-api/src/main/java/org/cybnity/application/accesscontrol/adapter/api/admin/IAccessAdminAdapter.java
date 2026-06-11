@@ -1,8 +1,8 @@
 package org.cybnity.application.accesscontrol.adapter.api.admin;
 
+import org.cybnity.accesscontrol.domain.model.TenantDTO;
 import org.cybnity.framework.domain.ICleanup;
 import org.cybnity.framework.domain.IHealthControl;
-import org.cybnity.framework.domain.model.Tenant;
 
 /**
  * Contract relative to access capabilities administration (e.g setting of system's client scopes, access control configuration supervision).
@@ -17,7 +17,7 @@ public interface IAccessAdminAdapter extends ICleanup, IHealthControl {
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      * @throws OperationException       When the requested creation operation occurred a logical or technical problem.
      */
-    public Tenant createTenant(String tenantLabel) throws IllegalArgumentException, OperationException;
+    public TenantDTO createTenant(String tenantLabel) throws IllegalArgumentException, OperationException;
 
     /**
      * Delete a tenant and all its configuration data.

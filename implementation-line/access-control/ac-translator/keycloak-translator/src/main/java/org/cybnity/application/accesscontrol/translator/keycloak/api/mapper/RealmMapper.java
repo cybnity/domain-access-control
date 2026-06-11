@@ -6,9 +6,31 @@ import org.cybnity.keycloak.domain.model.Realm;
 /**
  * Utility class ensuring the mapping of data relative to a Keycloak Realm object structure (keycloak domain ontology based) with a Tenant object structure (Access Control domain ontology base).
  */
-public class RealmMapper {
+public class RealmMapper implements KeycloakOntologyMapper {
 
-    public TenantDTO toDTO(Realm realm) {
+    /**
+     * Default constructor of mapper relative to Keycloak Realm objects.
+     * Reserved constructor to only concrete factory of mappers.
+     */
+    RealmMapper() {
+    }
+
+    /**
+     * Prepare eventual settings required by the mapper before usage of its transformation methods.
+     */
+    @Override
+    public void prepare() {
+        // Define eventual settings required by transformation methods
+    }
+
+    /**
+     * Translate a Realm object including all its contents, into a TenantDTO version
+     *
+     * @param realm
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public TenantDTO toDTO(Realm realm) throws IllegalArgumentException {
 // TODO to implement
         return null;
     }
@@ -18,4 +40,5 @@ public class RealmMapper {
         return null;
 
     }
+
 }

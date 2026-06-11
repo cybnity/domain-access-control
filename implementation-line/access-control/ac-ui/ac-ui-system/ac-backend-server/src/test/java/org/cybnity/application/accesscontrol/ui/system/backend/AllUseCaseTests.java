@@ -10,6 +10,6 @@ import org.junit.platform.suite.api.Suite;
  * @author olivier
  */
 @Suite
-@SelectClasses({ExecutableBackendCheckerUseCaseTest.class, PublicTenantRegistrationUseCaseTest.class})
+@SelectClasses({ExecutableBackendCheckerUseCaseIntegrationTest.class, PublicTenantRegistrationUseCaseIntegrationTest.class})
 public class AllUseCaseTests {
 }

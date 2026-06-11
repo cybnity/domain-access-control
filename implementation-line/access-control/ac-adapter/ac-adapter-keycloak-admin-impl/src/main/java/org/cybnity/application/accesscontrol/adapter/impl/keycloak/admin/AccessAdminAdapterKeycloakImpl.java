@@ -1,13 +1,15 @@
 package org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin;
 
+import org.cybnity.accesscontrol.domain.model.TenantDTO;
 import org.cybnity.application.accesscontrol.adapter.api.admin.IAccessAdminAdapter;
 import org.cybnity.application.accesscontrol.adapter.api.admin.OperationException;
+import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.KeycloakMapperFactory;
+import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.RealmMapper;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
-import org.cybnity.framework.domain.model.Tenant;
+import org.cybnity.keycloak.domain.model.Realm;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
-import org.keycloak.admin.client.resource.ServerInfoResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.RealmRepresentation;
 
@@ -123,13 +125,19 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
     }
 
     @Override
-    public Tenant createTenant(String tenantLabel) throws IllegalArgumentException, OperationException {
+    public TenantDTO createTenant(String tenantLabel) throws IllegalArgumentException, OperationException {
         if (tenantLabel == null || tenantLabel.isEmpty())
             throw new IllegalArgumentException("Tenant label parameter is required!");
-        // TODO Creation of tenant to code
-
         // Create Keycloak realm instance over keycloak-authz-client connector
         // https://www.keycloak.org/securing-apps/authz-client documentation
+        // TODO Creation of tenant to code into Keycloak over its Admin client
+        // TODO create Realm object into Keycloak and get instance state including configuration elements (e.g; potential technical settings allowing its technical identification or usage options to synchronize into Tenant object for CYBNITY domain)
+        Realm instance = new Realm("");
+
+        // Transform created Realm instance (Keycloak ontology based) into CYBNITY Access Control DTO (including eventual configuration elements state)
+        RealmMapper mapper = new KeycloakMapperFactory().createRealmMapper();
+        TenantDTO dto = mapper.toDTO(instance);
+
         throw new OperationException("to implement!");
     }
 
@@ -141,13 +149,13 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
         if (tenantLabel == null || tenantLabel.isEmpty())
             return false; // Return false because null or empty label is non conformity call
 
-        // Search existing Keycloak realm with same name
-        // When not found realm with same label, confirme deletion as effective (=current state of unexisting realm with same name)
+        // Search existing Keycloak realm with same name into Keycloak over its API client
+        // When not found realm with same label, confirm deletion as effective (=current state of unexisting realm with same name)
 
         // When realm found, check if important dependent sub-data are existing (e.g; user accounts)
         // If none important sub-data found: delete the realm instance and confirm executed deletion
 
-        // If forcing required: delete the realm including all any sub-informations
+        // If forcing required: delete the realm including all any sub-information
         // If forcing not required: don't execute deletion and confirm not executed for cause of existing important sub-data
 
         return false;

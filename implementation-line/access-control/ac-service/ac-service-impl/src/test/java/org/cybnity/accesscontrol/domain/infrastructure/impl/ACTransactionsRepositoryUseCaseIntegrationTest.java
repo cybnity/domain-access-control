@@ -42,7 +42,7 @@ import java.util.concurrent.CompletableFuture;
  * Test of implemented repository relative to a perimeter of Tenant projections.
  */
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ACTransactionsRepositoryUseCaseTest extends CustomContextualizedTest {
+public class ACTransactionsRepositoryUseCaseIntegrationTest extends CustomContextualizedTest {
 
     private static TenantTransactionCollectionsRepository repo;
     private TenantsStore tenantsStore;
@@ -50,7 +50,7 @@ public class ACTransactionsRepositoryUseCaseTest extends CustomContextualizedTes
     /**
      * Default constructor.
      */
-    public ACTransactionsRepositoryUseCaseTest() {
+    public ACTransactionsRepositoryUseCaseIntegrationTest() {
         super(true, true, true, false, /* With snapshots management capability activated */true);
     }
 

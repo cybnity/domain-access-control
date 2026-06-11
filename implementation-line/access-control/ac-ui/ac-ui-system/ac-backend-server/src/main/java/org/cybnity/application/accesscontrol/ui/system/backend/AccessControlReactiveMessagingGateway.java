@@ -26,29 +26,25 @@ import java.util.logging.Logger;
 public class AccessControlReactiveMessagingGateway extends AbstractVerticle implements IHealthControl {
 
     /**
-     * List of identifiers regarding deployed verticles.
-     */
-    private final List<String> deploymentIDs = new LinkedList<>();
-
-    /**
-     * Utility class managing the verification of operable instance.
-     */
-    private ExecutableBackendChecker healthyChecker;
-
-    /**
-     * Current context of adapter runtime.
-     */
-    private final IContext context = new Context();
-
-    /**
      * Name of the pool including all the executed workers of this domain.
      */
     private static final String DOMAIN_POOL_NAME = NamingConventionHelper.buildComponentName(/* component type */NamingConventionHelper.NamingConventionApplicability.GATEWAY, /* domainName */ "ac", /* componentMainFunction */"messaging",/* resourceType */ null, /* segregationLabel */ "workers");
-
     /**
      * Technical logging
      */
     private static final Logger logger = Logger.getLogger(AccessControlReactiveMessagingGateway.class.getName());
+    /**
+     * List of identifiers regarding deployed verticles.
+     */
+    private final List<String> deploymentIDs = new LinkedList<>();
+    /**
+     * Current context of adapter runtime.
+     */
+    private final IContext context = new Context();
+    /**
+     * Utility class managing the verification of operable instance.
+     */
+    private ExecutableBackendChecker healthyChecker;
 
     /**
      * Default start method regarding the server.

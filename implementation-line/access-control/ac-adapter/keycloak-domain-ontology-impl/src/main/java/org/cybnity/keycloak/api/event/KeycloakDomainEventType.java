@@ -1,4 +1,4 @@
-package org.cybnity.application.accesscontrol.translator.keycloak.api.event;
+package org.cybnity.keycloak.api.event;
 
 import org.cybnity.framework.domain.event.IEventType;
 

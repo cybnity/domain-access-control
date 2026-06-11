@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * Behavior unit test regarding the registration cases. This test scope is not considering the integration concerns with repositories or event sourcing collaboration actions (based on mocked services).
  */
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
+public class TenantRegistrationUseCaseIntegrationTest extends CustomContextualizedTest {
 
     private TenantsStore tenantsStore;
     private TenantRegistration tenantRegistrationService;
@@ -49,7 +49,7 @@ public class TenantRegistrationUseCaseTest extends CustomContextualizedTest {
     /**
      * Default constructor.
      */
-    public TenantRegistrationUseCaseTest() {
+    public TenantRegistrationUseCaseIntegrationTest() {
 
         super(true, true, true, true, true);
 

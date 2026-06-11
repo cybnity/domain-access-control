@@ -45,15 +45,13 @@ import java.util.logging.Logger;
 public class DomainPublicAPIMessagesContentBasedRouter extends AbstractChannelMessageRouter {
 
     /**
-     * Client managing interactions with Users Interactions Space.
-     */
-    private final UISAdapter uisClient;
-
-    /**
      * Technical logging
      */
     private static final Logger logger = Logger.getLogger(DomainPublicAPIMessagesContentBasedRouter.class.getName());
-
+    /**
+     * Client managing interactions with Users Interactions Space.
+     */
+    private final UISAdapter uisClient;
     /**
      * Routing map between Event bus path and UIS channels
      */

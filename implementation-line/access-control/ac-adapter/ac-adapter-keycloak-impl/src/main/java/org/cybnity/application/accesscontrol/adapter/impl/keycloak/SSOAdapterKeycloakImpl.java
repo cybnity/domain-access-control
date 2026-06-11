@@ -41,7 +41,7 @@ public class SSOAdapterKeycloakImpl implements ISSOAdapter {
         if (context == null)
             throw new IllegalArgumentException("Context parameter is required!");
         this.context = context;
-        
+
         // Check the minimum required data allowing connection to the targeted Redis
         // server
         checkHealthyState();
