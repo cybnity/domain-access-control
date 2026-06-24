@@ -11,7 +11,6 @@ import org.cybnity.keycloak.domain.model.Realm;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.util.logging.Logger;
 
@@ -43,12 +42,6 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
     private Keycloak keycloakAdminClient;
 
     /**
-     * Keycloak default master realm name as configured by Kyecolack server.
-     * By default based on environment variable read.
-     */
-    private String masterRealmName;
-
-    /**
      * Default constructor of the adapter ready to manage remote interactions with a Keycloak instance(s).
      *
      * @param context Mandatory context provider of reusable configuration allowing
@@ -63,9 +56,18 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
             throw new IllegalArgumentException("Context parameter is required!");
         this.context = context;
 
-        // Check the minimum required data allowing connection to the targeted Keycloak
-        // server
+        // Check the minimum required data allowing connection to the targeted Keycloak server
         checkHealthyState();
+
+        // Test connection to Keycloak instance over the Admin REST API client library
+        // See https://www.keycloak.org/securing-apps/admin-client documentation about Keycloak admin client usage
+        try {
+            RealmResource realmResource = getKeycloakAdminClient(context).realm(context.get(AdminConfigurationVariable.REALM_MASTER_NAME));
+            if (realmResource == null || realmResource.toRepresentation() == null)
+                throw new UnoperationalStateException(AdminConfigurationVariable.REALM_MASTER_NAME + " resource not found in Keycloak server!");
+        } catch (Exception e) {
+            throw new UnoperationalStateException(e);
+        }
     }
 
     @Override
@@ -80,17 +82,7 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
             healthyChecker = new ExecutableAdminAdapterChecker(context);
         // Execution the health check about configuration
         healthyChecker.checkOperableState();
-
-        // Test connection to Keycloak instance over the Admin REST API client library
-        // See https://www.keycloak.org/securing-apps/admin-client documentation about Keycloak admin client usage
-        if (getKeycloakAdminClient(context).isClosed())
-            throw new UnoperationalStateException("Keycloak API is closed and is not usable!");
-        try {
-            RealmResource realmResource = keycloakAdminClient.realm("master"); // TODO change for default master from context environment variable
-            RealmRepresentation realm = realmResource.toRepresentation();
-        } catch (Exception e) {
-            throw new UnoperationalStateException(e);
-        }
+        // Connection test is only performed by constructor to allow reuse of this configuration check by the getKeycloakAdminClient method without overread of test calls to Keycloak server each time when admin configuration variable are changed during runtime
     }
 
     /**
@@ -103,23 +95,26 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
     private Keycloak getKeycloakAdminClient(IContext context) throws IllegalArgumentException, UnoperationalStateException {
         if (context == null) throw new IllegalArgumentException("context parameter is required!");
         if (keycloakAdminClient != null) {
-            // Check if previous connector is instantiated and is operational (e.g; Keycloak instance have not been undeployed or client decommissionned which shall be re-established
+            // Check if previous connector is instantiated and is operational (e.g; Keycloak instance have not been undeployed or client decommissioned which shall be re-established
             if (!keycloakAdminClient.isClosed()) {
+                // TODO Evaluate if potential token expiration of previous client instance is expired (and need to be refreshed before to return operational client) or is not granted (e.g; changed account user name or password in Keycloak server-side web console requiring to instantiate new client based on new authentication account from environment variable normally also upgraded)
                 return keycloakAdminClient;
             }
         }
-        // Read dynamically name of Keycloak master realm (supporting any environment configuration change)
-        masterRealmName = context.get(AdminConfigurationVariable.REALM_MASTER_NAME); // read current envt variable state
+
+        // --- READ TARGETED SERVER CONFIGURATION FROM ENVIRONMENT VARIABLES DEFINED INTO THE SYSTEM USING THIS ADAPTER INSTANCE ---
+        healthyChecker.checkOperableState(); // Execution the health check about configuration potentially upgraded (e.g; with undefined values error!)
 
         // Create or re-instantiate singleton instance to Keycloak server over its administration API client
+        // See https://www.keycloak.org/securing-apps/admin-client documentation
         keycloakAdminClient = KeycloakBuilder.builder()
-                // TODO read config from context variables (e.g. admin account credentials, server url from environment variables)
-                .serverUrl("http://localhost:8081")
-                .realm(masterRealmName/* master realm */)
-                .clientId("admin-cli")
-                .grantType("password")
-                .username("admin")
-                .password("admin")
+                // Read current up-to-date administration client configuration allowing Keycloak Admin Client API usage of master realm (supporting any environment configuration HOT changes)
+                .serverUrl(context.get(AdminConfigurationVariable.KEYCLOAK_SERVER_URL))
+                .realm(context.get(AdminConfigurationVariable.REALM_MASTER_NAME /* Keycloak default master realm as currently configured into Keycloak server */))
+                .clientId(context.get(AdminConfigurationVariable.REALM_MASTER_CLIENTID))
+                .grantType(context.get(AdminConfigurationVariable.REALM_MASTER_GRANT_TYPE))
+                .username(context.get(AdminConfigurationVariable.REALM_MASTER_USERNAME))
+                .password(context.get(AdminConfigurationVariable.REALM_MASTER_PASSWORD))
                 .build();
         return keycloakAdminClient;
     }

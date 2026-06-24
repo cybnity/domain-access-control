@@ -3,7 +3,6 @@ package org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin;
 import org.cybnity.application.accesscontrol.adapter.api.admin.ISSOAdminAdapter;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
-import org.cybnity.framework.domain.model.Tenant;
 
 import java.util.logging.Logger;
 

@@ -18,7 +18,33 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 public enum AdminConfigurationVariable implements IReadableConfiguration {
 
     /**
-     * Name of Keycloak default master realm (e.g defined by default into the Keycloak server coonfiguration for server administration) allowing administration of extended realms.
+     * Full URL of the Keycloak URL (e.g; http://localhost:8081)
+     * Path value shall include communication protocol, dns or ip address of server, and port.
+     */
+    KEYCLOAK_SERVER_URL("KEYCLOAK_SERVER_URL"),
+
+    /**
+     * Administration account username allowing authentication to the default Keycloak realm.
+     */
+    REALM_MASTER_USERNAME("REALM_MASTER_USERNAME"),
+
+    /**
+     * Administration account password allowing authentication to the default Keycloak realm.
+     */
+    REALM_MASTER_PASSWORD("REALM_MASTER_PASSWORD"),
+
+    /**
+     * Keycloak clientId (e.g; admin-cli) required for connection to Keycloak Admin API.
+     */
+    REALM_MASTER_CLIENTID("REALM_MASTER_CLIENTID"),
+
+    /**
+     * Grant type (e.g; password) defined for master realm usage clientId according to the authentication flow defined into Keycloak server.
+     */
+    REALM_MASTER_GRANT_TYPE("REALM_MASTER_GRANT_TYPE"),
+
+    /**
+     * Name of Keycloak default master realm (e.g defined by default into the Keycloak server configuration for server administration) allowing administration of extended realms.
      */
     REALM_MASTER_NAME("REALM_MASTER_NAME");
 

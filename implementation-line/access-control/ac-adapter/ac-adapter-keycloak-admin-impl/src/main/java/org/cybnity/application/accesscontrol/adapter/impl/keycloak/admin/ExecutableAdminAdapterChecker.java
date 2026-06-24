@@ -40,11 +40,13 @@ public class ExecutableAdminAdapterChecker extends ExecutableComponentChecker {
         // Define the mandatory environment variable for adapter running
         Set<IReadableConfiguration> required = new HashSet<>();
 
-        // - required
-
-        // For Keycloak Admin REST API client instantiation
-        // TODO Keycloak http url including server port, administration account login and password
-        //required.add(AdminConfigurationVariable.REALM_MASTER_NAME);
+        // - required for Keycloak Admin REST API client instantiation
+        required.add(AdminConfigurationVariable.REALM_MASTER_NAME);
+        required.add(AdminConfigurationVariable.KEYCLOAK_SERVER_URL);
+        required.add(AdminConfigurationVariable.REALM_MASTER_USERNAME);
+        required.add(AdminConfigurationVariable.REALM_MASTER_PASSWORD);
+        required.add(AdminConfigurationVariable.REALM_MASTER_CLIENTID);
+        required.add(AdminConfigurationVariable.REALM_MASTER_GRANT_TYPE);
 
         return required;
     }
