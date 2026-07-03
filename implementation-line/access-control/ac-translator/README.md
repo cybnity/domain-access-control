@@ -1,15 +1,15 @@
 ## PURPOSE
 
 This documentation presents the mapping of concerns, components (e.g services, capabilities providers) and object
-types (e.g entities, structural elements) managed by the Access Control domain model and the Keycloak implementation
-model.
+types (e.g entities, structural elements) managed by the Access Control domain model and the translation implementation
+models.
 
-The AC domain model is encapsulating the Keycloak implementation model reused as technical solution, via the integration
-of Keycloak API elements (e.g services libraries, naming convention).
+The role of translator projects is to manage the transformation of/from AC domain model with custom implementation models (e.g; Keycloak domain model) reused as technical solution, via the integration
+of API elements (e.g services libraries, naming convention).
 
-# OBJECT MODELS
+# OBJECT MODELS TRANSLATED
 
-## AC-DOMAIN-MODEL PROJECT
+## CYBNITY AC-DOMAIN-MODEL PROJECT
 
 Deliverable: `org.cybnity.application.access-control:domain` java library.
 
@@ -22,18 +22,18 @@ capabilities (e.g OAuth features; security concerns of the Identity Management).
 Tactically, when a mapping of behaviors and/or data is managed between Keycloak components and CYBNITY domain model
 components, an encapsulation approach is primary selected.
 
-When a specific enhancement of the Keycloak domain model doesn't make sens in terms of quality or addionnal required
+For example, when a specific enhancement of the Keycloak domain model doesn't make sens in terms of quality or addionnal required
 feature, some standard design patterns (e.g interpreter, mediator, adaptor) are implemented to reduce the proliferation
 of direct dependency of Keycloak domain model to external other components (e.g CYBNITY domain service layer).
 
-Documentation: [Keycloak client javadoc](https://www.keycloak.org/docs-api/21.0.1/javadocs/index.html)
-
-## DOMAIN OBJECTS MAPPING (Translator intputs)
+## KEYCLOAK DOMAIN OBJECTS MAPPING (Translator intputs)
 
 The conceptual mapping of main concerns supported by the CYBNITY domain model and Keycloak model is presented here to
 understand the several terms that are used into each side's technical documentation.
 
 The translation of the Keycloak domain ontolgy and object types with the CYBNITY Access Control domain (mapping according to the mapping table presented here) is ensured by the [keycloak-translator](keycloak-translator) implementation library project.
+
+Documentation: [Keycloak client javadoc](https://www.keycloak.org/docs-api/21.0.1/javadocs/index.html)
 
 | CYBNITY Object Type     | Description                                                                                                                                                                                                                                                                                                                                                                    | KEYCLOAK Object Type | Description                                                                                                                                                                                                     |
 |:------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
