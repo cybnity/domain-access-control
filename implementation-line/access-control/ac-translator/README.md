@@ -28,12 +28,12 @@ of direct dependency of Keycloak domain model to external other components (e.g 
 
 Documentation: [Keycloak client javadoc](https://www.keycloak.org/docs-api/21.0.1/javadocs/index.html)
 
-## DOMAIN OBJECTS MAPPING
+## DOMAIN OBJECTS MAPPING (Translator intputs)
 
 The conceptual mapping of main concerns supported by the CYBNITY domain model and Keycloak model is presented here to
 understand the several terms that are used into each side's technical documentation.
 
-The translation of the Keycloak domain ontolgy and object types with the CYBNITY Access Control domain (mapping according to the mapping table presented here) is ensured by the [keycloak-translator](../ac-translator/keycloak-translator) implementation library project.
+The translation of the Keycloak domain ontolgy and object types with the CYBNITY Access Control domain (mapping according to the mapping table presented here) is ensured by the [keycloak-translator](keycloak-translator) implementation library project.
 
 | CYBNITY Object Type     | Description                                                                                                                                                                                                                                                                                                                                                                    | KEYCLOAK Object Type | Description                                                                                                                                                                                                     |
 |:------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

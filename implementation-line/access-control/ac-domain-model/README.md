@@ -184,8 +184,9 @@ Presentation of the core components and files organization, packaging models and
 configuration management of systems released. Globally this section give overview of technical components and structures
 implemented as domain layer.
 
-- Structural diagrams regarding the domain model components matching the Keycloak domain elements
-    - [CYBNITY Domain Model Mapping with Keycloak domain components](cybnity-keycloak-components-mapping.md)
+- Structural diagrams regarding the domain model components
+    - [CYBNITY Domain Model components](domain-model-components.md)
+    - [Keycloak Domain Model component](../ac-translator/README.md) matching the Keycloak domain elements with CYBNITY Domain Model
 - Behavioral diagrams regarding the interactions, states machines and activities provided by the model
 - System assembly is mainly managed by Maven as a Java library artifact reused by the application service layer
 
