@@ -28,7 +28,6 @@
 			<!-- Keycloak Admin REST client -->
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-admin-client</artifactId>
-			<version>26.0.9</version>
 			<scope>compile</scope>
 		</dependency>
 		<!-- Test cycle dependencies -->

@@ -12,4 +12,11 @@
 	<packaging>jar</packaging>
 	<name>-- Keycloak domain ontology (impl)</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-client-common-synced</artifactId>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
 </project>

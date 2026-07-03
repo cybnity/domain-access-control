@@ -21,6 +21,8 @@
 
 	<properties>
 		<keycloak.authz-client.version>26.0.9</keycloak.authz-client.version>
+		<keycloak.admin-client.version>26.0.9</keycloak.admin-client.version>
+		<keycloak.client-common.version>26.0.9</keycloak.client-common.version>
 	</properties>
 
 	<dependencyManagement>
@@ -31,6 +33,19 @@
 				<groupId>org.keycloak</groupId>
 				<artifactId>keycloak-authz-client</artifactId>
 				<version>${keycloak.authz-client.version}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<!-- Keycloak Admin REST client -->
+				<groupId>org.keycloak</groupId>
+				<artifactId>keycloak-admin-client</artifactId>
+				<version>${keycloak.admin-client.version}</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.keycloak</groupId>
+				<artifactId>keycloak-client-common-synced</artifactId>
+				<version>${keycloak.client-common.version}</version>
 				<scope>compile</scope>
 			</dependency>
 		</dependencies>

@@ -2,9 +2,11 @@ package org.cybnity.feature.accesscontrol.domain.system;
 
 import io.vertx.core.Vertx;
 import org.cybnity.feature.accesscontrol.domain.system.service.TenantRegistrationFeaturePipeline;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.module.AbstractProcessModuleImpl;
 import org.cybnity.framework.immutable.utility.ExecutableComponentChecker;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.NamingConventionHelper;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -21,6 +23,7 @@ public class AccessControlDomainProcessModule extends AbstractProcessModuleImpl 
      * Dedicated module's technical logging.
      */
     private static final Logger logger = Logger.getLogger(AccessControlDomainProcessModule.class.getName());
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AccessControlDomainProcessModule.class);
 
     /**
      * Default start method regarding the server.
@@ -88,6 +91,24 @@ public class AccessControlDomainProcessModule extends AbstractProcessModuleImpl 
 
     @Override
     public void freeUpResources() {
+        try {
+            disable();
+        } catch (UnoperationalStateException e) {
+            logger.warning(e.getMessage());
+        }
+    }
+
+    @Override
+    public void enable() throws UnoperationalStateException {
+    }
+
+    @Override
+    public void disable() throws UnoperationalStateException {
+
+    }
+
+    @Override
+    public void resume() throws UnoperationalStateException {
 
     }
 }

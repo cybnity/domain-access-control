@@ -128,6 +128,21 @@ public class AccessControlReactiveMessagingGateway extends AbstractVerticle impl
         healthyChecker.checkOperableState();
     }
 
+    @Override
+    public void enable() throws UnoperationalStateException {
+
+    }
+
+    @Override
+    public void disable() throws UnoperationalStateException {
+
+    }
+
+    @Override
+    public void resume() throws UnoperationalStateException {
+
+    }
+
     /**
      * Define instances quantity for this worker type according to existing AppConfigurationVariable.DOMAIN_WORKER_INSTANCES environment variable, and add configuration to the deployment options set.
      * When environment variable is not defined, none configuration about instances quantity is configured.

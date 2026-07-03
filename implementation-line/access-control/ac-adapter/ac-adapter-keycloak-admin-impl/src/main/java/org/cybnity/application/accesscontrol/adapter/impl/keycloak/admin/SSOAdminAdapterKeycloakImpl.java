@@ -50,7 +50,11 @@ public class SSOAdminAdapterKeycloakImpl implements ISSOAdminAdapter {
 
     @Override
     public void freeUpResources() {
-
+        try {
+            this.disable();
+        } catch (UnoperationalStateException e) {
+            logger.warning(e.getMessage());
+        }
     }
 
     @Override
@@ -59,6 +63,21 @@ public class SSOAdminAdapterKeycloakImpl implements ISSOAdminAdapter {
             healthyChecker = new ExecutableAdminAdapterChecker(context);
         // Execution the health check
         healthyChecker.checkOperableState();
+    }
+
+    @Override
+    public void enable() throws UnoperationalStateException {
+        // TODO implement the function
+    }
+
+    @Override
+    public void disable() throws UnoperationalStateException {
+        // TODO implement the function
+    }
+
+    @Override
+    public void resume() throws UnoperationalStateException {
+        // TODO implement the function
     }
 
 }

@@ -3,6 +3,7 @@ package org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin;
 import org.cybnity.accesscontrol.domain.model.TenantDTO;
 import org.cybnity.application.accesscontrol.adapter.api.admin.IAccessAdminAdapter;
 import org.cybnity.application.accesscontrol.adapter.api.admin.OperationException;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.config.RealmConfigurationStrategy;
 import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.KeycloakMapperFactory;
 import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.RealmMapper;
 import org.cybnity.framework.IContext;
@@ -10,6 +11,8 @@ import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.keycloak.domain.model.Realm;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.ClientsResource;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.ServerInfoResource;
 import org.keycloak.admin.client.token.TokenManager;
 import org.keycloak.representations.AccessTokenResponse;
@@ -80,9 +83,11 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
 
     @Override
     public void freeUpResources() {
-        // Disconnect Keycloak REST API stub is existing
-        if (keycloakAdminClient != null) {
-            keycloakAdminClient.close();
+        try {
+            // Disable the Keycloak admin client
+            this.disable();
+        } catch (UnoperationalStateException e) {
+            logger.warning(e.getMessage());
         }
     }
 
@@ -93,6 +98,33 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
         // Execution the health check about configuration
         healthyChecker.checkOperableState();
         // Connection test is only performed by constructor to allow reuse of this configuration check by the getKeycloakAdminClient method without overread of test calls to Keycloak server each time when admin configuration variable are changed during runtime
+    }
+
+    @Override
+    public void enable() throws UnoperationalStateException {
+        try {
+            // Delegated admin client reusability management, or re-instantiation
+            getKeycloakAdminClient(this.context);
+        } catch (IllegalArgumentException iae) {
+            throw new UnoperationalStateException(iae);
+        }
+    }
+
+    @Override
+    public void disable() throws UnoperationalStateException {// Disconnect Keycloak REST API stub is existing
+        if (keycloakAdminClient != null) {
+            keycloakAdminClient.close(); // Automatic managed logout
+        }
+    }
+
+    @Override
+    public void resume() throws UnoperationalStateException {
+        try {
+            // Delegated admin client reusability management, or re-instantiation
+            getKeycloakAdminClient(this.context);
+        } catch (IllegalArgumentException iae) {
+            throw new UnoperationalStateException(iae);
+        }
     }
 
     /**
@@ -200,37 +232,73 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
     public TenantDTO createTenant(String tenantLabel) throws IllegalArgumentException, OperationException {
         if (tenantLabel == null || tenantLabel.isEmpty())
             throw new IllegalArgumentException("Tenant label parameter is required!");
-        // Create Keycloak realm instance over keycloak-authz-client connector
-        // https://www.keycloak.org/securing-apps/authz-client documentation
+        try {
+            // Create Keycloak realm instance over keycloak-authz-client connector
+            // https://www.keycloak.org/securing-apps/authz-client documentation
 
-        // TODO Creation of tenant to code into Keycloak over its Admin client
-        // TODO create Realm object into Keycloak and get instance state including configuration elements (e.g; potential technical settings allowing its technical identification or usage options to synchronize into Tenant object for CYBNITY domain)
-        Realm.Status currentState = Realm.Status.REALM_DISABLED; // TEMP DATA VALUE
-        String retrievedName = tenantLabel;// TEMP TEST VALUE
-        Realm instance = new Realm(retrievedName, currentState);
+            // Prepare of realm default configured version
+            Realm realm = (Realm) new RealmConfigurationStrategy().prepare(this.context,
+                    tenantLabel.trim() /*real name */,
+                    RealmConfigurationStrategy.ENABLED_BY_DEFAULT /* isEnabled */,
+                    RealmConfigurationStrategy.SSL_REQUIRED /* sslModeRequired */,
+                    RealmConfigurationStrategy.BRUTE_FORCE_PROTECTED /* bruteForceProtected */,
+                    Boolean.TRUE /* adminEventsDetailsEnabled */,
+                    null /* notBefore */);
 
-        // Transform created Realm instance (Keycloak ontology based) into CYBNITY Access Control DTO (including eventual configuration elements state)
-        RealmMapper mapper = new KeycloakMapperFactory().createRealmMapper();
-        return mapper.toDTO(instance);
+            // Create Realm object into Keycloak
+            this.keycloakAdminClient.realms().create(realm); // Create new Realm into Keycloak server
+
+            // Read resource recorded state including configuration elements (e.g; potential technical settings allowing its technical identification or usage options to synchronize into Tenant object for CYBNITY domain)
+            RealmResource realmRecord = this.keycloakAdminClient.realms().realm(tenantLabel); // Read new created resource from Keycloak server
+            ClientsResource clients = realmRecord.clients();
+            // TODO Read the technical elements to store into the TenantDTO to return, that allow future connection by Access Control domain components over the dedicated clients and security credentials
+
+
+            // Transform created and enhanced Realm instance (Keycloak ontology based) into CYBNITY Access Control DTO (including eventual configuration elements state)
+            RealmMapper mapper = new KeycloakMapperFactory().createRealmMapper();
+            return mapper.toDTO(realm); // TODO implement the mapper read and transform method to solve the current test case
+        } catch (Exception e) {
+            throw new OperationException(e);
+        }
     }
 
     @Override
-    public boolean deleteTenant(String tenantLabel, boolean force) {
-        // TODO deletion of tenant to code
-
+    public boolean deleteTenant(String tenantLabel, boolean force) throws IllegalArgumentException, OperationException {
         // Check tenantLabel defined and requiring treatment
         if (tenantLabel == null || tenantLabel.isEmpty())
-            return false; // Return false because null or empty label is non conformity call
+            throw new IllegalArgumentException("Tenant label parameter is required!");
+        try {
+            // Search existing Keycloak realm with same name into Keycloak over its API client
+            this.keycloakAdminClient.realm(tenantLabel).clearRealmCache(); // Try to clean cache about existing realm
+        } catch (Exception nfe) {
+            // Potential not found exception about realm with the searched name when it is not existing
+            return false; // as not existing tenant, confirm not deletion need to be performed
+        }
+        try {
+            RealmResource foundRealm = this.keycloakAdminClient.realm(tenantLabel);
 
-        // Search existing Keycloak realm with same name into Keycloak over its API client
-        // When not found realm with same label, confirm deletion as effective (=current state of unexisting realm with same name)
-
-        // When realm found, check if important dependent sub-data are existing (e.g; user accounts)
-        // If none important sub-data found: delete the realm instance and confirm executed deletion
-
-        // If forcing required: delete the realm including all any sub-information
-        // If forcing not required: don't execute deletion and confirm not executed for cause of existing important sub-data
-
-        return false;
+            // When not found realm with same label, confirm deletion as effective (=current state of unexisting realm with same name)
+            if (foundRealm != null) {
+                if (!force) {
+                    // When forcing not required: don't execute deletion and confirm not executed for cause of existing important sub-data
+                    // When realm found, check if important dependent sub-data are existing (e.g; user accounts additionally to the default root user)
+                    if (foundRealm.users().count().compareTo(1) > 0) {
+                        return false; // Some user accounts are existing as important data (cause of refused deletion)
+                    } else {
+                        // If none important sub-data found: delete the realm instance and confirm executed deletion
+                        foundRealm.remove();
+                        return true;
+                    }
+                } else {
+                    // When forcing required: delete the realm including all any sub-information
+                    foundRealm.remove();
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            throw new OperationException(e);
+        }
     }
+
 }

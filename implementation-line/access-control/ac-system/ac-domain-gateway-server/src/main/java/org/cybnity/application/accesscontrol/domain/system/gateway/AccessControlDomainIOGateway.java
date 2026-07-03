@@ -2,6 +2,7 @@ package org.cybnity.application.accesscontrol.domain.system.gateway;
 
 import io.vertx.core.Vertx;
 import org.cybnity.application.accesscontrol.domain.system.gateway.service.DomainIOEventsPipeline;
+import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.application.vertx.common.module.AbstractProcessModuleImpl;
 import org.cybnity.framework.immutable.utility.ExecutableComponentChecker;
 import org.cybnity.infrastructure.technical.message_bus.adapter.api.NamingConventionHelper;
@@ -76,6 +77,25 @@ public class AccessControlDomainIOGateway extends AbstractProcessModuleImpl {
 
     @Override
     public void freeUpResources() {
+        try {
+            disable();
+        } catch (UnoperationalStateException e) {
+            logger().warning(e.getMessage());
+        }
+    }
+
+    @Override
+    public void enable() throws UnoperationalStateException {
+
+    }
+
+    @Override
+    public void disable() throws UnoperationalStateException {
+
+    }
+
+    @Override
+    public void resume() throws UnoperationalStateException {
 
     }
 }
