@@ -1,6 +1,6 @@
 package org.cybnity.accesscontrol.domain.infrastructure.impl.projections.change;
 
-import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.framework.domain.AbstractDTOMapper;
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.event.ConcreteDomainChangeEvent;
@@ -18,7 +18,7 @@ import java.util.Date;
 /**
  * DTO mapping implementation class ensuring the preparation of a data view version relative to a Tenant.
  */
-public class TenantDataViewMapper extends AbstractDTOMapper<TenantDataView> {
+public class TenantDataViewMapper extends AbstractDTOMapper<TenantDTO> {
     /**
      * Store of tenant versions.
      */
@@ -45,7 +45,7 @@ public class TenantDataViewMapper extends AbstractDTOMapper<TenantDataView> {
      * @throws UnsupportedOperationException When impossible to read attributes that are required for data view instance creation.
      */
     @Override
-    public TenantDataView convertTo(Object source) throws IllegalArgumentException, UnsupportedOperationException {
+    public TenantDTO convertTo(Object source) throws IllegalArgumentException, UnsupportedOperationException {
         if (source == null) throw new IllegalArgumentException("Source parameter is required!");
         // Identify and check that is a supported event type
         try {
@@ -123,7 +123,7 @@ public class TenantDataViewMapper extends AbstractDTOMapper<TenantDataView> {
                     // --------------
 
                     // Try instantiation which is responsible for mandatory information required for creation
-                    return new TenantDataView(activityStatus, label, occurredAt, tenantIdentifier,/* The date of occurrence is considered as the date of Tenant creation */ occurredAt, committedVersion);
+                    return new TenantDTO(activityStatus, label, occurredAt, tenantIdentifier,/* The date of occurrence is considered as the date of Tenant creation */ occurredAt, committedVersion);
                 } else {
                     throw new IllegalArgumentException("The rehydrated tenant version of changed origin domain object is not available for transformation into Tenant data view queryable projection!");
                 }

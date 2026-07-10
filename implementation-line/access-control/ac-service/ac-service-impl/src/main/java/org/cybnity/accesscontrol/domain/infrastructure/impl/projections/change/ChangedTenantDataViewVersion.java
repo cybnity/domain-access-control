@@ -6,7 +6,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.event.ConcreteDomainChangeEvent;
@@ -111,14 +111,14 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
      * When not identified from event, this method define the static default node type statically.
      *
      * @param view Mandatory event.
-     * @return A node type dynamically identified from event, or statically defined as TenantDataView.class.getSimpleName()
+     * @return A node type dynamically identified from event, or statically defined as TenantDTO.class.getSimpleName()
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    private String identifyNodeType(TenantDataView view) throws IllegalArgumentException {
+    private String identifyNodeType(TenantDTO view) throws IllegalArgumentException {
         if (view == null) throw new IllegalArgumentException("view parameter is required!");
-        String domainNodeType = view.valueOfProperty(TenantDataView.PropertyAttributeKey.DATAVIEW_TYPE);
+        String domainNodeType = view.valueOfProperty(TenantDTO.PropertyAttributeKey.DATAVIEW_TYPE);
         if (domainNodeType == null || domainNodeType.isEmpty())
-            domainNodeType = TenantDataView.class.getSimpleName();// Default type definition
+            domainNodeType = TenantDTO.class.getSimpleName();// Default type definition
         return domainNodeType;
     }
 
@@ -136,7 +136,7 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
             // Open a traversal allowing graph manipulation
             try (GraphTraversalSource source = graph.open()) {
                 // Map origin domain object attributes from event to targeted (and normally satisfying completeness) data view type
-                TenantDataView expectedView = new TenantDataViewMapper(this.rehydrationStore).convertTo(event);
+                TenantDTO expectedView = new TenantDataViewMapper(this.rehydrationStore).convertTo(event);
                 String domainNodeType = identifyNodeType(expectedView);
 
                 // Initialize transaction
@@ -146,9 +146,9 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
 
                 // --- EXISTENCE CHECK: Before to create a new data view, verify if data view version is not existing about identifiable domain object
                 // Search from domain object identifier property
-                String originDomainIdentifier = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY);
+                String originDomainIdentifier = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY);
                 Vertex existingNode = findByTenantId(gtx, domainNodeType, originDomainIdentifier);
-                String changeRequestLabel = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.LABEL);
+                String changeRequestLabel = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.LABEL);
                 if (existingNode == null) {
                     // Search from equals label
                     existingNode = findByTenantLabel(gtx, domainNodeType, changeRequestLabel);
@@ -165,26 +165,26 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
                 // Prepare transaction's subject based on required/existing properties
                 GraphTraversal<Vertex, Vertex> dataViewVersion = gtx.addV(/* Vertex label nature */domainNodeType)
                         .property(/* Name property */"name", changeRequestLabel)
-                        .property(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY.name(), originDomainIdentifier);
+                        .property(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY.name(), originDomainIdentifier);
 
                 // Add optional properties
-                String creationDate = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.CREATED);
+                String creationDate = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.CREATED);
                 if (creationDate != null && !creationDate.isEmpty())
-                    dataViewVersion.property(TenantDataView.PropertyAttributeKey.CREATED.name(), formatter.parse(creationDate));
+                    dataViewVersion.property(TenantDTO.PropertyAttributeKey.CREATED.name(), formatter.parse(creationDate));
 
-                String commitVersion = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.COMMIT_VERSION);
+                String commitVersion = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.COMMIT_VERSION);
                 if (commitVersion != null && !commitVersion.isEmpty())
-                    dataViewVersion.property(TenantDataView.PropertyAttributeKey.COMMIT_VERSION.name(), commitVersion);
+                    dataViewVersion.property(TenantDTO.PropertyAttributeKey.COMMIT_VERSION.name(), commitVersion);
 
-                String status = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS);
+                String status = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.ACTIVITY_STATUS);
                 if (status != null && !status.isEmpty())
-                    dataViewVersion.property(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS.name(),
+                    dataViewVersion.property(TenantDTO.PropertyAttributeKey.ACTIVITY_STATUS.name(),
                             /* Boolean type is not supported natively; see https://docs.janusgraph.org/v0.4/index-backend/search-predicates/#data-type-support */
                             status);
 
-                String updatedAt = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.LAST_UPDATED_AT);
+                String updatedAt = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.LAST_UPDATED_AT);
                 if (updatedAt != null && !updatedAt.isEmpty()) {
-                    dataViewVersion.property(TenantDataView.PropertyAttributeKey.LAST_UPDATED_AT.name(), formatter.parse(updatedAt));
+                    dataViewVersion.property(TenantDTO.PropertyAttributeKey.LAST_UPDATED_AT.name(), formatter.parse(updatedAt));
                 }
 
                 final Vertex dataViewVertex = dataViewVersion.next(); // Execute the transaction creating a new graph vertex
@@ -209,7 +209,7 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
                 logger.log(Level.SEVERE, "Impossible graph opening!", ce);
                 throw new UnoperationalStateException(ce);
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Impossible or inconsistent creation of TenantDataView in read-model database!", e);
+                logger.log(Level.SEVERE, "Impossible or inconsistent creation of TenantDTO in read-model database!", e);
                 if (graph.isSupportsTransactions() && tx != null) {
                     tx.rollback();
                 }
@@ -220,23 +220,28 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
 
     /**
      * Prepare a common event relative to a data view version that have been changed.
-     * @param dataViewChangeType Mandatory for event definition.
-     * @param dataViewId Mandatory for event definition.
-     * @param originDomainObjectUID Mandatory for event definition.
-     * @param domainNodeType Mandatory for event definition.
-     * @param dataViewNodeName Mandatory for event definition.
-     * @param dataViewUpdatedAt Optional for event definition.
-     * @param priorCommandRef Optional for event definition.
+     *
+     * @param dataViewChangeType     Mandatory for event definition.
+     * @param dataViewId             Mandatory for event definition.
+     * @param originDomainObjectUID  Mandatory for event definition.
+     * @param domainNodeType         Mandatory for event definition.
+     * @param dataViewNodeName       Mandatory for event definition.
+     * @param dataViewUpdatedAt      Optional for event definition.
+     * @param priorCommandRef        Optional for event definition.
      * @param changedModelElementRef Optional for event definition.
      * @return A prepared new instance of event uniquely identified.
      * @throws IllegalArgumentException When any mandatory parameter is missing or not defined.
      */
     private DomainEvent prepareDataViewNotification(DataViewEventType dataViewChangeType, String dataViewId, String originDomainObjectUID, String domainNodeType, String dataViewNodeName, String dataViewUpdatedAt, EntityReference priorCommandRef, EntityReference changedModelElementRef) throws IllegalArgumentException {
-        if (dataViewChangeType==null) throw new IllegalArgumentException("dataViewChangeType parameter is required!");
-        if (dataViewId==null || dataViewId.isEmpty()) throw new IllegalArgumentException("dataViewId parameter is required!");
-        if (originDomainObjectUID==null || originDomainObjectUID.isEmpty()) throw new IllegalArgumentException("originDomainObjectUID parameter is required!");
-        if (domainNodeType==null || domainNodeType.isEmpty()) throw new IllegalArgumentException("domainNodeType parameter is required!");
-        if (dataViewNodeName==null || dataViewNodeName.isEmpty()) throw new IllegalArgumentException("dataViewNodeName parameter is required!");
+        if (dataViewChangeType == null) throw new IllegalArgumentException("dataViewChangeType parameter is required!");
+        if (dataViewId == null || dataViewId.isEmpty())
+            throw new IllegalArgumentException("dataViewId parameter is required!");
+        if (originDomainObjectUID == null || originDomainObjectUID.isEmpty())
+            throw new IllegalArgumentException("originDomainObjectUID parameter is required!");
+        if (domainNodeType == null || domainNodeType.isEmpty())
+            throw new IllegalArgumentException("domainNodeType parameter is required!");
+        if (dataViewNodeName == null || dataViewNodeName.isEmpty())
+            throw new IllegalArgumentException("dataViewNodeName parameter is required!");
 
         // Prepare event relative to the read-model projection perimeter changed (e.g including one or several Vertex, edges, attributes...) that could interest read-model observers
         Collection<Attribute> dataViewChangeDefinition = new HashSet<>(); //  // Can contain set of any technical information (e.g time of update, id of graph element changed) and/or logical information (e.g detail about relation name changed on Vertex)
@@ -268,7 +273,7 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
             // Open a traversal allowing graph manipulation
             try (GraphTraversalSource source = graph.open()) {
                 // Map origin domain object attributes from event to targeted (and normally satisfying completeness) data view type
-                TenantDataView expectedView = new TenantDataViewMapper(this.rehydrationStore).convertTo(event);
+                TenantDTO expectedView = new TenantDataViewMapper(this.rehydrationStore).convertTo(event);
                 String domainNodeType = identifyNodeType(expectedView);
 
                 // Initialize transaction
@@ -278,9 +283,9 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
 
                 // --- EXISTENCE CHECK (based on tenant identifier that is immutable): Before to update a data view, verify if data view version is existing about identifiable domain object
                 // Search existing tenant data view from the origin domain object's identifier property
-                String originDomainIdentifier = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY);
+                String originDomainIdentifier = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY);
                 Vertex existingNode = findByTenantId(gtx, domainNodeType, originDomainIdentifier);
-                String changeRequestLabel = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.LABEL);
+                String changeRequestLabel = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.LABEL);
                 if (existingNode != null) {
                     // Existing data view can be refreshed...
                     // --- POTENTIAL NODE LABEL CONFLICTS RULE: logical label re-assigned to another Tenant can be in conflict with another vertex that need to be checked before to accept the update requested
@@ -298,11 +303,11 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
                     DateFormat formatter = DateConvention.dateFormatter(); // Convention selection about any date managed into the read-model projected graph
 
                     // --- LAST VERSION CHECK RULE: UPDATE ONLY IF CHANGE DATE IS MORE YOUNG THAN EXISTING NODE VERSION (support potential reception of parallel change event, not ordered and relative to a same domain object that have been upgraded over async method not synchronized)
-                    String updatedAt = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.LAST_UPDATED_AT);
+                    String updatedAt = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.LAST_UPDATED_AT);
                     if (updatedAt != null && !updatedAt.isEmpty()) {
                         try {
                             // Verify that change event notified is more young than existing data view version
-                            Date existingNodeVersionDatedAs = gtx.V(existingNode).next().value(TenantDataView.PropertyAttributeKey.LAST_UPDATED_AT.name());
+                            Date existingNodeVersionDatedAs = gtx.V(existingNode).next().value(TenantDTO.PropertyAttributeKey.LAST_UPDATED_AT.name());
                             // Compare existing node version age to the new updated version
                             if (existingNodeVersionDatedAs.compareTo(formatter.parse(updatedAt)) > 0/* greater than*/) {
                                 // The existing node is more young and up-to-date than the update event notified
@@ -316,26 +321,26 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
 
                     // --- UPGRADE TRANSACTION ---
                     Map<Object, Object> selectFilter = new HashMap<>();
-                    selectFilter.put(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY.name(), originDomainIdentifier);
+                    selectFilter.put(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY.name(), originDomainIdentifier);
                     selectFilter.put(/* vertex nature label*/ T.label, domainNodeType);
                     // Define properties to be updated in existing data view (vertex)
                     Map<Object, Object> updatedProperties = new HashMap<>();
                     // Mandatory properties
                     updatedProperties.put(/* Name property */"name", changeRequestLabel);
                     // Optional properties
-                    String creationDate = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.CREATED);
+                    String creationDate = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.CREATED);
                     if (creationDate != null && !creationDate.isEmpty())
-                        updatedProperties.put(TenantDataView.PropertyAttributeKey.CREATED.name(), formatter.parse(creationDate));
-                    String commitVersion = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.COMMIT_VERSION);
+                        updatedProperties.put(TenantDTO.PropertyAttributeKey.CREATED.name(), formatter.parse(creationDate));
+                    String commitVersion = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.COMMIT_VERSION);
                     if (commitVersion != null && !commitVersion.isEmpty())
-                        updatedProperties.put(TenantDataView.PropertyAttributeKey.COMMIT_VERSION.name(), commitVersion);
-                    String status = expectedView.valueOfProperty(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS);
+                        updatedProperties.put(TenantDTO.PropertyAttributeKey.COMMIT_VERSION.name(), commitVersion);
+                    String status = expectedView.valueOfProperty(TenantDTO.PropertyAttributeKey.ACTIVITY_STATUS);
                     if (status != null && !status.isEmpty())
-                        updatedProperties.put(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS.name(),
+                        updatedProperties.put(TenantDTO.PropertyAttributeKey.ACTIVITY_STATUS.name(),
                                 /* Boolean type is not supported natively; see https://docs.janusgraph.org/v0.4/index-backend/search-predicates/#data-type-support */
                                 status);
                     if (updatedAt != null && !updatedAt.isEmpty()) {
-                        updatedProperties.put(TenantDataView.PropertyAttributeKey.LAST_UPDATED_AT.name(), formatter.parse(updatedAt));
+                        updatedProperties.put(TenantDTO.PropertyAttributeKey.LAST_UPDATED_AT.name(), formatter.parse(updatedAt));
                     }
 
                     // Update the changed domain object attributes into the data view
@@ -367,7 +372,7 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
                 logger.log(Level.SEVERE, "Impossible graph opening!", ce);
                 throw new UnoperationalStateException(ce);
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Impossible or inconsistent creation of TenantDataView in read-model database!", e);
+                logger.log(Level.SEVERE, "Impossible or inconsistent creation of TenantDTO in read-model database!", e);
                 if (graph.isSupportsTransactions() && tx != null) {
                     tx.rollback();
                 }
@@ -405,7 +410,7 @@ public class ChangedTenantDataViewVersion extends AbstractDataViewVersionTransac
     private Vertex findByTenantId(GraphTraversalSource gtx, String domainNodeType, String tenantIdentifier) {
         try {
             // Execute query
-            return gtx.V().has(T.label /* vertex node label only consulted */, domainNodeType).has(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY.name(), tenantIdentifier).next();
+            return gtx.V().has(T.label /* vertex node label only consulted */, domainNodeType).has(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY.name(), tenantIdentifier).next();
         } catch (NoSuchElementException nse) {
             // Not found result
         }

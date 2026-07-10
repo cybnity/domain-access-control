@@ -5,9 +5,9 @@ import org.cybnity.accesscontrol.domain.model.ITenantsWriteModel;
 import org.cybnity.accesscontrol.domain.service.api.ApplicationServiceOutputCause;
 import org.cybnity.accesscontrol.domain.service.api.ITenantRegistrationService;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
-import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
 import org.cybnity.application.accesscontrol.adapter.api.admin.ISSOAdminAdapter;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType;
 import org.cybnity.application.accesscontrol.ui.api.event.AttributeName;
 import org.cybnity.application.accesscontrol.ui.api.event.CommandName;
@@ -115,15 +115,15 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
                     Map<String, String> queryParameters = new HashMap<>();
                     // Explicit query name to perform with filtering criteria definition
                     queryParameters.put(Command.TYPE, ACApplicationQueryName.TENANT_VIEW_FIND_BY_LABEL.name());
-                    queryParameters.put(TenantDataView.PropertyAttributeKey.LABEL.name(), tenantName); // Search vertex (data-view) node with equals name
-                    queryParameters.put(TenantDataView.PropertyAttributeKey.DATAVIEW_TYPE.name(), TenantDataView.class.getSimpleName()); // type of vertex (node type in graph model)
+                    queryParameters.put(TenantDTO.PropertyAttributeKey.LABEL.name(), tenantName); // Search vertex (data-view) node with equals name
+                    queryParameters.put(TenantDTO.PropertyAttributeKey.DATAVIEW_TYPE.name(), TenantDTO.class.getSimpleName()); // type of vertex (node type in graph model)
                     // Search tenant in any in operational status avoiding duplicated tenants with same name
                     List<TenantTransactionsCollection> tenantsCollection = tenantsReadModel.queryWhere(queryParameters, this.context);
-                    TenantDataView existingOrganizatonTenant = null;
+                    TenantDTO existingOrganizatonTenant = null;
                     if (tenantsCollection != null) {
                         if (tenantsCollection.size() == 1) {
                             // Only one valid tenant data view versions history have been found in the repository
-                            List<TenantDataView> existingTenantVersions = tenantsCollection.get(0).versions();
+                            List<TenantDTO> existingTenantVersions = tenantsCollection.get(0).versions();
                             // Get the last known tenant data view version
                             existingOrganizatonTenant = existingTenantVersions.get(existingTenantVersions.size() - 1);
                         } else {
@@ -134,10 +134,10 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
                     if (existingOrganizatonTenant != null) {
                         // Existing registered tenant is identified and known by access control domain
                         // RULE : de-duplication rule about existing Tenant that is already in operational activity
-                        String statusLabel = existingOrganizatonTenant.valueOfProperty(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS);
+                        String statusLabel = existingOrganizatonTenant.valueOfProperty(TenantDTO.PropertyAttributeKey.ACTIVITY_STATUS);
                         Boolean activityStatus = (statusLabel != null && !statusLabel.isEmpty()) ? Boolean.valueOf(statusLabel) : null;
-                        String tenantCurrentLabel = existingOrganizatonTenant.valueOfProperty(TenantDataView.PropertyAttributeKey.LABEL);
-                        String tenantUUID = existingOrganizatonTenant.valueOfProperty(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY);
+                        String tenantCurrentLabel = existingOrganizatonTenant.valueOfProperty(TenantDTO.PropertyAttributeKey.LABEL);
+                        String tenantUUID = existingOrganizatonTenant.valueOfProperty(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY);
                         if (activityStatus != null && activityStatus) {
                             // CASE: tenant (e.g platform tenant with same name and already in an operational activity status not re-assignable) creation is not authorized AND REJECTION SHALL BE NOTIFIED
                             commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTRATION_REJECTED, command, tenantCurrentLabel, activityStatus, tenantUUID);

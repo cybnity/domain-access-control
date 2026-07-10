@@ -1,6 +1,6 @@
 package org.cybnity.application.accesscontrol.translator.keycloak.api;
 
-import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.RealmMapper;
+import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.RealmRepresentationMapper;
 
 /**
  * Factory of mapping helpers allowing translation of object between Keycloak domain ontology (3rd-party project governed) and Access Control domain ontology (CYBNITY project governed).
@@ -10,10 +10,10 @@ import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.Real
 public abstract class MapperAbstractFactory {
 
     /**
-     * Create an instance of RealmMapper relative to Realm object (Keycloak ontology).
+     * Create an instance of RealmRepresentationMapper relative to Realm object (Keycloak ontology).
      *
      * @return New instance of mapper for Realm objects.
      */
-    public abstract RealmMapper createRealmMapper();
+    public abstract RealmRepresentationMapper createRealmRepresentationMapper();
 
 }

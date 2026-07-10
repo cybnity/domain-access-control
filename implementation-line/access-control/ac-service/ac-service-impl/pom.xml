@@ -27,10 +27,6 @@
             <artifactId>api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.cybnity.application.access-control</groupId>
-            <artifactId>domain</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.cybnity.application.access-control.adapters</groupId>
             <artifactId>admin-api</artifactId>
         </dependency>

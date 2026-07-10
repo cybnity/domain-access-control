@@ -15,8 +15,8 @@ package org.cybnity.accesscontrol.domain.infrastructure.impl;
 
 import org.cybnity.accesscontrol.CustomContextualizedTest;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
-import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.Command;
 import org.cybnity.framework.domain.DomainEvent;
@@ -71,7 +71,7 @@ public class ACTransactionsRepositoryUseCaseIntegrationTest extends CustomContex
             repo.freeUpResources();
         }
         repo = null;
-        tenantsStore=null;
+        tenantsStore = null;
     }
 
     /**
@@ -119,7 +119,7 @@ public class ACTransactionsRepositoryUseCaseIntegrationTest extends CustomContex
 
         if (committed.get()) {
             // Execute query based on label filtering
-            Map<String, String> queryParameters = prepareQueryBasedOnLabel(aggregateLabel, TenantDataView.class.getSimpleName(), ACApplicationQueryName.TENANT_VIEW_FIND_BY_LABEL);
+            Map<String, String> queryParameters = prepareQueryBasedOnLabel(aggregateLabel, TenantDTO.class.getSimpleName(), ACApplicationQueryName.TENANT_VIEW_FIND_BY_LABEL);
             List<TenantTransactionsCollection> results = repo.queryWhere(queryParameters, context());
 
             // Verify if a first version of the data view (projection view relative to the aggregate) have been created into the graph model
@@ -127,18 +127,18 @@ public class ACTransactionsRepositoryUseCaseIntegrationTest extends CustomContex
             Assertions.assertFalse(results.isEmpty(), "First created data view in collection should have been found!");
 
             TenantTransactionsCollection recordedDataViewStates = results.get(0);
-            List<TenantDataView> views = recordedDataViewStates.versions();
+            List<TenantDTO> views = recordedDataViewStates.versions();
             Assertions.assertNotNull(views, "Existing data view should have been found!");
             Assertions.assertFalse(views.isEmpty(), "Created first data view shall have been found!");
 
             // Check some data view attributes that should be equals to the original aggregate version
-            TenantDataView firstVersion = views.get(0);
+            TenantDTO firstVersion = views.get(0);
             Assertions.assertEquals(originAggregateId.value().toString(), recordedDataViewStates.tenantIdentifier(), "Identifier of data view shall be the id of the original aggregate!");
-            Assertions.assertEquals(aggregateLabel, firstVersion.valueOfProperty(TenantDataView.PropertyAttributeKey.LABEL), "Invalid label of data view generated in repository's read-model!");
+            Assertions.assertEquals(aggregateLabel, firstVersion.valueOfProperty(TenantDTO.PropertyAttributeKey.LABEL), "Invalid label of data view generated in repository's read-model!");
             // Verify that multiple creation/change events generated during the initial instantiation of the Tenant, have been identified with multiple commit versions and only last collected by the data-view refreshed
-            Assertions.assertNotEquals(originCommitVersion, firstVersion.valueOfProperty(TenantDataView.PropertyAttributeKey.COMMIT_VERSION), "Invalid data view commit version because shall have been modified by the last change event of the origin tenant (creation event, label definition event, status definition event)!");
+            Assertions.assertNotEquals(originCommitVersion, firstVersion.valueOfProperty(TenantDTO.PropertyAttributeKey.COMMIT_VERSION), "Invalid data view commit version because shall have been modified by the last change event of the origin tenant (creation event, label definition event, status definition event)!");
             // Verify activity status that shall have been refreshed into the repository during the next change event notification from store (not defined from the Tenant's origin creation event but notified by the status change event notified)
-            Assertions.assertEquals(originActivityStatus, Boolean.valueOf(firstVersion.valueOfProperty(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS)), "Shall have been modified during the last change event received by repository for data-view refresh!");
+            Assertions.assertEquals(originActivityStatus, Boolean.valueOf(firstVersion.valueOfProperty(TenantDTO.PropertyAttributeKey.ACTIVITY_STATUS)), "Shall have been modified during the last change event received by repository for data-view refresh!");
         }
 
         // --- CHANGE NOTIFICATION TO READ-MODEL VERIFICATION ---
@@ -158,8 +158,8 @@ public class ACTransactionsRepositoryUseCaseIntegrationTest extends CustomContex
         // Explicit query name to perform
         queryParameters.put(Command.TYPE, queryType.name());
         // Query filtering criteria definition
-        queryParameters.put(TenantDataView.PropertyAttributeKey.LABEL.name(), label); // Search vertex (data-view) node with equals name
-        queryParameters.put(TenantDataView.PropertyAttributeKey.DATAVIEW_TYPE.name(), domainNodeType); // Yype of vertex (node type in graph model)
+        queryParameters.put(TenantDTO.PropertyAttributeKey.LABEL.name(), label); // Search vertex (data-view) node with equals name
+        queryParameters.put(TenantDTO.PropertyAttributeKey.DATAVIEW_TYPE.name(), domainNodeType); // Yype of vertex (node type in graph model)
         return queryParameters;
     }
 

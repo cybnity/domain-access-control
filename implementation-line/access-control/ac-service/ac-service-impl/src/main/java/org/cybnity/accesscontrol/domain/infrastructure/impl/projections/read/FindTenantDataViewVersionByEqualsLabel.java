@@ -4,7 +4,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
-import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.event.EventSpecification;
@@ -90,24 +90,24 @@ public class FindTenantDataViewVersionByEqualsLabel extends AbstractDataViewVers
      *
      * @param command Mandatory origin query.
      * @return Found or empty result.
-     * @throws IllegalArgumentException    When any required parameter (e.g TenantDataView.PropertyAttributeKey.LABEL.name(), or TenantDataView.PropertyAttributeKey.DATAVIEW_TYPE.name() ) is missing (e.g filter have not been found into the received command).
+     * @throws IllegalArgumentException    When any required parameter (e.g TenantDTO.PropertyAttributeKey.LABEL.name(), or TenantDTO.PropertyAttributeKey.DATAVIEW_TYPE.name() ) is missing (e.g filter have not been found into the received command).
      * @throws UnoperationalStateException When execution problem (e.g during graph model consultation).
      */
     private IQueryResponse findByLabel(Command command) throws IllegalArgumentException, UnoperationalStateException {
         // Read query parameter usable as filter for query execution
-        Attribute labelFilter = EventSpecification.findSpecificationByName(TenantDataView.PropertyAttributeKey.LABEL.name(), command.specification());
+        Attribute labelFilter = EventSpecification.findSpecificationByName(TenantDTO.PropertyAttributeKey.LABEL.name(), command.specification());
 
         // Check mandatory label value parameter to search
         if (labelFilter == null || labelFilter.value() == null || labelFilter.value().isEmpty())
-            throw new IllegalArgumentException("Invalid transaction parameter (TenantDataView.PropertyAttributeKey.LABEL.name() is required)!");
+            throw new IllegalArgumentException("Invalid transaction parameter (TenantDTO.PropertyAttributeKey.LABEL.name() is required)!");
         String tenantViewNameFilter = labelFilter.value();
-        Attribute dataViewType = EventSpecification.findSpecificationByName(TenantDataView.PropertyAttributeKey.DATAVIEW_TYPE.name(), command.specification());
+        Attribute dataViewType = EventSpecification.findSpecificationByName(TenantDTO.PropertyAttributeKey.DATAVIEW_TYPE.name(), command.specification());
 
         // Check mandatory domain object type (data view nature) to navigate as queryable projection
         if (dataViewType == null || dataViewType.value() == null || dataViewType.value().isEmpty())
-            throw new IllegalArgumentException("Missing mandatory parameter (TenantDataView.PropertyAttributeKey.DATAVIEW_TYPE.name() is required and shall be defined)!");
+            throw new IllegalArgumentException("Missing mandatory parameter (TenantDTO.PropertyAttributeKey.DATAVIEW_TYPE.name() is required and shall be defined)!");
         // Type of node can be statically defined by the implementation language (like here) or dynamically known by the requester
-        String domainNodeType = (dataViewType.value() != null && !dataViewType.value().isEmpty()) ? dataViewType.value() : TenantDataView.class.getSimpleName();
+        String domainNodeType = (dataViewType.value() != null && !dataViewType.value().isEmpty()) ? dataViewType.value() : TenantDTO.class.getSimpleName();
 
         try (GraphTraversalSource traversal = graph.open()) {
             GraphTraversalSource gtx;
@@ -121,36 +121,36 @@ public class FindTenantDataViewVersionByEqualsLabel extends AbstractDataViewVers
                 Vertex foundEqualsLabelNode = gtx.V().has(T.label /* vertex node label only consulted */, domainNodeType).has("name", tenantViewNameFilter).next();
 
                 // Mandatory existing properties
-                String tenantUID = foundEqualsLabelNode.value(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY.name());
+                String tenantUID = foundEqualsLabelNode.value(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY.name());
                 String label = foundEqualsLabelNode.value("name");
                 // Optional existing properties
                 Date createdAt = null;
                 try {
-                    createdAt = foundEqualsLabelNode.value(TenantDataView.PropertyAttributeKey.CREATED.name());
+                    createdAt = foundEqualsLabelNode.value(TenantDTO.PropertyAttributeKey.CREATED.name());
                 } catch (Exception nse) {
                     // Unknown optional property
                 }
                 Date updatedAt = null;
                 try {
-                    updatedAt = foundEqualsLabelNode.value(TenantDataView.PropertyAttributeKey.LAST_UPDATED_AT.name());
+                    updatedAt = foundEqualsLabelNode.value(TenantDTO.PropertyAttributeKey.LAST_UPDATED_AT.name());
                 } catch (Exception nse) {
                     // Unknown optional property
                 }
                 String commitVersion = null;
                 try {
-                    commitVersion = foundEqualsLabelNode.value(TenantDataView.PropertyAttributeKey.COMMIT_VERSION.name());
+                    commitVersion = foundEqualsLabelNode.value(TenantDTO.PropertyAttributeKey.COMMIT_VERSION.name());
                 } catch (Exception nse) {
                     // Unknown optional property
                 }
                 String status = null;
                 try {
-                    status = foundEqualsLabelNode.value((TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS.name()));
+                    status = foundEqualsLabelNode.value((TenantDTO.PropertyAttributeKey.ACTIVITY_STATUS.name()));
                 } catch (Exception nse) {
                     // Unknown optional property
                 }
                 Boolean isActive = (status != null && !status.isEmpty()) ? Boolean.valueOf(status) : null;
 
-                final TenantDataView result = new TenantDataView(isActive, label, updatedAt, tenantUID, createdAt, commitVersion);
+                final TenantDTO result = new TenantDTO(isActive, label, updatedAt, tenantUID, createdAt, commitVersion);
 
                 // Prepare found data view response
                 return () -> Optional.of(result);

@@ -1,11 +1,15 @@
 package org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin;
 
-import org.cybnity.accesscontrol.domain.model.TenantDTO;
+
 import org.cybnity.application.accesscontrol.adapter.api.admin.IAccessAdminAdapter;
 import org.cybnity.application.accesscontrol.adapter.api.admin.OperationException;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.config.RealmConfigurationStrategy;
+import org.cybnity.application.accesscontrol.translator.keycloak.api.ErrorTypeIdentificationExpression;
+import org.cybnity.application.accesscontrol.translator.keycloak.api.KeycloakAPIErrorCode;
+import org.cybnity.application.accesscontrol.translator.keycloak.api.KeycloakInterpretableContext;
 import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.KeycloakMapperFactory;
-import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.RealmMapper;
+import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.RealmRepresentationMapper;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.keycloak.domain.model.Realm;
@@ -14,14 +18,16 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.ServerInfoResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.admin.client.token.TokenManager;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.time.OffsetDateTime;
 import java.util.logging.Logger;
 
 /**
- * Contract relative to access capabilities administration (e.g setting of system's client scopes, access control configuration supervision).
+ * Contract relative to access capabilities administration (e.g; setting of system's client scopes, access control configuration supervision).
  * For example, services allowing realms, access workflows, standardized roles management according to privileged capabilities.
  * The features supported by this adapter implementation class are focused on administration of User Access Management's elements.
  */
@@ -236,9 +242,9 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
             // Create Keycloak realm instance over keycloak-authz-client connector
             // https://www.keycloak.org/securing-apps/authz-client documentation
 
-            // Prepare of realm default configured version
+            // Prepare of realm default configured version, included default extended resources to record into the created new Realm
             Realm realm = (Realm) new RealmConfigurationStrategy().prepare(this.context,
-                    tenantLabel.trim() /*real name */,
+                    tenantLabel,
                     RealmConfigurationStrategy.ENABLED_BY_DEFAULT /* isEnabled */,
                     RealmConfigurationStrategy.SSL_REQUIRED /* sslModeRequired */,
                     RealmConfigurationStrategy.BRUTE_FORCE_PROTECTED /* bruteForceProtected */,
@@ -246,18 +252,68 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
                     null /* notBefore */);
 
             // Create Realm object into Keycloak
-            this.keycloakAdminClient.realms().create(realm); // Create new Realm into Keycloak server
+            this.keycloakAdminClient.realms().create(realm);
+            // Complete default configuration of the new created resource into Keycloak server
+            RealmRepresentation realmDataView = createExtendedResources(realm, this.keycloakAdminClient.realms().realm(tenantLabel));
 
-            // Read resource recorded state including configuration elements (e.g; potential technical settings allowing its technical identification or usage options to synchronize into Tenant object for CYBNITY domain)
-            RealmResource realmRecord = this.keycloakAdminClient.realms().realm(tenantLabel); // Read new created resource from Keycloak server
-            ClientsResource clients = realmRecord.clients();
-            // TODO Read the technical elements to store into the TenantDTO to return, that allow future connection by Access Control domain components over the dedicated clients and security credentials
-
-
-            // Transform created and enhanced Realm instance (Keycloak ontology based) into CYBNITY Access Control DTO (including eventual configuration elements state)
-            RealmMapper mapper = new KeycloakMapperFactory().createRealmMapper();
-            return mapper.toDTO(realm); // TODO implement the mapper read and transform method to solve the current test case
+            // Read the technical elements to store into the TenantDTO to return, that allow future connection by Access Control domain components over the dedicated clients and security credentials
+            // Transform enhanced Realm data view instance (Keycloak ontology based) into CYBNITY Access Control Tenant data view
+            RealmRepresentationMapper mapper = new KeycloakMapperFactory().createRealmRepresentationMapper();
+            return mapper.convertTo(realmDataView);
         } catch (Exception e) {
+            throw new OperationException(e);
+        }
+    }
+
+    /**
+     * Create additional Keycloak resources as expected default configuration regarding extended contents attached to a realm of Keycloak.
+     *
+     * @param defaultConfiguration Optional configuration including all default values and settings elements which shall be created as additional resources in Keycloak. When null, none additional resource created into Keycloak.
+     * @param toEnhance            Mandatory current existing realm resource client (accessor to Keycloak) that shall be extended in terms of settings into Keycloak instance.
+     * @return The current version of instance enhanced with the additional resources created into Keycloak.
+     * @throws IllegalArgumentException When mandatory parameter is missing.
+     * @throws OperationException       When problem occurred during additional resources creation with Keycloak server.
+     */
+    private RealmRepresentation createExtendedResources(Realm defaultConfiguration, RealmResource toEnhance) throws IllegalArgumentException, OperationException {
+        if (toEnhance == null) throw new IllegalArgumentException("toEnhance parameter is required!");
+        try {
+            RealmRepresentation realmDataView = toEnhance.toRepresentation();
+            if (defaultConfiguration != null) {
+                // TODO add expected configuration regarding extended contents attached to a realm which is already existing into Keycloak
+                // .....
+
+
+                // --- REALM CLIENTS REQUIRED BY CYBNITY LAYERS
+                // --- Identify default clients setting from default configuration
+                // Create the default dedicated Clients required by CYBNITY systems to exchanges with Keycloak (e.g; from several types of components and layers)
+                ClientsResource clients = toEnhance.clients();
+                // TODO create each required CYBNITY layer clients as currently defined in manually procedure for automated way
+                //Response createdClientResult = clients.create(new ClientRepresentation());
+
+                // --- REALM CLIENT SCOPES
+
+                // --- REALM ROLES
+
+                // --- REALM USERS
+                UsersResource defaultUsers = toEnhance.users();
+
+                // --- REALM GROUPS
+
+                // --- REALM SESSIONS
+
+                // --- REALM EVENTS
+
+                // --- REALM SETTINGS
+
+                // --- REALM AUTHENTICATION
+
+                // --- REALM IDENTITY PROVIDERS
+
+                // --- REALM USER FEDERATION
+            }
+            return realmDataView;
+        } catch (Exception e) {
+            // Keycloak interactions problem
             throw new OperationException(e);
         }
     }
@@ -301,4 +357,27 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
         }
     }
 
+    @Override
+    public TenantDTO findTenantByLabel(String tenantLabel) throws IllegalArgumentException, OperationException {
+        if (tenantLabel == null || tenantLabel.isEmpty())
+            throw new IllegalArgumentException("Tenant label parameter is required!");
+        try {
+            // Search Realm object into Keycloak from real name
+            RealmRepresentation realmDataView = this.keycloakAdminClient.realms().realm(tenantLabel).toRepresentation();
+            // Transform to data view in target ontology
+            RealmRepresentationMapper mapper = new KeycloakMapperFactory().createRealmRepresentationMapper();
+            return mapper.convertTo(realmDataView);
+        } catch (Exception e) {
+            String errorMsg = e.getMessage();
+            // Identify if is a HTTP 404 not found exception
+            ErrorTypeIdentificationExpression exp = new ErrorTypeIdentificationExpression(errorMsg);
+            KeycloakAPIErrorCode error = (KeycloakAPIErrorCode) exp.interpret(new KeycloakInterpretableContext());
+
+            if (KeycloakAPIErrorCode.HTTP_404 == error)
+                return null;// Return null as functional not found realm with equals label
+
+            // When realm not found equals label
+            throw new OperationException(e);
+        }
+    }
 }

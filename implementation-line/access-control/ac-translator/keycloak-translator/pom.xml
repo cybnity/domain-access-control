@@ -14,13 +14,17 @@
 	<dependencies>
 		<dependency>
 			<!-- Translate internal domain ontology data models -->
-			<groupId>org.cybnity.application.access-control</groupId>
-			<artifactId>domain</artifactId>
+			<groupId>org.cybnity.application.access-control.adapters</groupId>
+			<artifactId>api</artifactId>
 		</dependency>
 		<dependency>
 			<!-- Translate Keycloak domain ontology data models -->
 			<groupId>org.cybnity.application.access-control.adapters</groupId>
 			<artifactId>keycloak-domain-ontology-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.cybnity.framework</groupId>
+			<artifactId>domain</artifactId>
 		</dependency>
 	</dependencies>
 </project>

@@ -1,4 +1,4 @@
-package org.cybnity.accesscontrol.domain.service.api.model;
+package org.cybnity.application.accesscontrol.adapter.api.model;
 
 import org.cybnity.framework.domain.Attribute;
 import org.cybnity.framework.domain.DataTransferObject;
@@ -11,11 +11,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Read-Model VIEW of a Tenant data view version (e.g denormalized, limited to specific attributes), shareable out of the Access Control domain.
+ * Data Transfer Object representing a Tenant temp version.
+ * Read-Model VIEW of a Tenant data view version (e.g; denormalized, limited to specific attributes), shareable out of the Access Control domain.
  * Represent a version of a Tenant entity, at a moment of its life.
  * Type of DTO implementation which can be used into read-model projection(s) stored/exposed via repository.
+ * Usable for transfer between internal and external domain via communication systems.
+ * Can be used during a translation betwwen a 3rd-party ontology (e.g; Keycloak ontology Realm object type) with the access control domain.
+ * Unique timely versioned status of a Tenant, this is a structured object reserved for data transport.
  */
-public class TenantDataView extends DataTransferObject {
+public class TenantDTO extends DataTransferObject {
 
     /**
      * Immutable set of DTO properties including a data view version's values.
@@ -37,7 +41,8 @@ public class TenantDataView extends DataTransferObject {
         LABEL,
         /**
          * Status of activation regarding the tenant.
-         * True when the tenant is considered as active and in operable state.
+         * True when the tenant is considered as active and in operable state (equals to global enabled state).
+         * False when the tenant is considered as disabled.
          */
         ACTIVITY_STATUS,
         /**
@@ -69,13 +74,13 @@ public class TenantDataView extends DataTransferObject {
      * @param commitVersion  Optional identifier of the commit version relative to the tenant change transaction.
      * @throws IllegalArgumentException When any mandatory parameter is missing.
      */
-    public TenantDataView(Boolean activityStatus, String label, Date versionedAt, String tenantUID, Date createdAt, String commitVersion) throws IllegalArgumentException {
+    public TenantDTO(Boolean activityStatus, String label, Date versionedAt, String tenantUID, Date createdAt, String commitVersion) throws IllegalArgumentException {
         if (tenantUID == null || tenantUID.isEmpty())
             throw new IllegalArgumentException("TenantUID parameter is required!");
         // Prepare immutable attributes set
         Set<Attribute> s = new HashSet<>();
         // Default type of data-view
-        s.add(new Attribute(PropertyAttributeKey.DATAVIEW_TYPE.name(), TenantDataView.class.getSimpleName()));
+        s.add(new Attribute(PropertyAttributeKey.DATAVIEW_TYPE.name(), TenantDTO.class.getSimpleName()));
         s.add(new Attribute(PropertyAttributeKey.IDENTIFIED_BY.name(), tenantUID));
 
         if (label != null && !label.isEmpty()) {
@@ -122,8 +127,8 @@ public class TenantDataView extends DataTransferObject {
         if (obj == this) {
             return true;
         } else {
-            if (obj instanceof TenantDataView) {
-                TenantDataView item = (TenantDataView) obj;
+            if (obj instanceof TenantDTO) {
+                TenantDTO item = (TenantDTO) obj;
                 // Logical equality based on label
                 if (item.valueOfProperty(PropertyAttributeKey.IDENTIFIED_BY).equals(this.valueOfProperty(PropertyAttributeKey.IDENTIFIED_BY))) {
                     equalsObject = true;

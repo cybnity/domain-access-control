@@ -72,7 +72,7 @@ public class Realm extends RealmRepresentation {
         /**
          * The name of the Realm.
          *
-         * @param realmName A mandatory defined logical name.
+         * @param realmName A mandatory defined logical name. The origin value is transformed in lower case by default.
          * @return This builder instance.
          * @throws IllegalArgumentException When realName parameter value is empty or does not respect format rule (e.g; not empty, not blank character).
          */

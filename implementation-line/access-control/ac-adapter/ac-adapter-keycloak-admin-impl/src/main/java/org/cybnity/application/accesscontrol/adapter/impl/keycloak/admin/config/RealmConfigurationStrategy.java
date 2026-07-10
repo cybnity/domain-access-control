@@ -12,9 +12,10 @@ import org.cybnity.keycloak.domain.model.Realm;
 public class RealmConfigurationStrategy extends ConfigurationStrategy {
 
     /**
-     * Default configuration defining that any Realm is not enabled by default.
+     * Default configuration defining that any Realm is enabled by default.
+     * When a realm is disabled, users and clients cannot access the realm (only admin adapter can access it).
      */
-    public static boolean ENABLED_BY_DEFAULT = false;
+    public static boolean ENABLED_BY_DEFAULT = true;
 
     /**
      * Default configuration defining that SSL is required with scope "all".
@@ -63,7 +64,7 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
         if (args == null || args.length < 6)
             throw new IllegalArgumentException("args parameter is required and shall include [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore]!");
 
-        // Check each mandatory value for real configuration
+        // --- Check each mandatory value for real configuration
 
         String name = (String) args[0]; //  a realm name is provided as args[0]
         if (name == null || name.isEmpty())

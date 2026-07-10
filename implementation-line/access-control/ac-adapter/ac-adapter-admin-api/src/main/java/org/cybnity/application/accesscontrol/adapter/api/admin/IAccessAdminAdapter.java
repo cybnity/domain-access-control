@@ -1,6 +1,6 @@
 package org.cybnity.application.accesscontrol.adapter.api.admin;
 
-import org.cybnity.accesscontrol.domain.model.TenantDTO;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.framework.domain.ICleanup;
 import org.cybnity.framework.domain.IHealthControl;
 
@@ -31,4 +31,13 @@ public interface IAccessAdminAdapter extends ICleanup, IHealthControl {
      */
     public boolean deleteTenant(String tenantLabel, boolean force) throws IllegalArgumentException, OperationException;
 
+    /**
+     * Search existing tenant with equals name.
+     *
+     * @param tenantLabel Mandatory label to search.
+     * @return Found tenant with equals name. Or null is none found.
+     * @throws IllegalArgumentException When mandatory parameter is not defined.
+     * @throws OperationException       When the requested deletion operation occurred a logical or technical problem.
+     */
+    public TenantDTO findTenantByLabel(String tenantLabel) throws IllegalArgumentException, OperationException;
 }
