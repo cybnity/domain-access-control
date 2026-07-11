@@ -5,13 +5,13 @@ import org.cybnity.application.accesscontrol.adapter.api.admin.IAccessAdminAdapt
 import org.cybnity.application.accesscontrol.adapter.api.admin.OperationException;
 import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.config.RealmConfigurationStrategy;
-import org.cybnity.application.accesscontrol.translator.keycloak.api.ErrorTypeIdentificationExpression;
-import org.cybnity.application.accesscontrol.translator.keycloak.api.KeycloakAPIErrorCode;
-import org.cybnity.application.accesscontrol.translator.keycloak.api.KeycloakInterpretableContext;
 import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.KeycloakMapperFactory;
 import org.cybnity.application.accesscontrol.translator.keycloak.api.mapper.RealmRepresentationMapper;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
+import org.cybnity.keycloak.api.KeycloakAPIResponseCode;
+import org.cybnity.keycloak.api.KeycloakInterpretableContext;
+import org.cybnity.keycloak.api.ResponseCodeIdentificationExpression;
 import org.cybnity.keycloak.domain.model.Realm;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -370,10 +370,10 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
         } catch (Exception e) {
             String errorMsg = e.getMessage();
             // Identify if is a HTTP 404 not found exception
-            ErrorTypeIdentificationExpression exp = new ErrorTypeIdentificationExpression(errorMsg);
-            KeycloakAPIErrorCode error = (KeycloakAPIErrorCode) exp.interpret(new KeycloakInterpretableContext());
+            ResponseCodeIdentificationExpression exp = new ResponseCodeIdentificationExpression(errorMsg);
+            KeycloakAPIResponseCode error = (KeycloakAPIResponseCode) exp.interpret(new KeycloakInterpretableContext());
 
-            if (KeycloakAPIErrorCode.HTTP_404 == error)
+            if (KeycloakAPIResponseCode.NOT_FOUND == error)
                 return null;// Return null as functional not found realm with equals label
 
             // When realm not found equals label

@@ -34,23 +34,53 @@ public class Realm extends RealmRepresentation {
     }
 
     /**
-     * Apply rules of formatting on a label as required by Keycloak domain.
+     * Apply rules of cleaning (also called Sanitization) on a label as required by Keycloak domain.
      * (e.g.; remove any space or special character to be usable into an URL path).
      *
      * @param label Mandatory label to reformat.
-     * @return The reformatted label.
-     * @throws IllegalArgumentException When parameter is missing, null, or empty.
+     * @return The label value after cleaning.
+     * @throws IllegalArgumentException When label parameter is null.
      */
-    public String applyKeycloakRealmLabelFormatRequirements(String label) throws IllegalArgumentException {
-        if (label == null || label.isEmpty())
-            throw new IllegalArgumentException("The name parameter is required!");
+    public static String applyLabelSanitizationRequirements(String label) throws IllegalArgumentException {
+        // Remove any potential special character (ensure all non-alphanumeric characters are removed)
+        return removeAllSpecialCharacters(label);
+    }
 
-        // Remove any existing space
-        return label.trim();
+    /**
+     * Remove any special character from string.
+     * Sanitization rules applied are:
+     * - All Non-ASCII Alphanumerics (example "Hello!@# World123_$%^&*()") removed (including spaces and underscores)
+     * - Unicode Alphanumeric (example "Café123!üñîcødé") removed
+     * - Underscores, accented letters and special characters (example "user_name123!@#") removed
+     * - Dot Characters (e.g., ".") removed
+     *
+     * @param label Mandatory text to sanitize.
+     * @return The cleaned label value.
+     * @throws IllegalArgumentException When label parameter is null.
+     */
+    private static String removeAllSpecialCharacters(String label) throws IllegalArgumentException {
+        if (label == null)
+            throw new IllegalArgumentException("The label parameter is required!");
+        if (label.isEmpty()) return label; // no need of sanitization (implementation optimization rule)
 
-        // Remove any potential special character
-        // TODO implement a regex to remove any special character potentially included into the label
+        // Non-ASCII Alphanumerics (ASCII-Only) or inputs with no alphanumerics
+        // Remove all characters that are not ASCII letters (a-z, A-Z) or digits (0-9). This is ideal for use cases requiring strict ASCII compliance (e.g. realm label into URLs).
+        String cleaned = label.replaceAll("[^a-zA-Z0-9]", ""); // Remove non-ASCII alphanumerics (including spaces and underscores)
 
+        // Unicode Alphanumeric Sanitization
+        // Remove all non-alphanumeric characters from "Café123!üñîcødé" (includes Unicode letters)
+        cleaned = cleaned.replaceAll("[^\\p{Alnum}]", ""); // Use \p{Alnum} to include Unicode alphanumerics
+
+        // Remove ALL Unicode non-alphanumerics (including accented letters)
+        cleaned = cleaned.replaceAll("\\P{Alnum}", "");
+
+        // Remove underscores and special characters
+        cleaned = cleaned.replaceAll("[^\\\\w]|_", "");
+
+        // Remove dots
+        cleaned = cleaned.replaceAll("\\.", "");
+
+        return cleaned;
     }
 
     /**
@@ -58,12 +88,12 @@ public class Realm extends RealmRepresentation {
      * See example of value supported at <a href="https://jirutka.github.io/keycloak-json-schema/keycloak-realm-26.json">RealmRepresentation object via JSON</a>.
      */
     public static class Builder {
+        public static String SSL_MODE_ALL = "all", SSL_MODE_EXTERNAL = "external", SSL_MODE_NONE = "none";
         private String name;
         private boolean isEnabled;
         private String sslModeRequired;
         private boolean bruteForceProtected, eventsEnabled, adminEventsEnabled, adminEventsDetailsEnabled;
         private int notBefore;
-        public static String SSL_MODE_ALL = "all", SSL_MODE_EXTERNAL = "external", SSL_MODE_NONE = "none";
 
         public Realm build() {
             return new Realm(this);
@@ -71,6 +101,8 @@ public class Realm extends RealmRepresentation {
 
         /**
          * The name of the Realm.
+         * This method only apply basic Keycloak minimum sanitization rule that check is real name is not empty and does not contain space character.
+         * To ensure better sanitization of real name, use {@link Realm#applyLabelSanitizationRequirements(String)} method before to clean the real name about multiple special characters generating potential problem for usage into URLs.
          *
          * @param realmName A mandatory defined logical name. The origin value is transformed in lower case by default.
          * @return This builder instance.
