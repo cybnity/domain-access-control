@@ -21,14 +21,14 @@ From **Realm Settings** created:
   - Frontend URL
     - Define the external (e.g url and port exposed outside the K8s cluster) of Keycloak realm (e.g `http://10.101.238.65/auth/` regarding a host based on IP address)
     - Require SSL: `External requests`
-- Security Defenses to configure the Clickjacking security
-  - Default `SAMEORIGIN` value of **X-Frame-Options**
-    - See https://datatracker.ietf.org/doc/html/rfc7034#section-2.2.1 for more details about X-Frame-Options
-    - See https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/threat/clickjacking.html for help about mitigation of Clickjacking
-  - Default `frame-src 'self'; frame-ancestors 'self'; object-src 'none';` value of **Content-Security-Policy**
-    - See https://www.w3.org/TR/CSP/#directive-frame-src about frame-src to restrict the URLS which may be loaded into nested browsing contexts
-    - See https://www.w3.org/TR/CSP/#directive-frame-ancestors about frame-ancestors to define the URLs which can embed the resource using frame of iframe
-    - See https://www.w3.org/TR/CSP/#directive-object-src about object-src to restrict URLS from which plugin context may be loaded
+  - Security Defenses to configure the Clickjacking security
+    - Default `SAMEORIGIN` value of **X-Frame-Options**
+      - See https://datatracker.ietf.org/doc/html/rfc7034#section-2.2.1 for more details about X-Frame-Options
+      - See https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/threat/clickjacking.html for help about mitigation of Clickjacking
+    - Default `frame-src 'self'; frame-ancestors 'self'; object-src 'none';` value of **Content-Security-Policy**
+      - See https://www.w3.org/TR/CSP/#directive-frame-src about frame-src to restrict the URLS which may be loaded into nested browsing contexts
+      - See https://www.w3.org/TR/CSP/#directive-frame-ancestors about frame-ancestors to define the URLs which can embed the resource using frame of iframe
+      - See https://www.w3.org/TR/CSP/#directive-object-src about object-src to restrict URLS from which plugin context may be loaded
 
 ## SYSTEMS' CLIENTS REGISTRATION
 
