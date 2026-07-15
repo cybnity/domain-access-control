@@ -102,6 +102,7 @@ The source codes managed in theses sub-projects (Maven projects) are supporting 
   - Gateway application module
   - RTS computation unit
 
+### Dependencies Overview
 ```mermaid
 %%{
   init: {
