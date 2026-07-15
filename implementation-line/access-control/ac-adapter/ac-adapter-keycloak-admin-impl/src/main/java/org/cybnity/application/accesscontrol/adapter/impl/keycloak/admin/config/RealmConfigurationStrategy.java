@@ -1,8 +1,10 @@
 package org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.config;
 
 import org.cybnity.accesscontrol.ConfigurationStrategy;
+import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.AdminConfigurationVariable;
 import org.cybnity.framework.IContext;
-import org.cybnity.keycloak.domain.model.Realm;
+import org.cybnity.keycloak.domain.model.RealmBuilder;
+import org.cybnity.keycloak.domain.model.RealmWithDefaultExtendedResourcesBuilder;
 
 /**
  * Strategy concrete class defining the composite of configuration elements regarding a Realm creation.
@@ -20,7 +22,7 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
     /**
      * Default configuration defining that SSL is required with scope "all".
      */
-    public static String SSL_REQUIRED = Realm.Builder.SSL_MODE_ALL;
+    public static String SSL_REQUIRED = RealmBuilder.SSL_MODE_ALL;
 
     /**
      * Default protection enabled against brute force.
@@ -54,15 +56,15 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
      *
      * @param ctx  Mandatory context eventually including elements required during the Realm object preparation runtime.
      * @param args Mandatory configuration elements and or logical contents that can be used during the preparation process.
-     *             Ordered configuration elements are [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore]
-     * @return The expected Realm instance including common and default configuration elements.
+     *             Ordered configuration elements are [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore, frontendUrl]
+     * @return The expected Realm instance including common settings.
      * @throws IllegalArgumentException When mandatory parameter is missing or is invalid.
      */
     @Override
     public Object prepare(IContext ctx, Object... args) throws IllegalArgumentException {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
         if (args == null || args.length < 6)
-            throw new IllegalArgumentException("args parameter is required and shall include [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore]!");
+            throw new IllegalArgumentException("6 args parameters are required and shall include [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore]!");
 
         // --- Check each mandatory value for real configuration
 
@@ -90,16 +92,35 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
             adminEventsDetailsEnabled = ADMIN_EVENTS_DETAILS_ENABLED;
         }
 
-        Integer notBefore = (Integer) args[5];
+        Integer notBefore = null;
+        try {
+            notBefore = (Integer) args[5];
+        } catch (IndexOutOfBoundsException e) {
+            // Not provided input
+        }
 
-        return new Realm.Builder().name(name)
+        RealmWithDefaultExtendedResourcesBuilder builder = new RealmWithDefaultExtendedResourcesBuilder();
+        builder.name(name)
                 .enabled(isEnabled)
                 .sslModeRequired(sslModeRequired)
                 .bruteForceProtected(bruteForceProtected)
                 .eventsEnabled(EVENTS_ENABLED)
                 .adminEventsEnabled(ADMIN_EVENTS_ENABLED)
                 .adminEventsDetailsEnabled(adminEventsDetailsEnabled)
-                .notBefore(notBefore)
-                .build(); // Prepared Realm instance according to Keycloak values rules and return configured instance
+                .notBefore(notBefore);
+
+        String xframeoptions = null;
+        try {
+            xframeoptions = (String) args[6];
+        } catch (IndexOutOfBoundsException e) {
+            // Not dynamically provided input, so try to read from static configuration (environment variable based)
+            xframeoptions = ctx.get(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS);
+        }
+        // Set extension resources
+        builder.xFrameOptions(xframeoptions);
+
+        // TODO continue to create each required CYBNITY layer clients as currently defined in manually procedure for automated way
+
+        return builder.build(); // Prepared Realm instance according to Keycloak values rules and return configured instance
     }
 }

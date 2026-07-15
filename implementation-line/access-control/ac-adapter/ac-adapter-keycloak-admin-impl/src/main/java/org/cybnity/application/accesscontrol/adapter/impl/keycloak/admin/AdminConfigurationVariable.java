@@ -18,7 +18,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 public enum AdminConfigurationVariable implements IReadableConfiguration {
 
     /**
-     * Full URL of the Keycloak URL (e.g; http://localhost:8081)
+     * Full URL of the Keycloak URL (e.g; http://dev-deploy.cybnity.tech:8081)
      * Path value shall include communication protocol, dns or ip address of server, and port.
      */
     KEYCLOAK_SERVER_URL("KEYCLOAK_SERVER_URL"),
@@ -44,9 +44,12 @@ public enum AdminConfigurationVariable implements IReadableConfiguration {
     REALM_MASTER_GRANT_TYPE("REALM_MASTER_GRANT_TYPE"),
 
     /**
-     * Name of Keycloak default master realm (e.g defined by default into the Keycloak server configuration for server administration) allowing administration of extended realms.
+     * Name of Keycloak default master realm (e.g; defined by default into the Keycloak server configuration for server administration) allowing administration of extended realms.
      */
-    REALM_MASTER_NAME("REALM_MASTER_NAME");
+    REALM_MASTER_NAME("REALM_MASTER_NAME"),
+
+    REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS("REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS")
+    ;
 
     /**
      * Name of this environment variable currently hosted by the system environment.

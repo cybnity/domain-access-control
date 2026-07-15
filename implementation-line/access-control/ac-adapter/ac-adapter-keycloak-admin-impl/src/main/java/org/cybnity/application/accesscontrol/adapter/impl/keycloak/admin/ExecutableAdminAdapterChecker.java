@@ -48,6 +48,9 @@ public class ExecutableAdminAdapterChecker extends ExecutableComponentChecker {
         required.add(AdminConfigurationVariable.REALM_MASTER_CLIENTID);
         required.add(AdminConfigurationVariable.REALM_MASTER_GRANT_TYPE);
 
+        // - required common configuration data for any realm configuration
+        required.add(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS);
+
         return required;
     }
 
