@@ -34,6 +34,60 @@ These implementation sub-projects build client adapters which can be reuse by an
 - [ac-adapter-keycloak-impl](ac-adapter-keycloak-impl): implementation components that are compatible to Keycloak endpoints and API, and support realization of the capabilities (e.g communication protocol, data transformation) with contribution/delegation of Keycloak server system. This __implementation library__ is supporting the scope of `ac-adapter-api` as __common features__ usable from any CYBNITY architecture layer. For example, the authentication features are realized by this library in a SSO protocol implemented for authentication and authorization of a user or system.
 - [ac-adapter-keycloak-admin-impl](ac-adapter-keycloak-admin-impl): implementation components that are managing the integration and support with Keycloak Admin REST API. This __implementation library__ is supporting the scope of `ac-adapter-admin-api` as __IAM administration features__ usable only from CYBNITY Access Control domain that is deployed into secure layers (e.g server-side system executed and deployed into protected area). For example, this library is usefull for TenantRegistrationService ensuring the creation of independant Realm scopes dedicated per organization.
 
+#### Adaptation Components Dependencies
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+        'background': '#ffffff',
+        'fontFamily': 'arial',
+        'fontSize': '10px',
+        'primaryColor': '#fff',
+        'primaryTextColor': '#0e2a43',
+        'primaryBorderColor': '#0e2a43',
+        'secondaryColor': '#fff',
+        'secondaryTextColor': '#fff',
+        'secondaryBorderColor': '#fff',
+        'tertiaryColor': '#fff',
+        'tertiaryTextColor': '#fff',
+        'tertiaryBorderColor': '#fff',
+        'edgeLabelBackground':'#fff',
+        'lineColor': '#0e2a43',
+        'titleColor': '#fff',
+        'textColor': '#0e2a43',
+        'lineColor': '#0e2a43',
+        'nodeTextColor': '#0e2a43',
+        'nodeBorder': '#0e2a43',
+        'noteTextColor': '#0e2a43',
+        'noteBorderColor': '#0e2a43'
+    },
+    'flowchart': { 'curve': 'monotoneX' }
+  }
+}%%
+classDiagram
+  class ac_aaa["ac_adapter_admin_api"]
+  class kac["keycloak_admin_client"]
+  class ac_aki["ac_adapter_keycloak_impl"]
+  class ac_aa["ac_adapter_api"]
+  class ac_akai["ac_adapter_keycloak_admin_impl"]
+  class kautc["keycloak_authz_client"]
+  class ktr["keycloak_translator"]
+  class kdo["keycloak_domain_ontology"]
+  class ac_dmm["ac_domain_model"]
+  ac_akai ..> ac_aaa
+  ac_akai ..> kac
+  ac_akai ..> ac_aki
+  ac_aaa ..> ac_aa
+  ac_aki ..> kautc
+  ac_aki ..> ktr
+  ac_aki ..> ac_aa
+  ktr ..> kdo
+  ktr ..> ac_aa
+  ac_aa ..> ac_dmm
+
+```
+
 ### Javascript Connectors
 
 ### Node.js Connectors
