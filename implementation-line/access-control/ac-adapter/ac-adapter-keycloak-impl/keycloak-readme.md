@@ -76,7 +76,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
       - Login theme: `base`
     - Logout settings
       - Front channel logout: `ON`
-      - Backchannel logout session required: `ON`
+      - Frontchannel logout session required: `ON`
 
 #### Applicative role definition
 From **Roles** section, add a new standard role named `user` described as `standard user role of the frontend user interface`.
