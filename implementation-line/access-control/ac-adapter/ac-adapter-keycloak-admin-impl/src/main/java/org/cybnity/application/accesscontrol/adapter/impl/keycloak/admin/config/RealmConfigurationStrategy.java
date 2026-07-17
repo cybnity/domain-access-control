@@ -153,8 +153,7 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
         // Set content security policy configuration
         builder.contentSecurityPolicy(contentSecurityPolicy);
 
-
-        // TODO continue to create each required CYBNITY layer clients as currently defined in manually procedure for automated way
+        // Add additional definition of configuration elements to include by default into new realm resource
 
         return builder.build(); // Prepared Realm instance according to Keycloak values rules and return configured instance
     }

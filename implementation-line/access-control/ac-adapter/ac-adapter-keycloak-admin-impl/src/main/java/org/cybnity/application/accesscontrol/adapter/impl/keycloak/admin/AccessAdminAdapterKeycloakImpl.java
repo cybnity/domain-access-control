@@ -291,7 +291,6 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
         try {
             if (defaultConfiguration != null) {
                 // Read customization elements (extended contents requiring to be attached/changed to a realm which is already existing into Keycloak)
-//                toEnhance.update(defaultConfiguration);// Update all customized configuration elements in Keycloak server. Any user, roles or client information in the representation are ignored
 
                 // TODO create each additional resource OR DELET THIS METHOD IF ALREADY PERFORMED DURING REALM ORIGIN CREATE METHOD CALL
                 // --- REALM CLIENTS REQUIRED BY CYBNITY LAYERS
