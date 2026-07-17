@@ -7,11 +7,24 @@ package org.cybnity.keycloak.domain.model;
  * @author olivier
  */
 public class RealmBuilder {
-    public static String SSL_MODE_ALL = "all", SSL_MODE_EXTERNAL = "external", SSL_MODE_NONE = "none";
+    /**
+     * All request
+     */
+    public static String SSL_MODE_ALL = "all";
+    /**
+     * External request
+     */
+    public static String SSL_MODE_EXTERNAL = "external";
+    /**
+     * None request
+     */
+    public static String SSL_MODE_NONE = "none";
 
     String name;
     boolean isEnabled;
     String sslModeRequired;
+    boolean isOrganizationEnabled;
+    boolean isAdminPermissionsEnabled;
     boolean bruteForceProtected, eventsEnabled, adminEventsEnabled, adminEventsDetailsEnabled;
     int notBefore;
 
@@ -19,7 +32,6 @@ public class RealmBuilder {
      * Default constructor
      */
     public RealmBuilder() {
-
     }
 
     /**
@@ -36,7 +48,7 @@ public class RealmBuilder {
      * This method only apply basic Keycloak minimum sanitization rule that check is real name is not empty and does not contain space character.
      * To ensure better sanitization of real name, use {@link Realm#applyLabelSanitizationRequirements(String)} method before to clean the real name about multiple special characters generating potential problem for usage into URLs.
      *
-     * @param realmName A mandatory defined logical name. The origin value is transformed in lower case by default.
+     * @param realmName A mandatory defined logical name.
      * @return This builder instance.
      * @throws IllegalArgumentException When realName parameter value is empty or does not respect format rule (e.g; not empty, not blank character).
      */
@@ -56,13 +68,35 @@ public class RealmBuilder {
     }
 
     /**
-     * Is the realm is active.
+     * Is the realm is enabled.
      *
-     * @param isEnabled True when is active.
+     * @param isEnabled True when is enabled.
      * @return This builder instance.
      */
     public RealmBuilder enabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
+        return this;
+    }
+
+    /**
+     * Is the realm organization management capability is enabled.
+     *
+     * @param isEnabled True when is enabled.
+     * @return This builder instance.
+     */
+    public RealmBuilder organizationEnabled(boolean isEnabled) {
+        this.isOrganizationEnabled = isEnabled;
+        return this;
+    }
+
+    /**
+     * Is the realm administration permissions management capability is enabled.
+     *
+     * @param isEnabled True when is enabled.
+     * @return This builder instance.
+     */
+    public RealmBuilder adminPermissionsManagementEnabled(boolean isEnabled) {
+        this.isAdminPermissionsEnabled = isEnabled;
         return this;
     }
 
@@ -81,13 +115,19 @@ public class RealmBuilder {
         if (sslMode != null) {
             // Check value conformity
             if (!SSL_MODE_ALL.equals(sslMode) && !SSL_MODE_EXTERNAL.equals(sslMode) && !SSL_MODE_NONE.equals(sslMode)) {
-                throw new IllegalArgumentException("The SSL mode parameters are invalid!");
+                throw new IllegalArgumentException("The SSL mode parameter is invalid!");
             }
         }
         this.sslModeRequired = sslMode;
         return this;
     }
 
+    /**
+     * Enable or disable the force brute protection for the realm.
+     *
+     * @param bruteForceProtected If enabled, specify what should happen to the user account if a brute force attack is detected.
+     * @return This builder.
+     */
     public RealmBuilder bruteForceProtected(boolean bruteForceProtected) {
         this.bruteForceProtected = bruteForceProtected;
         return this;
@@ -113,11 +153,23 @@ public class RealmBuilder {
         return this;
     }
 
+    /**
+     * Define events enabling.
+     *
+     * @param eventsEnabled Enabling?
+     * @return This builder instance.
+     */
     public RealmBuilder eventsEnabled(boolean eventsEnabled) {
         this.eventsEnabled = eventsEnabled;
         return this;
     }
 
+    /**
+     * Define admin events enabling.
+     *
+     * @param adminEventsEnabled Enabling?
+     * @return This builder instance.
+     */
     public RealmBuilder adminEventsEnabled(boolean adminEventsEnabled) {
         this.adminEventsEnabled = adminEventsEnabled;
         return this;

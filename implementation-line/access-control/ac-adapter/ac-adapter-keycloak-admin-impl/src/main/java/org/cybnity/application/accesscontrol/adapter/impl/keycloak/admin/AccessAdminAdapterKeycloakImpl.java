@@ -50,7 +50,7 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
     /**
      * Keycloak instance Administration REST api.
      * Single of connector to Keycloak server (default master realm).
-     * See features exposed by the Admin API at https://www.keycloak.org/docs-api/latest/rest-api/index.html
+     * See <a href="https://www.keycloak.org/docs-api/latest/rest-api/index.html">features exposed</a> by the Admin API.
      */
     private Keycloak keycloakAdminClient;
 
@@ -192,7 +192,7 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
 
             // Check if latest provided token is not expired and should be refreshed before to return the client instance
             // Evaluate if potential token expiration of previous client instance is expired (and need to be refreshed before to return operational client)
-            // or is not granted (e.g; changed account user name or password in Keycloak server-side web console requiring to instantiate new client based on new authentication account from environment variable normally also upgraded)
+            // or is not granted (e.g; changed account username or password in Keycloak server-side web console requiring to instantiate new client based on new authentication account from environment variable normally also upgraded)
             if (currentTokenExpiringAt != null) {
                 // Verify if expiration date is reached justifying call to received refresh token
                 // Optimization rule: Potential duration of this SYNCHRONIZED CALL TO KEYCLOAK SERVER BY ADMIN CLIENT!
@@ -251,19 +251,19 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
                     RealmConfigurationStrategy.BRUTE_FORCE_PROTECTED /* bruteForceProtected */,
                     Boolean.TRUE /* adminEventsDetailsEnabled */,
                     null /* notBefore */,
-                    this.context.get(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS) /* assignable frontend configuration to new realm */);
+                    this.context.get(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS.getName()) /* assignable security defense xframe options*/,
+                    this.context.get(AdminConfigurationVariable.REALM_DEFAULT_FRONTEND_URL.getName()) /* assignable frontend configuration to new realm */);
 
             Realm realm = (Realm) realmObj;
             if (realmObj instanceof RealmWithDefaultExtendedResources) {
                 // Create the Realm object including all extended resourced
-                RealmWithDefaultExtendedResources defaultConfig = (RealmWithDefaultExtendedResources) realm;
+                RealmWithDefaultExtendedResources defaultConfig = (RealmWithDefaultExtendedResources) realm; // Imports a realm from a full representation of that realm
                 this.keycloakAdminClient.realms().create(defaultConfig);
-                // TODO check by unit test if the returned RealmWithDefaultExtendedResources by strategy have been created into keycloak WITH AUTOMATIC CREATION OF ADDITIONAL RESOURCES
-                // TODO Execute this operation only if additional resources have not been automatically created into keycloak during the origin creat() previous call
+                // Create attached configuration resources extending default configuration (e.g; roles, user, clients...)
                 createExtendedResources(defaultConfig, this.keycloakAdminClient.realm(tenantLabel));
             } else {
                 // Create Realm object into Keycloak
-                this.keycloakAdminClient.realms().create(realm);
+                this.keycloakAdminClient.realms().create(realm); // Imports a realm from a full representation of that realm
             }
 
             // Read the latest version of created resource from Keycloak server
@@ -291,10 +291,7 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
         try {
             if (defaultConfiguration != null) {
                 // Read customization elements (extended contents requiring to be attached/changed to a realm which is already existing into Keycloak)
-                RealmRepresentation realmProxy = toEnhance.toRepresentation();
-                realmProxy.setBrowserSecurityHeaders(defaultConfiguration.getBrowserSecurityHeaders()); // Set into Keycloak server
-
-                //realmProxy.setAttributes();        frontend url
+//                toEnhance.update(defaultConfiguration);// Update all customized configuration elements in Keycloak server. Any user, roles or client information in the representation are ignored
 
                 // TODO create each additional resource OR DELET THIS METHOD IF ALREADY PERFORMED DURING REALM ORIGIN CREATE METHOD CALL
                 // --- REALM CLIENTS REQUIRED BY CYBNITY LAYERS

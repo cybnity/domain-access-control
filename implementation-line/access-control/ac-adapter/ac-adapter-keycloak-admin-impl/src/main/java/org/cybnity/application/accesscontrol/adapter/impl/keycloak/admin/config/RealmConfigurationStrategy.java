@@ -20,9 +20,9 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
     public static boolean ENABLED_BY_DEFAULT = true;
 
     /**
-     * Default configuration defining that SSL is required with scope "all".
+     * Default configuration defining that SSL is required with scope "external request".
      */
-    public static String SSL_REQUIRED = RealmBuilder.SSL_MODE_ALL;
+    public static String SSL_REQUIRED = RealmBuilder.SSL_MODE_EXTERNAL;
 
     /**
      * Default protection enabled against brute force.
@@ -45,6 +45,18 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
     public static Boolean ADMIN_EVENTS_DETAILS_ENABLED = Boolean.FALSE;
 
     /**
+     * If enabled, allows managing organizations. Otherwise, existing organizations are still kept but you will not be able to manage them anymore or authenticate their members.
+     * Enabled by default allowing potential future automated management for user team members.
+     */
+    public static Boolean ORGANIZATION_ENABLED = Boolean.TRUE;
+
+    /**
+     * If enabled, allows managing admin permissions in the realm.
+     * Enabled by default.
+     */
+    public static Boolean ADMIN_PERMISSIONS_MGT_ENABLED = Boolean.TRUE;
+
+    /**
      * Default strategy constructor.
      */
     public RealmConfigurationStrategy() {
@@ -56,15 +68,15 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
      *
      * @param ctx  Mandatory context eventually including elements required during the Realm object preparation runtime.
      * @param args Mandatory configuration elements and or logical contents that can be used during the preparation process.
-     *             Ordered configuration elements are [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore, frontendUrl]
+     *             Ordered configuration elements are [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore, xframeoptions, frontendUrl]
      * @return The expected Realm instance including common settings.
      * @throws IllegalArgumentException When mandatory parameter is missing or is invalid.
      */
     @Override
     public Object prepare(IContext ctx, Object... args) throws IllegalArgumentException {
         if (ctx == null) throw new IllegalArgumentException("ctx parameter is required!");
-        if (args == null || args.length < 6)
-            throw new IllegalArgumentException("6 args parameters are required and shall include [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore]!");
+        if (args == null || args.length < 5)
+            throw new IllegalArgumentException("5 args parameters are required and shall include [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled]!");
 
         // --- Check each mandatory value for real configuration
 
@@ -95,7 +107,7 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
         Integer notBefore = null;
         try {
             notBefore = (Integer) args[5];
-        } catch (IndexOutOfBoundsException e) {
+        } catch (Exception e) {
             // Not provided input
         }
 
@@ -107,17 +119,40 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
                 .eventsEnabled(EVENTS_ENABLED)
                 .adminEventsEnabled(ADMIN_EVENTS_ENABLED)
                 .adminEventsDetailsEnabled(adminEventsDetailsEnabled)
+                .organizationEnabled(ORGANIZATION_ENABLED)
+                .adminPermissionsManagementEnabled(ADMIN_PERMISSIONS_MGT_ENABLED)
                 .notBefore(notBefore);
 
-        String xframeoptions = null;
+        String xframeoptions;
         try {
             xframeoptions = (String) args[6];
-        } catch (IndexOutOfBoundsException e) {
+        } catch (Exception e) {
             // Not dynamically provided input, so try to read from static configuration (environment variable based)
-            xframeoptions = ctx.get(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS);
+            xframeoptions = (String) ctx.get(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS.getName());
         }
-        // Set extension resources
+        // Set xframe configuration
         builder.xFrameOptions(xframeoptions);
+
+        String frontendurl;
+        try {
+            frontendurl = (String) args[7];
+        } catch (Exception e) {
+            // Not dynamically provided input, so try to read from static configuration (environment variable based)
+            frontendurl = (String) ctx.get(AdminConfigurationVariable.REALM_DEFAULT_FRONTEND_URL.getName());
+        }
+        // Set frontend configuration
+        builder.frontEndUrl(frontendurl);
+
+        String contentSecurityPolicy;
+        try {
+            contentSecurityPolicy = (String) args[8];
+        } catch (Exception e) {
+            // Not dynamically provided input, so try to read from static configuration (environment variable based)
+            contentSecurityPolicy = (String) ctx.get(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_CONTENT_SECURITY_POLICY.getName());
+        }
+        // Set content security policy configuration
+        builder.contentSecurityPolicy(contentSecurityPolicy);
+
 
         // TODO continue to create each required CYBNITY layer clients as currently defined in manually procedure for automated way
 

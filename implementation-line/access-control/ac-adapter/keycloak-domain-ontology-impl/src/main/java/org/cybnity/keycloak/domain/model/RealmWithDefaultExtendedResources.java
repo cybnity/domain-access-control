@@ -9,6 +9,11 @@ package org.cybnity.keycloak.domain.model;
 public class RealmWithDefaultExtendedResources extends Realm {
 
     /**
+     * Current builder allowing to manage decoration of this extended realm.
+     */
+    private final RealmWithDefaultExtendedResourcesBuilder builder;
+
+    /**
      * Default constructor of an extended Realm controlled via Builder Pattern.
      * This extended class allow to host specific additional rules (e.g; limited values; security restriction on authorized values) applied to definition of a RealmRepresentation (controlled and maintained by Keycloak external project).
      *
@@ -17,20 +22,26 @@ public class RealmWithDefaultExtendedResources extends Realm {
      */
     RealmWithDefaultExtendedResources(RealmWithDefaultExtendedResourcesBuilder builder) throws IllegalArgumentException {
         super(builder);
-        // Get dynamic defined attributes as extended customization elements
-        this.setBrowserSecurityHeaders(builder.browserSecurityHeaders());
+        this.builder = builder; // provide reusable builder for decoration execution
         // Apply complementary customization of default value not already defined dynamically by the builder
         decorate();
     }
 
     /**
-     * Create additional resources required like static default configuration for this realm (e.g; client scopes, roles).
+     * Create additional resources required like static default configuration for this realm (e.g; other systems clients and scopes, default application roles).
      */
     @Override
     public void decorate() {
-        super.decorate();
+        // Dynamic defined attributes as extended customization elements
 
         // --- REALM SETTINGS
+        this.setAttributes(builder.generalSettings()); // all general contents represented as attributes
+        this.setBrowserSecurityHeaders(builder.browserSecurityHeaders()); // all security defense headers
+        this.setOrganizationsEnabled(builder.isOrganizationEnabled); // organization management enabling
+        this.setAdminPermissionsEnabled(builder.isAdminPermissionsEnabled); // realm admin permissions management enabling
+
+        // --- OTHER CYBNITY SYSTEMS CLIENTS
+        this.setClients(builder.systemsClientConfigurations());
 
         // --- REALM CLIENT SCOPES
 

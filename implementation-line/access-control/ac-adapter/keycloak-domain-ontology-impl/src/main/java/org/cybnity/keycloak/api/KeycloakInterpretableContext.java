@@ -8,9 +8,21 @@ import java.util.EnumSet;
  */
 public class KeycloakInterpretableContext {
 
+    /**
+     * Referential of response codes usable into this context.
+     */
     private EnumSet<KeycloakAPIResponseCode> responseCodesReferential;
 
+    /**
+     * Define referential of response codes.
+     *
+     * @param responseCodesReferential Mandatory set of codes.
+     * @throws IllegalArgumentException When missing parameter.
+     */
     public void setReferential(EnumSet<KeycloakAPIResponseCode> responseCodesReferential) throws IllegalArgumentException {
+        if (responseCodesReferential == null) {
+            throw new IllegalArgumentException("responseCodesReferential parameter is required!");
+        }
         this.responseCodesReferential = responseCodesReferential;
     }
 

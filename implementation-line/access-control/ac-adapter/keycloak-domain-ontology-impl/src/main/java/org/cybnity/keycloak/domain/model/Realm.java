@@ -23,6 +23,8 @@ public class Realm extends RealmRepresentation implements ExtendedResourcesDecor
      */
     Realm(RealmBuilder builder) throws IllegalArgumentException {
         super();
+        if (builder == null) throw new IllegalArgumentException("builder cannot be null");
+        // Set the common values provided by the builder
         this.setRealm(builder.name);
         this.setEnabled(builder.isEnabled);
         this.setSslRequired(builder.sslModeRequired);
@@ -43,45 +45,9 @@ public class Realm extends RealmRepresentation implements ExtendedResourcesDecor
      */
     public static String applyLabelSanitizationRequirements(String label) throws IllegalArgumentException {
         // Remove any potential special character (ensure all non-alphanumeric characters are removed)
-        return removeAllSpecialCharacters(label);
+        return Sanitizer.removeAllSpecialCharacters(label);
     }
 
-    /**
-     * Remove any special character from string.
-     * Sanitization rules applied are:
-     * - All Non-ASCII Alphanumerics (example "Hello!@# World123_$%^&*()") removed (including spaces and underscores)
-     * - Unicode Alphanumeric (example "Café123!üñîcødé") removed
-     * - Underscores, accented letters and special characters (example "user_name123!@#") removed
-     * - Dot Characters (e.g., ".") removed
-     *
-     * @param label Mandatory text to sanitize.
-     * @return The cleaned label value.
-     * @throws IllegalArgumentException When label parameter is null.
-     */
-    private static String removeAllSpecialCharacters(String label) throws IllegalArgumentException {
-        if (label == null)
-            throw new IllegalArgumentException("The label parameter is required!");
-        if (label.isEmpty()) return label; // no need of sanitization (implementation optimization rule)
-
-        // Non-ASCII Alphanumerics (ASCII-Only) or inputs with no alphanumerics
-        // Remove all characters that are not ASCII letters (a-z, A-Z) or digits (0-9). This is ideal for use cases requiring strict ASCII compliance (e.g. realm label into URLs).
-        String cleaned = label.replaceAll("[^a-zA-Z0-9]", ""); // Remove non-ASCII alphanumerics (including spaces and underscores)
-
-        // Unicode Alphanumeric Sanitization
-        // Remove all non-alphanumeric characters from "Café123!üñîcødé" (includes Unicode letters)
-        cleaned = cleaned.replaceAll("[^\\p{Alnum}]", ""); // Use \p{Alnum} to include Unicode alphanumerics
-
-        // Remove ALL Unicode non-alphanumerics (including accented letters)
-        cleaned = cleaned.replaceAll("\\P{Alnum}", "");
-
-        // Remove underscores and special characters
-        cleaned = cleaned.replaceAll("[^\\\\w]|_", "");
-
-        // Remove dots
-        cleaned = cleaned.replaceAll("\\.", "");
-
-        return cleaned;
-    }
 
     /**
      * Apply a decoration of the realm with additional customization elements.

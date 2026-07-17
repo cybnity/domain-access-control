@@ -50,6 +50,7 @@ public class ExecutableAdminAdapterChecker extends ExecutableComponentChecker {
 
         // - required common configuration data for any realm configuration
         required.add(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS);
+        required.add(AdminConfigurationVariable.REALM_DEFAULT_FRONTEND_URL);
 
         return required;
     }

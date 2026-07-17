@@ -7,13 +7,37 @@ package org.cybnity.keycloak.api;
  */
 public enum KeycloakAPIResponseCode {
 
+    /**
+     * HTTP 200
+     */
     OK("HTTP", "200"),
+    /**
+     * HTTP 201
+     */
     CREATED("HTTP", "201"),
+    /**
+     * HTTP 204
+     */
     NO_CONTENT("HTTP", "204"),
+    /**
+     * HTTP 400
+     */
     BAD_REQUEST("HTTP", "400"),
+    /**
+     * HTTP 403
+     */
     FORBIDDEN("HTTP", "403"),
+    /**
+     * HTTP 404
+     */
     NOT_FOUND("HTTP", "404"),
+    /**
+     * HTTP 409
+     */
     CONFLICT("HTTP", "409"),
+    /**
+     * HTTP 500
+     */
     INTERNAL_SERVER_ERROR("HTTP", "500");
 
     private final String protocol;
@@ -30,10 +54,20 @@ public enum KeycloakAPIResponseCode {
         this.responseCode = responseCode;
     }
 
+    /**
+     * Get response assigned code.
+     *
+     * @return A code.
+     */
     public String responseCode() {
         return responseCode;
     }
 
+    /**
+     * Get protocol name.
+     *
+     * @return A name.
+     */
     public String protocol() {
         return protocol;
     }
