@@ -58,8 +58,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
       - Direct access grants Enabled: `ON`
         (means that client has access to username/password of user and exchange it directly with Keycloak server for access token. In terms of OAuth2 specification, this enables support of 'Resource Owner Password Credentials Grant' for this client)
 
-- Complete the created client details
-  Don't forget to SAVE any changed information via **Save** button!
+- Complete the created client details and don't forget to SAVE any changed information via **Save** button!
   - Settings
     - Access settings
       - Root URL: `${authBaseUrl}`
