@@ -26,6 +26,7 @@ public class Realm extends RealmRepresentation implements ExtendedResourcesDecor
         if (builder == null) throw new IllegalArgumentException("builder cannot be null");
         // Set the common values provided by the builder
         this.setRealm(builder.name);
+        this.setDisplayName(builder.displayName);
         this.setEnabled(builder.isEnabled);
         this.setSslRequired(builder.sslModeRequired);
         this.setBruteForceProtected(builder.bruteForceProtected);

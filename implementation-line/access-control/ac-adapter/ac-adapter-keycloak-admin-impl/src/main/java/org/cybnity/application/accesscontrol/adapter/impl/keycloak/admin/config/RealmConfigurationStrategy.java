@@ -68,7 +68,7 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
      *
      * @param ctx  Mandatory context eventually including elements required during the Realm object preparation runtime.
      * @param args Mandatory configuration elements and or logical contents that can be used during the preparation process.
-     *             Ordered configuration elements are [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore, xframeoptions, frontendUrl]
+     *             Ordered configuration elements are [real name, isEnabled, sslModeRequired, bruteForceProtected, adminEventsDetailsEnabled, notBefore, xframeoptions, frontendUrl, displayLabel]
      * @return The expected Realm instance including common settings.
      * @throws IllegalArgumentException When mandatory parameter is missing or is invalid.
      */
@@ -152,6 +152,14 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
         }
         // Set content security policy configuration
         builder.contentSecurityPolicy(contentSecurityPolicy);
+
+        String displayName;
+        try {
+            displayName = (String) args[9];
+            builder.displayName(displayName);
+        } catch (Exception e) {
+            // Not dynamically provided input
+        }
 
         // Add additional definition of configuration elements to include by default into new realm resource
 

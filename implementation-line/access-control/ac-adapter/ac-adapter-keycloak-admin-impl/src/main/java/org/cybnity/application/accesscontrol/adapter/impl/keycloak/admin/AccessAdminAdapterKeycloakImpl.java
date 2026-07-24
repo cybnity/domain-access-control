@@ -236,7 +236,7 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
     }
 
     @Override
-    public TenantDTO createTenant(String tenantLabel) throws IllegalArgumentException, OperationException {
+    public TenantDTO createTenant(String tenantLabel, String displayLabel) throws IllegalArgumentException, OperationException {
         if (tenantLabel == null || tenantLabel.isEmpty())
             throw new IllegalArgumentException("Tenant label parameter is required!");
         try {

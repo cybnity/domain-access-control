@@ -21,6 +21,7 @@ public class RealmBuilder {
     public static String SSL_MODE_NONE = "none";
 
     String name;
+    String displayName;
     boolean isEnabled;
     String sslModeRequired;
     boolean isOrganizationEnabled;
@@ -64,6 +65,16 @@ public class RealmBuilder {
             throw new IllegalArgumentException("The name value shall not contain spaces!");
 
         this.name = realmName;
+        return this;
+    }
+
+    /**
+     * The display name of page regarding the realm authentication page.
+     * @param displayName A label.
+     * @return This builder instance.
+     */
+    public RealmBuilder displayName(String displayName) {
+        this.displayName = displayName;
         return this;
     }
 

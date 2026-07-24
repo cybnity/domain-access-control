@@ -139,12 +139,12 @@ public class TenantRegistration extends ApplicationService implements ITenantReg
                         String tenantCurrentLabel = existingOrganizatonTenant.valueOfProperty(TenantDTO.PropertyAttributeKey.LABEL);
                         String tenantUUID = existingOrganizatonTenant.valueOfProperty(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY);
                         if (activityStatus != null && activityStatus) {
-                            // CASE: tenant (e.g platform tenant with same name and already in an operational activity status not re-assignable) creation is not authorized AND REJECTION SHALL BE NOTIFIED
+                            // CASE: tenant (e.g; platform tenant with same name and already in an operational activity status not re-assignable) creation is not authorized AND REJECTION SHALL BE NOTIFIED
                             commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTRATION_REJECTED, command, tenantCurrentLabel, activityStatus, tenantUUID);
                             // Set precision about cause of rejection
                             commandResponse.appendSpecification(new Attribute(org.cybnity.framework.domain.event.AttributeName.OUTPUT_CAUSE_TYPE.name(), ApplicationServiceOutputCause.EXISTING_TENANT_ALREADY_ASSIGNED.name()));
                         } else {
-                            // CASE: tenant (e.g platform tenant with same name and that is not in an operational activity status, and could potentially be re-assignable) return as known AND ELIGIBLE TO RE-ASSIGNMENT
+                            // CASE: tenant (e.g; platform tenant with same name and that is not in an operational activity status, and could potentially be re-assignable) return as known AND ELIGIBLE TO RE-ASSIGNMENT
                             // Prepare and return new tenant actioned event
                             commandResponse = prepareCommonResponseEvent(DomainEventType.TENANT_REGISTERED, command, tenantCurrentLabel, activityStatus, tenantUUID);
                         }

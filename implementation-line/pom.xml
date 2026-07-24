@@ -14,8 +14,6 @@
 	<name>CYBNITY ACCESS CONTROL APPLICATION</name>
 
 	<properties>
-		<!-- CYBNITY project default revision -->
-		<revision>0.1.0</revision>
 		<!-- CYBNITY Foundation dependencies link-->
 		<!-- staging-latest-SNAPSHOT feature-237-SNAPSHOT -->
 		<foundation.compatibility.version>feature-237-SNAPSHOT</foundation.compatibility.version>

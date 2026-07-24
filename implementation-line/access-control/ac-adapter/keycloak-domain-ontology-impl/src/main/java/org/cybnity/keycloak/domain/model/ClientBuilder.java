@@ -271,7 +271,7 @@ public class ClientBuilder {
     /**
      * Define list of URIs for redirections.
      * Valid URI pattern a browser can redirect to after a successful login.
-     * Simple wildcards are allowed such as 'http://example.com/*'.
+     * Simple wildcards are allowed such as '<a href="http://example.com/">example</a>*'.
      * Relative path can be specified too such as /my/relative/path/*.
      * Relative paths are relative to the client root URL, or if none is specified the auth server root URL is used.
      * For SAML, you must set valid URI patterns if you are relying on the consumer service URL embedded with the login request.
@@ -287,7 +287,7 @@ public class ClientBuilder {
     /**
      * Valid URI pattern a browser can redirect to after a successful logout.
      * A value of '+' or an empty field uses the list of valid redirect URIs.
-     * A value of '-' does not allow any post logout redirect URIs. Simple wildcards are allowed such as 'http://example.com/*'.
+     * A value of '-' does not allow any post logout redirect URIs. Simple wildcards are allowed such as '<a href="http://example.com/">example</a>*'.
      * A relative path can be specified too, such as /my/relative/path/*.
      * Relative paths are relative to the client root URL; if none is specified, the auth server root URL is used.
      *

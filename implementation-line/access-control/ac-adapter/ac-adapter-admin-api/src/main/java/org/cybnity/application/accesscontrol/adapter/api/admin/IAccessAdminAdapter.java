@@ -14,11 +14,12 @@ public interface IAccessAdminAdapter extends ICleanup, IHealthControl {
      * Create a new tenant identifiable by a logical name.
      *
      * @param tenantLabel Mandatory defined label allowing unique identification name of the tenant to create.
+     * @param displayLabel Optional label shown on login page.
      * @return New created tenant including description.
      * @throws IllegalArgumentException When mandatory parameter is not defined.
      * @throws OperationException       When the requested creation operation occurred a logical or technical problem.
      */
-    public TenantDTO createTenant(String tenantLabel) throws IllegalArgumentException, OperationException;
+    public TenantDTO createTenant(String tenantLabel, String displayLabel) throws IllegalArgumentException, OperationException;
 
     /**
      * Delete a tenant and all its configuration data.
