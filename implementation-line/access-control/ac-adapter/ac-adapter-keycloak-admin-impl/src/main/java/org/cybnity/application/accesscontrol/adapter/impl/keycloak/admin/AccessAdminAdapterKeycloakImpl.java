@@ -252,7 +252,10 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
                     Boolean.TRUE /* adminEventsDetailsEnabled */,
                     null /* notBefore */,
                     this.context.get(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS.getName()) /* assignable security defense xframe options*/,
-                    this.context.get(AdminConfigurationVariable.REALM_DEFAULT_FRONTEND_URL.getName()) /* assignable frontend configuration to new realm */);
+                    this.context.get(AdminConfigurationVariable.REALM_DEFAULT_FRONTEND_URL.getName()) /* assignable frontend configuration to new realm */,
+                    null /* contentSecurityPolicy */,
+                    displayLabel /* Optional display name for the realm page */
+            );
 
             Realm realm = (Realm) realmObj;
             if (realmObj instanceof RealmWithDefaultExtendedResources) {
