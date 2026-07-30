@@ -1,37 +1,31 @@
 ## PURPOSE
 
-This documentation presents the mapping of concerns, components (e.g services, capabilities providers) and object
-types (e.g entities, structural elements) managed by the Access Control domain model and the translation implementation
-models.
+This documentation presents the mapping of concerns, components (e.g services, capabilities providers) and object types (e.g entities, structural elements) managed by the Access Control domain model and the translation implementation models.
 
-The role of translator projects is to manage the transformation of/from AC domain model with custom implementation models (e.g; Keycloak domain model) reused as technical solution, via the integration
-of API elements (e.g services libraries, naming convention).
+The role of translator projects is to manage the transformation of/from AC domain model with custom implementation models (e.g; Keycloak domain model) reused as technical solution, via the integration of API elements (e.g services libraries, naming convention).
 
 # OBJECT MODELS TRANSLATED
 
-## CYBNITY AC-DOMAIN-MODEL PROJECT
+## KEYCLOAK TRANSLATOR
 
-Deliverable: `org.cybnity.application.access-control:domain` java library.
+Deliverables: `org.cybnity.application.access-control.translator:keycloak` java library
 
-Goal: several CYBNITY domain objects are exposed to other Access Control domain elements (e.g service layer) as
-specification components or implementation components hosting behaviors required by the domain promise.
+Goal: several CYBNITY domain objects are exposed to other Access Control domain elements (e.g service layer) as specification components or implementation components hosting behaviours required by the domain promise.
 
-Some structural elements already provided by the Keycloak domain library are manipulated to reused existing
-capabilities (e.g OAuth features; security concerns of the Identity Management).
+Some structural elements already provided by the Keycloak domain library (dependent of Keycloak ontology) are manipulated to reused existing capabilities (e.g OAuth features; security concerns of the Identity Management).
 
-Tactically, when a mapping of behaviors and/or data is managed between Keycloak components and CYBNITY domain model
-components, an encapsulation approach is primary selected.
+Tactically, when a mapping of behaviours and/or data is managed between Keycloak components and CYBNITY domain model components, an encapsulation approach is primary selected.
 
-For example, when a specific enhancement of the Keycloak domain model doesn't make sens in terms of quality or addionnal required
-feature, some standard design patterns (e.g interpreter, mediator, adaptor) are implemented to reduce the proliferation
-of direct dependency of Keycloak domain model to external other components (e.g CYBNITY domain service layer).
+For example, when a specific enhancement of the Keycloak domain model doesn't make sens in terms of quality or additional required features, some standard design patterns (e.g interpreter, mediator, adaptor) are implemented to reduce the proliferation of direct dependency of Keycloak domain model to external other components (e.g; CYBNITY domain service layer).
 
-## KEYCLOAK DOMAIN OBJECTS MAPPING (Translator intputs)
+Dependencies:
+- ac-adapter-api component: `org.cybnity.application.access-control.adapters:api` containing transformed versions (e.g; Data Transfer Object representing a Tenant temporary version of Keycloak Realm object) of Keycloak external ontology which are managed by AC domain.
 
-The conceptual mapping of main concerns supported by the CYBNITY domain model and Keycloak model is presented here to
-understand the several terms that are used into each side's technical documentation.
+## KEYCLOAK DOMAIN OBJECTS MAPPING (Translator Inputs/Outputs)
 
-The translation of the Keycloak domain ontolgy and object types with the CYBNITY Access Control domain (mapping according to the mapping table presented here) is ensured by the [keycloak-translator](keycloak-translator) implementation library project.
+The conceptual mapping of main concerns supported by the CYBNITY domain model and Keycloak model is presented here to understand the several terms that are used into each side's technical documentation.
+
+The translation of the Keycloak domain ontology and object types with the CYBNITY Access Control domain (mapping according to the mapping table presented here) is ensured by the [keycloak-translator](keycloak-translator) implementation library project.
 
 Documentation: [Keycloak client javadoc](https://www.keycloak.org/docs-api/21.0.1/javadocs/index.html)
 
@@ -45,11 +39,11 @@ Documentation: [Keycloak client javadoc](https://www.keycloak.org/docs-api/21.0.
 | IResourceServer         | Host of protected resources which accept requests performed over confidential clients                                                                                                                                                                                                                                                                                          |                      |                                                                                                                                                                                                                 |
 | IScope                  | One or many policies and permissions allowed for users to access on a resource                                                                                                                                                                                                                                                                                                 |                      |                                                                                                                                                                                                                 |
 | IPolicyProvider         | Service providing policies regarding resources which can be protected                                                                                                                                                                                                                                                                                                          |                      |                                                                                                                                                                                                                 |
-| Tenant                  | Represent an organization subscription that allow to define a scope of multi-tenant application regarding a named organization which facilitates the users registrations through invitation                                                                                                                                                                                    | Realm                | Define a tenant and its context that define a boundary of Access Control (AC)                                                                                                                                   |
+| TenantDTO | Represent an organization subscription that allow to define a scope of multi-tenant application regarding a named organization which facilitates the users registrations through invitation | Realm | Define a tenant and its context that define a boundary of Access Control (AC) |
 | OrganizationalStructure | Represent a company, association, group of companies, or institution who is owner of an account who can have interactions with systems. Social entity defining an owner of a Tenant                                                                                                                                                                                            |                      |                                                                                                                                                                                                                 |
 | Person                  | Physical social entity (e.g human person) who can have interactions with systems                                                                                                                                                                                                                                                                                               |                      |                                                                                                                                                                                                                 |
 |                         |                                                                                                                                                                                                                                                                                                                                                                                | Permission           | Privilege allowed regarding a subject                                                                                                                                                                           |
-| Role, ClientScopeBasedAccessControl | Role managed into a context (e.g; that could be assigned to an account about a system type, a user type, a function) with or without defined scope (e.g; client scope) | Role                 | Logical role (e.g realm or client role) including allocated permissions      |
+| RoleDTO| Role managed into a context (e.g; that could be assigned to an account about a system type, a user type, a function) with or without defined scope (e.g; client scope) | Role | Logical role (e.g realm or client role) including allocated permissions |
 | SmartSystem             | Software and/or hardware system (e.g autonomous accessory representing a person or organization) who can have interactions with users, other systems, and UIAM system.                                                                                                                                                                                                         | Client               | Client adapter allowing authorization management and representing a system; include settings regarding permissions allowed to adapter. Can be linked to a ServiceAccount regarding group of permissions allowed |
 |                         |                                                                                                                                                                                                                                                                                                                                                                                | ServiceAccount       | Group of shared permissions according to allowed role(s)                                                                                                                                                        |
 
