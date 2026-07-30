@@ -91,9 +91,9 @@ The source codes managed in theses sub-projects (Maven projects) are supporting 
 - [Adapter libraries](/implementation-line/access-control/ac-adapter)
   - Adapter API libraries
   - Adapter implementation components
-- [Adapter translator libraries](/implementation-line/access-control/ac-translator)
+- Adapter translator libraries
   - UI translator library
-  - Keycloak translator library
+  - [Keycloak translator](/implementation-line/access-control/ac-translator/keycloak-translator) library
 - [Domain model library](/implementation-line/access-control/ac-domain-model)
 - [Domain service libraries](/implementation-line/access-control/ac-service)
   - Service API library
