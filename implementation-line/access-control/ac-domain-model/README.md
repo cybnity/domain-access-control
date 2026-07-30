@@ -96,7 +96,6 @@ type, as Identity & Access Management (IAM) features and domain objects.
 | Class Type              | Motivation                                                                                                                  |
 |:------------------------|:----------------------------------------------------------------------------------------------------------------------------|
 | Account                 | Domain root aggregate object relative to a subject's usable account                                                         |
-| ApplicationRole         | Applicative role managed by a domain (e.g; that could be assigned to an account)                                            |
 | OrganizationalStructure | Organizational structure (e.g company, association, group of companies, institution) who can have interactions with systems |
 | Person                  | Physical social entity (e.g human person)                                                                                   |
 | SmartSystem             | Represent a software and/or hardware system (e.g autonomous accessory representing a person or organization)                |
