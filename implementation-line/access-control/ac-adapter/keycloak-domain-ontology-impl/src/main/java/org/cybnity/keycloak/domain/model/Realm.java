@@ -40,11 +40,11 @@ public class Realm extends RealmRepresentation implements ExtendedResourcesDecor
      * Apply rules of cleaning (also called Sanitization) on a label as required by Keycloak domain.
      * (e.g.; remove any space or special character to be usable into an URL path).
      *
-     * @param label Mandatory label to reformat.
+     * @param label Mandatory label to eventually reformat.
      * @return The label value after cleaning.
      * @throws IllegalArgumentException When label parameter is null.
      */
-    public static String applyLabelSanitizationRequirements(String label) throws IllegalArgumentException {
+    public static String applyNameSanitizationRequirements(String label) throws IllegalArgumentException {
         // Remove any potential special character (ensure all non-alphanumeric characters are removed)
         return Sanitizer.removeAllSpecialCharacters(label);
     }

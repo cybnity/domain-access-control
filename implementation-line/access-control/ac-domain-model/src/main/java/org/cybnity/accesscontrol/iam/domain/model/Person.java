@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * Represent a physical social entity (e.g human person) who can have
+ * Represent a physical social entity (e.g; human person) who can have
  * interactions with systems.
  *
  * @author olivier

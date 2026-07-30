@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * Represent a software and/or hardware system (e.g autonomous accessory
+ * Represent a software and/or hardware system (e.g; autonomous accessory
  * representing a person or organization) who can have interactions with
  * systems.
  *

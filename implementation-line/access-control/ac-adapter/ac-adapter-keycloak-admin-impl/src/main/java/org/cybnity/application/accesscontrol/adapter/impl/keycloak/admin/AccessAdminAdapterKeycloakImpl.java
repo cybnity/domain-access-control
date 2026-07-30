@@ -295,11 +295,10 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
             if (defaultConfiguration != null) {
                 // Read customization elements (extended contents requiring to be attached/changed to a realm which is already existing into Keycloak)
 
-                // TODO create each additional resource OR DELET THIS METHOD IF ALREADY PERFORMED DURING REALM ORIGIN CREATE METHOD CALL
+                // TODO create each additional resource OR DELETE THIS METHOD IF ALREADY PERFORMED DURING REALM ORIGIN CREATE METHOD CALL
                 // --- REALM CLIENTS REQUIRED BY CYBNITY LAYERS
                 // --- Identify default dedicated Clients required by CYBNITY systems to exchanges with Keycloak (e.g; from several types of components and layers)
                 ClientsResource clients = toEnhance.clients();
-                defaultConfiguration.getClients();
                 //Response createdClientResult = clients.create(new ClientRepresentation());
 
 

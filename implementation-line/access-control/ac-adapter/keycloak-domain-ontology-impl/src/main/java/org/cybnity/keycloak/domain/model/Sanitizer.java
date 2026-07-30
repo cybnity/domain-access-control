@@ -6,6 +6,18 @@ package org.cybnity.keycloak.domain.model;
 public class Sanitizer {
 
     /**
+     * Remove any blank character from string.
+     *
+     * @param label Mandatory label to clean.
+     * @return The clean version of label without any blank character.
+     * @throws IllegalArgumentException When mandatory parameter is missing.
+     */
+    public static String removeAllBlankCharacters(String label) throws IllegalArgumentException {
+        if (label == null) throw new IllegalArgumentException("label cannot be null");
+        return label.trim();
+    }
+
+    /**
      * Remove any special character from string.
      * Sanitization rules applied are:
      * All Non-ASCII Alphanumerics removed (including spaces and underscores)
@@ -38,6 +50,9 @@ public class Sanitizer {
 
         // Remove dots
         cleaned = cleaned.replaceAll("\\.", "");
+
+        // Remove blank characters
+        cleaned = removeAllBlankCharacters(cleaned);
 
         return cleaned;
     }

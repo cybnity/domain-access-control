@@ -184,6 +184,7 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
      */
     private ClientRepresentation webReactiveFrontEndSystemClient() {
         List<String> redirectUris = new ArrayList<>();
+        // TODO Change static value by read of envt variables
         redirectUris.add("http://dev-deploy.cybnity.tech/*");
         redirectUris.add("/*");
         redirectUris.add("http://dev-deploy.cybnity.tech:3000/*");
@@ -215,10 +216,7 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
                 .redirectURIs(redirectUris)
                 .postLogoutRedirectUris(postLogoutRedirectUris)
                 .webOrigins(webOrigins)
-                .build();
-
-        // TODO refactoring of static test values with real values contextualized from environment variables
-        // as default configuration
+                .build(); // return as default configuration
     }
 
 }

@@ -2,6 +2,7 @@ package org.cybnity.keycloak.domain.model;
 
 /**
  * Builder pattern implementation class allowing to respect the build rules of Keycloak regarding a RealmRepresentation object.
+ * This class check the authorized values eligible for Realm build according to the format rules supported by Keycloak.
  * See example of value supported at <a href="https://jirutka.github.io/keycloak-json-schema/keycloak-realm-26.json">RealmRepresentation object via JSON</a>.
  *
  * @author olivier
@@ -47,7 +48,7 @@ public class RealmBuilder {
     /**
      * The name of the Realm.
      * This method only apply basic Keycloak minimum sanitization rule that check is real name is not empty and does not contain space character.
-     * To ensure better sanitization of real name, use {@link Realm#applyLabelSanitizationRequirements(String)} method before to clean the real name about multiple special characters generating potential problem for usage into URLs.
+     * To ensure better sanitization of real name, use {@link Realm#applyNameSanitizationRequirements(String)} method before to clean the real name about multiple special characters generating potential problem for usage into URLs.
      *
      * @param realmName A mandatory defined logical name.
      * @return This builder instance.
