@@ -100,6 +100,7 @@ type, as Identity & Access Management (IAM) features and domain objects.
 | OrganizationalStructure | Organizational structure (e.g company, association, group of companies, institution) who can have interactions with systems |
 | Person                  | Physical social entity (e.g human person)                                                                                   |
 | SmartSystem             | Represent a software and/or hardware system (e.g autonomous accessory representing a person or organization)                |
+| Role                    | Represent a generic role allowed to a user or a system type, named according to convention, and applicable into a scope     |
 
 ```mermaid
 %%{
