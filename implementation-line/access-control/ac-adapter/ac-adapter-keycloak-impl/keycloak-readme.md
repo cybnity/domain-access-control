@@ -78,11 +78,11 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
       - Frontchannel logout session required: `ON`
 
 #### Applicative role definition
-From **Roles** section, add a new standard role named `user` described as `standard user role of the frontend user interface`.
-
 From **Realm Roles** menu, add a new realm role named `tenant-user` via the **Create role** button:
 - Role name: `tenant-user`
 - Description: `Standard role of a user role (e.g frontend web user interface, backend api system) authorized to be used into the CYBNITY tenant context`
+
+From **Roles** section, add a new standard role named `user` described as `standard user role of the frontend user interface`.
 
 A composite role is a role that has one or more additional roles associated with it. When a composite role is mapped to a user, the user gains the roles associated with the composite role.
 
