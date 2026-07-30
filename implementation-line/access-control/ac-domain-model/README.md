@@ -80,13 +80,13 @@ Several components of specification or implementation are supporting the domain 
 
 Several sub-packages are implemented according to the specialization of sub-domains.
 
-### AC DOMAIN
+### CYBNITY FRAMEWORK
 
-The package `org.cybnity.accesscontrol.domain.model` provide common components regarding the access control domain.
+The package `org.cybnity.framework.domain.model` provide common components reusable by any CYBNITY application domain.
 
 | Class Type | Motivation                                                                                                                                                                                                                                                                                                                                                                                                               |
 |:-----------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| <<Tenant>> | Represent an organization subscription that allow to define a scope of multi-tenant application regarding a named organization which facilitates the users and organization's systems registrations.<br>NOTE: this high-level object is provided by the CYBNITY framework domain by default from `org.cybnity.framework.domain.model` package. So reused class type is not over-specified into the Access Control domain |
+| Tenant | Represent an organization subscription that allow to define a scope of multi-tenant application regarding a named organization which facilitates the users and organization's systems registrations.<br>NOTE: this high-level object is provided by the CYBNITY framework domain by default from `org.cybnity.framework.domain.model` package. So reused class type is not over-specified into the Access Control domain |
 
 ### IAM SUB-PACKAGE
 
@@ -96,6 +96,7 @@ type, as Identity & Access Management (IAM) features and domain objects.
 | Class Type              | Motivation                                                                                                                  |
 |:------------------------|:----------------------------------------------------------------------------------------------------------------------------|
 | Account                 | Domain root aggregate object relative to a subject's usable account                                                         |
+| ApplicationRole         | Applicative role managed by a domain (e.g; that could be assigned to an account)                                            |
 | OrganizationalStructure | Organizational structure (e.g company, association, group of companies, institution) who can have interactions with systems |
 | Person                  | Physical social entity (e.g human person)                                                                                   |
 | SmartSystem             | Represent a software and/or hardware system (e.g autonomous accessory representing a person or organization)                |
