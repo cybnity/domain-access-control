@@ -79,16 +79,17 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
 
 #### Applicative role definition
 From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-server` via the **Create role** button:
-- Role name: `tenant-enduser`
+- Role name: `tenant-user`
 - Description: `Standard role of a human user authorized to use a realm's contents perimeter`
 
-From **Roles** section, add a new standard role named `user` described as `standard user role of the frontend user interface`.
+#### Client roles definition
+From **Clients > item > Roles** section, add a new standard role named `enduser` described as `standard user role of the frontend user interface`.
 
 A composite role is a role that has one or more additional roles associated with it. When a composite role is mapped to a user, the user gains the roles associated with the composite role.
 
 From new created realm role, define associated roles (filter by clients) via the **Action > Add associated roles** top-right button:
 - Find and select the `web-reactive-frontend-system` item
-- Assign it to the `tenant-enduser` account type
+- Assign it to the `tenant-user` account type
 
 #### Client scope creation
 If there are many applications to secure and register within the organization (e.g multi tenant), it can become tedious to configure role scope mappings for each of these systems' clients. Keycloak allows to define a shared client configuration in an entity called a client scope.
