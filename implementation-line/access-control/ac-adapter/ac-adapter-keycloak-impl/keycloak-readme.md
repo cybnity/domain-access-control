@@ -83,7 +83,7 @@ From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-ser
 - Description: `Standard role of any type of user authorized to use a realm's contents perimeter`
 
 #### Client roles definition
-From **Clients > item > Roles** section, add a new standard role named `enduser` described as `standard user role of the frontend user interface`.
+From **Clients > item > Roles** section, add a new standard role named `endpoint-ui-user` described as `standard user role of the frontend user interface`.
 
 A composite role is a role that has one or more additional roles associated with it. When a composite role is mapped to a user, the user gains the roles associated with the composite role.
 
@@ -210,9 +210,9 @@ From **Clients > reactive-backend-system > Client Scopes** panel, add the custom
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
 
 #### Applicative role definition
-From **Realm roles** menu, complete the **tenant-enduser** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
+From **Realm roles** menu, complete the **tenant-user** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
 - Find and select the `reactive-backend-system` item
-- Assign it to the `tenant-enduser` account type
+- Assign it to the `endpoint-ui-user` account type
 
 #### Generated setting files
 The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](reactive-backend-system-keycloak.json).
