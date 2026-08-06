@@ -35,7 +35,7 @@ Key types of subject requiring roles and permissions support for a domain model 
 - System types:
   - Infrastructure resource (e.g; storage area or persistence system; network equipment)
   - Security tool (e.g; standalone device deployed into a protected zone as security control system)
-  - Application (e.g; CYBNITY domain application component executing process)
+  - Application (e.g; API Endpoint exposing websocket or JSON-RPC for AI Agentd, or CYBNITY domain application component executing process)
 
 #### Defined key Roles and Naming Convention
 The definition of a default consistent naming scheme for generic support of roles is based:
