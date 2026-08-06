@@ -80,7 +80,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
 #### Applicative role definition
 From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-server` via the **Create role** button:
 - Role name: `use-tenant`
-- Description: `Basic role of any type of user authorized to use a realm's contents perimeter`
+- Description: `Function based role regarding authorized access and use of resources under realm ownership`
 
 #### Client roles definition
 From **Clients > item > Roles** section, add a new standard role named `access-applications` described as `standard role for access to exposed CYBNITY application (e.g; frontend user interface, or backend API)`.
