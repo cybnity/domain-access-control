@@ -78,9 +78,9 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
       - Frontchannel logout session required: `ON`
 
 #### Applicative role definition
-From **Realm Roles** menu, add a new realm role named `tenant-user` via the **Create role** button:
-- Role name: `tenant-user`
-- Description: `Standard role of a user role (e.g frontend web user interface, backend api system) authorized to be used into the CYBNITY tenant context`
+From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-server` via the **Create role** button:
+- Role name: `endpoint-web-reactive-server`
+- Description: `Standard role of a system role (e.g frontend web user interface, backend api system) authorized to be used into the CYBNITY tenant context`
 
 From **Roles** section, add a new standard role named `user` described as `standard user role of the frontend user interface`.
 
@@ -88,7 +88,7 @@ A composite role is a role that has one or more additional roles associated with
 
 From new created realm role, define associated roles (filter by clients) via the **Action > Add associated roles** top-right button:
 - Find and select the `web-reactive-frontend-system` item
-- Assign it to the `tenant-user` account type
+- Assign it to the `tenant-enduser` account type
 
 #### Client scope creation
 If there are many applications to secure and register within the organization (e.g multi tenant), it can become tedious to configure role scope mappings for each of these systems' clients. Keycloak allows to define a shared client configuration in an entity called a client scope.
@@ -198,7 +198,7 @@ From **Client Scopes > ui-layer-systems-roles**:
     - Add to access token: `ON`
     - Add to userinfo: `ON`
 - Scope
-  - Make new assignment of `tenant-user` role to `ui-layer-systems-roles` account
+  - Make new assignment of `tenant-enduser` role to `ui-layer-systems-roles` account
 
 From **Clients > web-reactive-frontend-system > Client Scopes** panel, add the custom scope previously created via the **Add client scope** button:
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
@@ -209,9 +209,9 @@ From **Clients > reactive-backend-system > Client Scopes** panel, add the custom
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
 
 #### Applicative role definition
-From **Realm roles** menu, complete the **tenant-user** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
+From **Realm roles** menu, complete the **tenant-enduser** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
 - Find and select the `reactive-backend-system` item
-- Assign it to the `tenant-user` account type
+- Assign it to the `tenant-enduser` account type
 
 #### Generated setting files
 The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](reactive-backend-system-keycloak.json).
@@ -233,7 +233,7 @@ Create a test account (e.g dedicated to the frontend application test) declared 
     - Set a password for the user account and toggle `Temporary` to `OFF`
     - Validate password creation
   - **Role Mapping** section:
-      - Assign the `tenant-user` realm role to the user allowing him to have automatically assigned mapped role defined for each client
+      - Assign the `tenant-enduser` realm role to the user allowing him to have automatically assigned mapped role defined for each client
 
 #### User account authentication check
 When disconnected of any user account:
