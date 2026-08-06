@@ -45,9 +45,6 @@ public class Sanitizer {
         // Remove ALL Unicode non-alphanumerics (including accented letters)
         cleaned = cleaned.replaceAll("\\P{Alnum}", "");
 
-        // Remove underscores and special characters
-        cleaned = cleaned.replaceAll("[^\\\\w]|_", "");
-
         // Remove dots
         cleaned = cleaned.replaceAll("\\.", "");
 

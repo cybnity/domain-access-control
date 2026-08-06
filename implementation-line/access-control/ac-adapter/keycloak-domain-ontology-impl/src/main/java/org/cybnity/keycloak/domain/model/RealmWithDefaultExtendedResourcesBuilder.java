@@ -1,6 +1,7 @@
 package org.cybnity.keycloak.domain.model;
 
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -178,11 +179,19 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
     }
 
     /**
+     * Default prepared front end client (singleton instance)
+     */
+    Client webReactiveFrontEndSystemClient;
+
+    /**
      * Prepare a client dedicated to CYBNITY web reactive front end system allowing end-users SSO tokens control requests to Keycloak.
      *
-     * @return A client default configuration.
+     * @return A client default configuration as singleton.
      */
     private ClientRepresentation webReactiveFrontEndSystemClient() {
+        if (webReactiveFrontEndSystemClient != null) return webReactiveFrontEndSystemClient;
+
+        // Prepare singleton instance
         List<String> redirectUris = new ArrayList<>();
         // TODO Change static value by read of envt variables
         redirectUris.add("http://dev-deploy.cybnity.tech/*");
@@ -197,7 +206,7 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
         webOrigins.add("+");
         webOrigins.add("http://dev-deploy.cybnity.tech:3000/*");
 
-        return new ClientBuilder()
+        webReactiveFrontEndSystemClient = new ClientBuilder()
                 .clientId("web-reactive-frontend-system")
                 .name("Web Reactive Frontend Client")
                 .protocol(ClientBuilder.PROTOCOL_OPENID_CONNECT)
@@ -217,6 +226,26 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
                 .postLogoutRedirectUris(postLogoutRedirectUris)
                 .webOrigins(webOrigins)
                 .build(); // return as default configuration
+        return webReactiveFrontEndSystemClient;
+    }
+
+    /**
+     * Prepare a list of default roles that are required for a realm usage.
+     * For example, the roles assigned by default to any type of user and-or system roles (e.g; dedicated to environment or system types) required by CYBNITY application modules to use Keycloak authorization for access to specific resources.
+     *
+     * @return A list of transversal and default roles (e.g; "tenant-user" role) assignable to a realm.
+     */
+    public List<RoleRepresentation> tenantDefaultRealmRoles() {
+        List<RoleRepresentation> roles = new ArrayList<>();
+        // TODO Chante static roles definitions required by CYBNITY application and UI layers, for read from envt variables
+        // doc: https://github.com/cybnity/domain-access-control/blob/feature-237/implementation-line/access-control/ac-domain-model/domain-model-components.md
+
+        // Define basic role regarding any type of user authorized to use a tenant perimeter (equals to a realm scope)
+        roles.add(new RealmRoleBuilder()
+                .name(Sanitizer.removeAllBlankCharacters("tenant-user"))
+                .description("Standard role of any type of user authorized to use a realm's contents perimeter")
+                .build());
+        return roles;
     }
 
 }

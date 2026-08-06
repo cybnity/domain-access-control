@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 
 /**
- * Utility class ensuring the mapping of data relative to a Keycloak RealmRepresentation object structure (keycloak domain ontology based) with a Tenant data view object structure (Access Control domain ontology base).
+ * Utility class ensuring the mapping of data relative to a Keycloak RealmRepresentation object structure (keycloak domain ontology based) with a TenantDTO data view object structure (Access Control domain ontology base).
  */
 public class RealmRepresentationMapper extends AbstractDTOMapper<TenantDTO> implements KeycloakOntologyMapper {
 

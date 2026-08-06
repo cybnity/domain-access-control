@@ -4,8 +4,6 @@ import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 import org.keycloak.representations.idm.ClientRepresentation;
 
-import java.util.List;
-
 /**
  * Represents a client resource.
  * It's an extended ClientRepresentation that allow control of secured values to ensure CYBNITY / Keycloak compatibility.

@@ -4,7 +4,9 @@ import org.cybnity.accesscontrol.ConfigurationStrategy;
 import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.AdminConfigurationVariable;
 import org.cybnity.framework.IContext;
 import org.cybnity.keycloak.domain.model.RealmBuilder;
+import org.cybnity.keycloak.domain.model.RealmWithDefaultExtendedResources;
 import org.cybnity.keycloak.domain.model.RealmWithDefaultExtendedResourcesBuilder;
+import org.keycloak.admin.client.Keycloak;
 
 /**
  * Strategy concrete class defining the composite of configuration elements regarding a Realm creation.
@@ -164,5 +166,18 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
         // Add additional definition of configuration elements to include by default into new realm resource
 
         return builder.build(); // Prepared Realm instance according to Keycloak values rules and return configured instance
+    }
+
+    /**
+     * Get the type of helper compatible with the current realm configuration strategy, and that allow to identify the additional resources that a Realm shall be completed.
+     *
+     * @param keycloak    Mandatory operational client.
+     * @param tenantLabel Mandatory tenant identifier to enhance.
+     * @param defaultConfig Mandatory default configuration as provider of configuration elements.
+     * @return A helper.
+     * @throws IllegalArgumentException When mandatory parameter is missing.
+     */
+    public RealmDefaultComplementaryResourcesHelper realmComplementaryDefaultResourcesHelper(Keycloak keycloak, String tenantLabel, RealmWithDefaultExtendedResources defaultConfig) throws IllegalArgumentException {
+        return new RealmDefaultComplementaryResourcesHelper(keycloak, tenantLabel, defaultConfig);
     }
 }

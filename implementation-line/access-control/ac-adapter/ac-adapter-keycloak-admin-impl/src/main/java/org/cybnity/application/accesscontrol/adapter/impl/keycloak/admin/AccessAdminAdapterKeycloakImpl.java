@@ -16,10 +16,8 @@ import org.cybnity.keycloak.domain.model.Realm;
 import org.cybnity.keycloak.domain.model.RealmWithDefaultExtendedResources;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
-import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.ServerInfoResource;
-import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.admin.client.token.TokenManager;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -244,7 +242,8 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
             // https://www.keycloak.org/securing-apps/authz-client documentation
 
             // Prepare of realm default configured version, included default extended resources to record into the created new Realm
-            Object realmObj = new RealmConfigurationStrategy().prepare(this.context,
+            RealmConfigurationStrategy configStrategy = new RealmConfigurationStrategy();
+            Object realmObj = configStrategy.prepare(this.context,
                     tenantLabel,
                     RealmConfigurationStrategy.ENABLED_BY_DEFAULT /* isEnabled */,
                     RealmConfigurationStrategy.SSL_REQUIRED /* sslModeRequired */,
@@ -262,8 +261,8 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
                 // Create the Realm object including all extended resourced
                 RealmWithDefaultExtendedResources defaultConfig = (RealmWithDefaultExtendedResources) realm; // Imports a realm from a full representation of that realm
                 this.keycloakAdminClient.realms().create(defaultConfig);
-                // Create attached configuration resources extending default configuration (e.g; roles, user, clients...)
-                createExtendedResources(defaultConfig, this.keycloakAdminClient.realm(tenantLabel));
+                // Create complementary default resources required for realm
+                configStrategy.realmComplementaryDefaultResourcesHelper(this.keycloakAdminClient, tenantLabel, defaultConfig).createResources();
             } else {
                 // Create Realm object into Keycloak
                 this.keycloakAdminClient.realms().create(realm); // Imports a realm from a full representation of that realm
@@ -281,53 +280,6 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
         }
     }
 
-    /**
-     * Create additional Keycloak resources as expected default configuration regarding extended contents attached to a realm of Keycloak.
-     *
-     * @param defaultConfiguration Optional configuration including all default values and settings elements which shall be created as additional resources in Keycloak. When null, none additional resource created into Keycloak.
-     * @param toEnhance            Mandatory current existing realm resource client (accessor to Keycloak) that shall be extended in terms of settings into Keycloak instance.
-     * @throws IllegalArgumentException When mandatory parameter is missing.
-     * @throws OperationException       When problem occurred during additional resources creation with Keycloak server.
-     */
-    private void createExtendedResources(Realm defaultConfiguration, RealmResource toEnhance) throws IllegalArgumentException, OperationException {
-        if (toEnhance == null) throw new IllegalArgumentException("toEnhance parameter is required!");
-        try {
-            if (defaultConfiguration != null) {
-                // Read customization elements (extended contents requiring to be attached/changed to a realm which is already existing into Keycloak)
-
-                // TODO create each additional resource OR DELETE THIS METHOD IF ALREADY PERFORMED DURING REALM ORIGIN CREATE METHOD CALL
-                // --- REALM CLIENTS REQUIRED BY CYBNITY LAYERS
-                // --- Identify default dedicated Clients required by CYBNITY systems to exchanges with Keycloak (e.g; from several types of components and layers)
-                ClientsResource clients = toEnhance.clients();
-                //Response createdClientResult = clients.create(new ClientRepresentation());
-
-
-                // --- REALM CLIENT SCOPES supported
-
-                // --- REALM ROLES supported
-
-                // --- REALM USERS
-                UsersResource defaultUsers = toEnhance.users();
-
-                // --- REALM GROUPS
-
-                // --- REALM SESSIONS
-
-                // --- REALM EVENTS
-
-                // --- REALM SETTINGS
-
-                // --- REALM AUTHENTICATION
-
-                // --- REALM IDENTITY PROVIDERS
-
-                // --- REALM USER FEDERATION
-            }
-        } catch (Exception e) {
-            // Keycloak interactions problem
-            throw new OperationException(e);
-        }
-    }
 
     @Override
     public boolean deleteTenant(String tenantLabel, boolean force) throws IllegalArgumentException, OperationException {

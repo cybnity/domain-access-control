@@ -5,18 +5,10 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 import org.keycloak.representations.idm.RoleRepresentation;
 
 /**
- * A realm role is global within a realm and applies to all clients in the realm. Realm role represents organization-wide permissions.
- * For example, type of role used for app user, offline access role, uma authorization, default realm admin roles.
- * <p>
- * Best usages:
- * For roles that are truly global
- * When multiple applications share the same role semantics
- * When permissions are organization-wide
- * <p>
- * Recommended: avoid using realm roles for app specific permissions.
+ * A role represents organization-wide permissions or specific scope permissions.
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_IA_2")
-public class RealmRole extends RoleRepresentation implements ExtendedResourcesDecorator {
+public class Role extends RoleRepresentation implements ExtendedResourcesDecorator {
 
     /**
      * Default constructor of Role controlled via Builder Pattern.
@@ -25,11 +17,25 @@ public class RealmRole extends RoleRepresentation implements ExtendedResourcesDe
      * @param builder Mandatory builder.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    RealmRole(RealmRoleBuilder builder) throws IllegalArgumentException {
+    Role(RoleBuilder builder) throws IllegalArgumentException {
         super();
         if (builder == null) throw new IllegalArgumentException("builder cannot be null");
         // Set the common values provided by the builder
-        // TODO Add each values read from builder to this representation
+        this.setName(builder.name);
+        this.setDescription(builder.description);
+    }
+
+    /**
+     * Apply rules of cleaning (also called Sanitization) on a label as required by Keycloak domain.
+     * (e.g.; remove any space or special character to be usable as referenced by other object).
+     *
+     * @param label Mandatory label to eventually reformat.
+     * @return The label value after cleaning.
+     * @throws IllegalArgumentException When label parameter is null.
+     */
+    public static String applyNameSanitizationRequirements(String label) throws IllegalArgumentException {
+        // Remove any potential special character (ensure all non-alphanumeric characters are removed)
+        return Sanitizer.removeAllSpecialCharacters(label);
     }
 
     /**
