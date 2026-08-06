@@ -83,7 +83,7 @@ From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-ser
 - Description: `Standard role of any type of user authorized to use a realm's contents perimeter`
 
 #### Client roles definition
-From **Clients > item > Roles** section, add a new standard role named `endpoint-ui-user` described as `standard user role of the frontend user interface`.
+From **Clients > item > Roles** section, add a new standard role named `endpoint-ui-user` described as `standard user role of the an endpoint exposed by CYBNITY application (e.g; frontend user interface, or backend API)`.
 
 A composite role is a role that has one or more additional roles associated with it. When a composite role is mapped to a user, the user gains the roles associated with the composite role.
 
