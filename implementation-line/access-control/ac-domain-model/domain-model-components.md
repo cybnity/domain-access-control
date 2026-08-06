@@ -45,7 +45,7 @@ The definition of a default consistent naming scheme for generic support of role
   - Application module role (e.g; "process-module-access-control", "ui-module-access-control")
 
 - by function with naming convention based on template `<<function category name>>-<<responsibility label>>`
-  - Tenant user role (e.g; "tenant-enduser", "tenant-manager", "tenant-enduser-security-CISO")
+  - User with function representative role (e.g; "manage-tenant", "access-applications", "view-gui")
   - Security representative role (e.g; "security-CISO", "security-ISO", "security-risk-analyst", "security-controls-manager" or any role defined by a ISMS framework implemented in CYBNITY software suite instance by an organization)
   - System maintainer role (e.g; "maintenance-devops" as CYBNITY systems DevOps; "maintenance-deployer" or "maintenance-auditor")
   - Solution administrator role (e.g; "administration-contents-manager" about the contents perimeter regarding a CYBNITY tenant)
