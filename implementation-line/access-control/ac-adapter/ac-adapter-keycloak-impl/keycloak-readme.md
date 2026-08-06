@@ -79,7 +79,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
 
 #### Applicative role definition
 From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-server` via the **Create role** button:
-- Role name: `tenant-user`
+- Role name: `use-tenant`
 - Description: `Basic role of any type of user authorized to use a realm's contents perimeter`
 
 #### Client roles definition
@@ -87,7 +87,7 @@ From **Clients > item > Roles** section, add a new standard role named `access-a
 
 A composite role is a role that has one or more additional roles associated with it. When a composite role (e.g realm role) is mapped to a user, the user gains the roles associated with the composite role.
 
-From new created realm role `tenant-user`, define associated roles (filter by clients) via the **Action > Add associated roles** top-right button:
+From new created realm role `use-tenant`, define associated roles (filter by clients) via the **Action > Add associated roles** top-right button:
 - Find and select the `web-reactive-frontend-system` item
 - Assign it to the `access-applications` client role
 
@@ -210,7 +210,7 @@ From **Clients > reactive-backend-system > Client Scopes** panel, add the custom
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
 
 #### Applicative role definition
-From **Realm roles** menu, complete the **tenant-user** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
+From **Realm roles** menu, complete the **use-tenant** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
 - Find and select the `reactive-backend-system` item
 - Assign it to the `access-applications` client role
 
