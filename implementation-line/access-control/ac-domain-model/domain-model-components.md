@@ -39,6 +39,9 @@ Key types of subject requiring roles and permissions support for a domain model 
 
 #### Defined key Roles and Naming Convention
 The definition of a default consistent naming scheme for generic support of roles is based:
+- by type with naming convention based on template `<<system type>>-<<system name>>`
+  - Web endpoint role (e.g; "endpoint-web-reactive-server", "endpoint-ai-agent-mcp-server")
+  - Infrastructure persistence role (e.g; "graph-db-knr", "store-redis-uis")
 - by function with naming convention based on template `<<function category name>>-<<responsibility name>>`
   - Security representative role (e.g; "security-CISO", "security-ISO", "security-risk-analyst", "security-controls-manager" or any role defined by a ISMS framework implemented in CYBNITY software suite instance by an organization)
   - System maintainer role (e.g; "maintenance-devops" as CYBNITY systems DevOps; "maintenance-deployer" or "maintenance-auditor")
