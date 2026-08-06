@@ -40,7 +40,7 @@ Key types of subject requiring roles and permissions support for a domain model 
 #### Defined key Roles and Naming Convention
 The definition of a default consistent naming scheme for generic support of roles is based:
 - by type with naming convention based on template `<<system type>>-<<system label>>-<<custom logical name>>`
-  - Web endpoint role (e.g; "endpoint-web-reactive-server", "endpoint-ai-agent-mcp-server")
+  - Web endpoint role (e.g; "endpoint-web-reactive-server", "endpoint-reactive-backend-server" "endpoint-ai-mcp-server")
   - Infrastructure role (e.g; "store-janusgraph-knr", "store-redis-uis", "sso-keycloak-service")
   - Application module role (e.g; "process-module-access-control", "ui-module-access-control")
 - by function with naming convention based on template `<<function category name>>-<<responsibility name>>`
