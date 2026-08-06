@@ -14,7 +14,7 @@ of external API elements (e.g services libraries, naming convention).
 Deliverable: `org.cybnity.application.access-control:domain` java library.
 
 Goal: several CYBNITY domain objects are exposed to other Access Control domain elements (e.g service layer) as
-specification components or implementation components hosting behavior required by the domain promise.
+specification components or implementation components hosting behaviour required by the domain promise.
 
 Some structural elements already provided by the Keycloak domain library are manipulated to reused existing
 capabilities (e.g OAuth features; security concerns of the Identity Management).
@@ -35,7 +35,7 @@ Key types of subject requiring roles and permissions support for a domain model 
 - System types:
   - Infrastructure resource (e.g; storage area or persistence system; network equipment)
   - Security tool (e.g; standalone device deployed into a protected zone as security control system)
-  - Application (e.g; API Endpoint exposing websocket or JSON-RPC for AI Agentd, or CYBNITY domain application component executing process)
+  - Application (e.g; API Endpoint exposing websocket or JSON-RPC for AI Agents, or CYBNITY domain application component executing process)
 
 #### Defined key Roles and Naming Convention
 The definition of a default consistent naming scheme for generic support of roles is based:
