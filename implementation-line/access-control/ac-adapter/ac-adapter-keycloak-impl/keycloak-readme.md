@@ -80,16 +80,16 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
 #### Applicative role definition
 From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-server` via the **Create role** button:
 - Role name: `tenant-user`
-- Description: `Standard role of any type of user authorized to use a realm's contents perimeter`
+- Description: `Basic role of any type of user authorized to use a realm's contents perimeter`
 
 #### Client roles definition
-From **Clients > item > Roles** section, add a new standard role named `endpoint-ui-user` described as `standard user role of the an endpoint exposed by CYBNITY application (e.g; frontend user interface, or backend API)`.
+From **Clients > item > Roles** section, add a new standard role named `access-applications` described as `standard role for access to exposed CYBNITY application (e.g; frontend user interface, or backend API)`.
 
-A composite role is a role that has one or more additional roles associated with it. When a composite role is mapped to a user, the user gains the roles associated with the composite role.
+A composite role is a role that has one or more additional roles associated with it. When a composite role (e.g realm role) is mapped to a user, the user gains the roles associated with the composite role.
 
-From new created realm role, define associated roles (filter by clients) via the **Action > Add associated roles** top-right button:
+From new created realm role `tenant-user`, define associated roles (filter by clients) via the **Action > Add associated roles** top-right button:
 - Find and select the `web-reactive-frontend-system` item
-- Assign it to the `tenant-user` account type
+- Assign it to the `access-applications` client role
 
 #### Client scope creation
 If there are many applications to secure and register within the organization (e.g multi tenant), it can become tedious to configure role scope mappings for each of these systems' clients. Keycloak allows to define a shared client configuration in an entity called a client scope.
@@ -212,7 +212,7 @@ From **Clients > reactive-backend-system > Client Scopes** panel, add the custom
 #### Applicative role definition
 From **Realm roles** menu, complete the **tenant-user** existing composite realm role, with definition of additional associated role (filter by clients) via the **Associated roles** section's **Assign role** button:
 - Find and select the `reactive-backend-system` item
-- Assign it to the `endpoint-ui-user` account type
+- Assign it to the `access-applications` client role
 
 #### Generated setting files
 The generated client setting resulting of this settings should be equals (see it via the top-right **Action > Export** menu) to [client configuration file](reactive-backend-system-keycloak.json).
