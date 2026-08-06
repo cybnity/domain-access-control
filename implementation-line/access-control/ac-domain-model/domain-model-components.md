@@ -28,7 +28,7 @@ The Role-Based Access Control ([RBAC](https://en.wikipedia.org/wiki/Role-based_a
 #### Inventoried Identities, Systems and Critical Assets
 Key types of subject requiring roles and permissions support for a domain model (e.g; according to a tenant scope) are:
 - User types:
-  - Human (e.g; end-user account like security team member of an organization)
+  - Human (e.g; end-user account like security team member of an organization, or privileged administrator)
   - Service (e.g; transversal account used by CYBNITY systems to ensure their integration coupling; external account allowing 3rd-party system communication)
   - AI Agent (e.g; CYBNITY AI agent deployed into an organization context and executing protection activities)
   
@@ -36,7 +36,6 @@ Key types of subject requiring roles and permissions support for a domain model 
   - Infrastructure resource (e.g; storage area or persistence system; network equipment)
   - Security tool (e.g; standalone device deployed into a protected zone as security control system)
   - Application (e.g; CYBNITY domain application component executing process)
-  - Human (e.g; CYBNITY software suite end-user or administrator)
 
 #### Defined key Roles and Naming Convention
 The definition of a default consistent naming scheme for generic support of roles is based:
