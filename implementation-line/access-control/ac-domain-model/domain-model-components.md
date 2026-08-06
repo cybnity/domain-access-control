@@ -44,7 +44,7 @@ The definition of a default consistent naming scheme for generic support of role
   - Infrastructure role (e.g; "store-janusgraph-knr", "store-redis-uis", "sso-keycloak-service")
   - Application module role (e.g; "process-module-access-control", "ui-module-access-control")
 
-- by function with naming convention based on template `<<function category name>>-<<responsibility name>>`
+- by function with naming convention based on template `<<function category name>>-<<responsibility label>>`
   - Tenant user role (e.g; "tenant-enduser", "tenant-manager", "tenant-enduser-security-CISO")
   - Security representative role (e.g; "security-CISO", "security-ISO", "security-risk-analyst", "security-controls-manager" or any role defined by a ISMS framework implemented in CYBNITY software suite instance by an organization)
   - System maintainer role (e.g; "maintenance-devops" as CYBNITY systems DevOps; "maintenance-deployer" or "maintenance-auditor")
