@@ -80,7 +80,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
 #### Applicative role definition
 From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-server` via the **Create role** button:
 - Role name: `tenant-user`
-- Description: `Standard role of a user authorized to use a realm's contents perimeter`
+- Description: `Standard role of any type of user authorized to use a realm's contents perimeter`
 
 #### Client roles definition
 From **Clients > item > Roles** section, add a new standard role named `enduser` described as `standard user role of the frontend user interface`.
