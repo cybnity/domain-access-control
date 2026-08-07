@@ -23,6 +23,12 @@ public class Role extends RoleRepresentation implements ExtendedResourcesDecorat
         // Set the common values provided by the builder
         this.setName(builder.name);
         this.setDescription(builder.description);
+        if (builder.isClientRole != null)
+            this.setClientRole(builder.isClientRole);
+        if (builder.isComposite != null)
+            this.setComposite(builder.isComposite);
+        // Apply complementary customization of default value not already defined dynamically by the builder
+        decorate();
     }
 
     /**
@@ -40,8 +46,12 @@ public class Role extends RoleRepresentation implements ExtendedResourcesDecorat
 
     /**
      * Apply a decoration of this object with additional customization elements.
+     * This method is responsible to create the customization rules (e.g; instantiation of additional customization elements to this object; or to change some current object's attributes) and shall be implemented by any subclass as a concrete decorator pattern implementation.
      */
     @Override
     public void decorate() {
+        // Dynamic defined attributes as extended customization elements
+
     }
+
 }

@@ -4,6 +4,7 @@ import org.cybnity.accesscontrol.ConfigurationStrategy;
 import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.AdminConfigurationVariable;
 import org.cybnity.framework.IContext;
 import org.cybnity.keycloak.domain.model.RealmBuilder;
+import org.cybnity.keycloak.domain.model.RealmRoleBuilder;
 import org.cybnity.keycloak.domain.model.RealmWithDefaultExtendedResources;
 import org.cybnity.keycloak.domain.model.RealmWithDefaultExtendedResourcesBuilder;
 import org.keycloak.admin.client.Keycloak;
@@ -178,6 +179,6 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
     public RealmDefaultComplementaryResourcesHelper realmComplementaryDefaultResourcesHelper(Keycloak keycloak, String tenantLabel, RealmWithDefaultExtendedResources defaultConfig) throws IllegalArgumentException {
-        return new RealmDefaultComplementaryResourcesHelper(keycloak, tenantLabel, defaultConfig);
+        return new RealmDefaultComplementaryResourcesHelper(keycloak, tenantLabel, defaultConfig, new RealmRoleBuilder());
     }
 }

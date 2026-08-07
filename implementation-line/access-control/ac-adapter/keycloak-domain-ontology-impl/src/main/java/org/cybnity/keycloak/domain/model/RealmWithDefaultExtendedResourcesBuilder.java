@@ -229,23 +229,4 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
         return webReactiveFrontEndSystemClient;
     }
 
-    /**
-     * Prepare a list of default roles that are required for a realm usage.
-     * For example, the roles assigned by default to any type of user and-or system roles (e.g; dedicated to environment or system types) required by CYBNITY application modules to use Keycloak authorization for access to specific resources.
-     *
-     * @return A list of transversal and default roles (e.g; "tenant-user" role) assignable to a realm.
-     */
-    public List<RoleRepresentation> tenantDefaultRealmRoles() {
-        List<RoleRepresentation> roles = new ArrayList<>();
-        // TODO Chante static roles definitions required by CYBNITY application and UI layers, for read from envt variables
-        // doc: https://github.com/cybnity/domain-access-control/blob/feature-237/implementation-line/access-control/ac-domain-model/domain-model-components.md
-
-        // Define basic role regarding any type of user authorized to use a tenant perimeter (equals to a realm scope)
-        roles.add(new RealmRoleBuilder()
-                .name(Sanitizer.removeAllBlankCharacters("tenant-user"))
-                .description("Standard role of any type of user authorized to use a realm's contents perimeter")
-                .build());
-        return roles;
-    }
-
 }

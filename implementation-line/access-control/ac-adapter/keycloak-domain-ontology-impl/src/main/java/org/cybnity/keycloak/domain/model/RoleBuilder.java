@@ -9,8 +9,15 @@ package org.cybnity.keycloak.domain.model;
  */
 public class RoleBuilder {
 
+    /**
+     * Attribute key name usable on a role to define when it can be associated by default with clients.
+     */
+    public static String ATTRIBUTE_ASSOCIABLE_WITH_CLIENTS_BY_DEFAULT_KEY = "ASSOCIABLE_WITH_CLIENTS_BY_DEFAULT_KEY";
+
     String name;
     String description;
+    Boolean isClientRole = Boolean.FALSE;
+    Boolean isComposite = Boolean.FALSE;
 
     /**
      * Default constructor.
@@ -52,6 +59,28 @@ public class RoleBuilder {
     }
 
     /**
+     * The confirmation of role composite state.
+     *
+     * @param isComposite True if the role is a composite.
+     * @return This builder instance.
+     */
+    public RoleBuilder isComposite(Boolean isComposite) {
+        this.isComposite = isComposite;
+        return this;
+    }
+
+    /**
+     * The confirmation of role scope as defined for a client scope.
+     *
+     * @param isClientRole True if the role is dedicated to scope of a client.
+     * @return This builder instance.
+     */
+    public RoleBuilder isClientRole(Boolean isClientRole) {
+        this.isClientRole = isClientRole;
+        return this;
+    }
+
+    /**
      * The description of the role.
      *
      * @param description A textual description helping to understand what goal, usage, scope is concerned by the role.
@@ -61,4 +90,5 @@ public class RoleBuilder {
         this.description = description;
         return this;
     }
+
 }

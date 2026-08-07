@@ -1,8 +1,6 @@
 package org.cybnity.keycloak.domain.model;
 
 import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.RolesRepresentation;
 
 import java.util.List;
 
@@ -57,14 +55,6 @@ public class RealmWithDefaultExtendedResources extends Realm {
 
         // --- REALM CLIENTS
         this.setClients(systemsClientConfigurationsSupported()); // only default roles defined by Keycloak are automatically assigned
-
-        // --- REALM DEFAULT ROLES
-        List<RoleRepresentation> realmRoles = builder.tenantDefaultRealmRoles();
-        if (realmRoles != null && !realmRoles.isEmpty()) {
-            RolesRepresentation realmRolesRep = new RolesRepresentation();
-            realmRolesRep.setRealm(realmRoles); // by default roles are not assigned to clients
-            this.setRoles(realmRolesRep);
-        }
     }
 
 }
