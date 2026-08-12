@@ -98,7 +98,7 @@ To get client roles as a custom key in the JWT token, add client scope to put cl
 From **Client Scopes**, create a new scope via the **Create client scope** button:
 - Name: `ui-layer-systems-roles`
   (name of the client scope. Must be unique in the realm. Name should not contain space characters as it is used as value of scope parameter)
-- Description: `Shared configuration of clients used by systems executed in the UI layer`
+- Description: `OpenID Connect build-in scope about the common roles of clients used by systems of UI layer`
 - Type: `Default`
 - Protocol: `OpenID Connect`
   (SSO protocol configuration is being supplied by this client scope)
