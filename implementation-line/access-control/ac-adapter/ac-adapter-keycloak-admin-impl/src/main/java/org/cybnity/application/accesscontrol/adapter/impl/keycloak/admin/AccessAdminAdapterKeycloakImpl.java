@@ -23,6 +23,7 @@ import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -243,15 +244,21 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
 
             // Prepare of realm default configured version, included default extended resources to record into the created new Realm
             RealmConfigurationStrategy configStrategy = new RealmConfigurationStrategy();
+            Map<String, String> conf;
+            try {
+                conf = configStrategy.getConfigurationProperties(this.context);
+            } catch (UnoperationalStateException e) {
+                throw new IllegalArgumentException(e);
+            }
             Object realmObj = configStrategy.prepare(this.context,
                     tenantLabel,
-                    RealmConfigurationStrategy.ENABLED_BY_DEFAULT /* isEnabled */,
-                    RealmConfigurationStrategy.SSL_REQUIRED /* sslModeRequired */,
-                    RealmConfigurationStrategy.BRUTE_FORCE_PROTECTED /* bruteForceProtected */,
-                    Boolean.TRUE /* adminEventsDetailsEnabled */,
+                    null/* isEnabled */,
+                    null /* sslModeRequired */,
+                    null /* bruteForceProtected */,
+                    null /* adminEventsDetailsEnabled */,
                     null /* notBefore */,
-                    this.context.get(AdminConfigurationVariable.REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS.getName()) /* assignable security defense xframe options*/,
-                    this.context.get(AdminConfigurationVariable.REALM_DEFAULT_FRONTEND_URL.getName()) /* assignable frontend configuration to new realm */,
+                    null /* assignable security defense xframe options*/,
+                    null /* assignable frontend configuration to new realm */,
                     null /* contentSecurityPolicy */,
                     displayLabel /* Optional display name for the realm page */
             );

@@ -10,6 +10,7 @@ import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.Map;
  * Helper supporting the creation of complementary default resources required by a Tenant (Keycloak Realm) to operate in a CYBNITY context.
  * This class provided utility services including the knowledge of additional resources to create, to link with realm and/or to update with specific configuration elements.
  */
-public class RealmDefaultComplementaryResourcesHelper {
+public class RealmDefaultComplementaryResourcesProvider {
 
     private final Keycloak keycloakClient;
     private final String tenantLabel;
@@ -37,7 +38,7 @@ public class RealmDefaultComplementaryResourcesHelper {
      * @param realmRoleConfig Mandatory role builder for realm.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public RealmDefaultComplementaryResourcesHelper(Keycloak keycloak, String tenantLabel, RealmWithDefaultExtendedResources defaultConfig, RealmRoleBuilder realmRoleConfig) throws IllegalArgumentException {
+    public RealmDefaultComplementaryResourcesProvider(Keycloak keycloak, String tenantLabel, RealmWithDefaultExtendedResources defaultConfig, RealmRoleBuilder realmRoleConfig) throws IllegalArgumentException {
         if (tenantLabel == null || tenantLabel.isEmpty()) {
             throw new IllegalArgumentException("Tenant label cannot be null or empty");
         }
@@ -61,6 +62,7 @@ public class RealmDefaultComplementaryResourcesHelper {
      * Create all complementary default resources required by th realm including:
      * - realm system clients custom roles (e.g; function roles)
      * - associated client roles with realm roles
+     * - shared common scope between UI layer clients
      *
      * @throws OperationException When problem occurred during interactions with Keycloak server.
      */
@@ -76,14 +78,14 @@ public class RealmDefaultComplementaryResourcesHelper {
             }
             List<RoleRepresentation> realmRolesRecords = new ArrayList<>(realm.roles().list()); // Including technical identifiers
 
-            // ----- CLIENT DEDICATED ROLES
+            // --- CLIENT DEDICATED ROLES
             Map<ClientRepresentation, RoleRepresentation> defaultClientComplementaryRoleRecords = createSystemClientsRoles(realm, defaultConfig); // not yet associated to realm role
-
             // ----- ASSOCIATED DEFAULT CLIENTS ROLES TO DEFAULT REALM ROLE(S)
             associateClientRoles(realm, defaultClientComplementaryRoleRecords, realmRolesRecords);
 
-            // --- REALM CLIENT SCOPES supported
-
+            // --- REALM CLIENT SCOPES about shared configuration for UI layer systems (e.g; common shared roles for endpoint systems)
+            createDefaultClientsScopes(realm, defaultConfig, defaultClientComplementaryRoleRecords);
+            // ----- MAPPED DEFAULT CLIENTS TO COMMON SCOPES
 
             // --- REALM USERS
             //UsersResource defaultUsers = toEnhance.users();
@@ -124,7 +126,6 @@ public class RealmDefaultComplementaryResourcesHelper {
                 List<RoleRepresentation> clientRolesEligibleToAssociation = new ArrayList<>();
                 // Read client roles
                 for (Map.Entry<ClientRepresentation, RoleRepresentation> entry : defaultClientComplementaryRoles.entrySet()) {
-                    ClientRepresentation client = entry.getKey();
                     RoleRepresentation clientDedicatedRole = entry.getValue();
                     clientRolesEligibleToAssociation.add(clientDedicatedRole); // Add client role reference as eligible to association with realm role
                 }
@@ -176,6 +177,70 @@ public class RealmDefaultComplementaryResourcesHelper {
     }
 
     /**
+     * Create default clients scopes that are a common set of protocol mappers and roles that are shared between multiple clients.
+     * <p>
+     * Usage: if there are many applications to secure and register within the organization (e.g; multi tenant), it can become tedious to configure role scope mappings for each of these systems' clients. Keycloak allows to define a shared client configuration in an entity called a client scope. To get client roles as a custom key in the JWT token, add client scope to put client roles in access token.
+     * Client scopes naming convention: the "type" based naming template is applied for definition of each client scope name.
+     * This method create the default scopes usable into a realm.
+     *
+     * @param realm                           Mandatory current existing realm resource client (including technical identifier).
+     * @param defaultConfig                   Mandatory default configuration including definition of default scope potentially requiring creation for common roles sharing with associated default clients.
+     * @param defaultClientComplementaryRoles Client roles (including technical identifiers) eligible to subject of mapping with default clients scopes. No scope created if null or empty.
+     * @return Created clients scopes including recorded technical identifiers (instance created by Keycloak) or empty set.
+     * @throws IllegalArgumentException When mandatory parameter is missing.
+     * @throws OperationException       When problem occurred during interactions with Keycloak server.
+     */
+    private List<ClientScopeRepresentation> createDefaultClientsScopes(RealmResource realm, RealmWithDefaultExtendedResources defaultConfig, Map<ClientRepresentation, RoleRepresentation> defaultClientComplementaryRoles) throws IllegalArgumentException, OperationException {
+        if (realm == null) throw new IllegalArgumentException("realm parameter is required!");
+        if (defaultConfig == null) throw new IllegalArgumentException("defaultConfig parameter is required!");
+        List<ClientScopeRepresentation> scopes = new ArrayList<>();
+        if (defaultClientComplementaryRoles != null) {
+            try {
+
+
+                // TODO change static value for environment variable values relative to minimum set of client scopes to create for the clients (equals to name of a client)
+                // TODO The envt variables should define a common client scope assigning shared roles (over mappers) for backend and frontend clients (systems using clients from the UI layer)
+
+                // --- DEFAULT CLIENT SCOPES PREPARATION AND RECORDING INTO KEYCLOAK
+                // Identify the default client scope to prepare and to add into Keycloak for the realm
+                // Todo use RealmWithDefaultExtendedResources defaultConfig for read of default scopes to prepare (apply same approach that createSystemClientsRoles() )
+
+                // Create each common scope required by default for the realm
+
+                // Define client scope unique name defined into a realm (according to naming convention based on shared "type" between multiple clients)
+                // Name should not contain space characters as it is used as value of scope parameter.
+                String clientScopeName = "ui-layer-systems-roles"; // <<system type>>-<<system label>>-<<custom logical name>> naming convention
+                String clientScopeDescription = "OpenID Connect build-in scope about the common roles of clients used by systems of UI layer";
+                String assignedType = "Default"; // None, Default or Optional. Client scopes, which will be added as default scopes to each created client
+                String protocol = "OpenID Connect"; // SSO protocol configuration supplied by the client scope
+
+                // ---- CONSENT SCREEN CONFIGURATION ---
+                boolean isDisplayOnConsentScreen = true; // If on, and this client scope is added to some client with consent required, the text specified by 'Consent Screen Text' will be displayed on consent screen. If off, this client scope will not be displayed on the consent screen.
+                String consentScreenText = ""; // Text that will be shown on the consent screen when this client scope is added to some client with consent required. Defaults to name of client scope if it is not filled.
+
+                boolean includedInTokenScope = true; // If on, the name of this client scope will be added to the access token property 'scope' as well as to the Token Introspection Endpoint response. If off, this client scope will be omitted from the token and from the Token Introspection Endpoint response.
+                Integer displayOrder = 1; // Specify order of the provider in GUI (such as in Consent page) as integer.
+
+
+                // --- CREATION OF MAPPERS REQUIRED FOR SHARING OF SCOPE TO THE ELIGIBLE CLIENTS
+
+                // TODO Client roles mapping: identify which mapper need to be created for each new created client scope, and what client shall be assigned by configuration
+                // or manage this association via mapper into createResource() method next step
+
+                // Mapper type: label
+                // Mapper name: unique mapper name
+                // Role attribute name: Name of the SAML attribute you want to put your roles into. i.e. 'Role', 'memberOf'.
+                // Friendly name: Standard SAML attribute setting. An optional, more human-readable form of the attribute's name that can be provided if the actual attribute name is cryptic.
+                // SAML attribute nameformat: Basic // SAML Attribute NameFormat. Can be basic, URI reference, or unspecified.
+                // Single Role Attribute: on/off // If true, all roles will be stored under one attribute with multiple attribute values.
+            } catch (Exception e) {
+                throw new OperationException(e);
+            }
+        }
+        return scopes; // instance of created scope including technical identifiers
+    }
+
+    /**
      * Identify default roles that are required by a system client according to its client identifier.
      * Best practice: specific function based roles can be created by client (role by function with naming convention based on template <<function category name>>-<<responsibility label>>).
      *
@@ -210,7 +275,7 @@ public class RealmDefaultComplementaryResourcesHelper {
      */
     public List<RoleRepresentation> tenantDefaultRealmRoles() {
         List<RoleRepresentation> roles = new ArrayList<>();
-        // TODO Chante static roles definitions required by CYBNITY application and UI layers, for read from envt variables
+        // TODO Change static roles definitions required by CYBNITY application and UI layers, for read from envt variables
         // doc: https://github.com/cybnity/domain-access-control/blob/feature-237/implementation-line/access-control/ac-domain-model/domain-model-components.md
 
         // Define basic role regarding any type of user authorized to use a tenant perimeter (equals to a realm scope)

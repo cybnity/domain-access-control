@@ -29,7 +29,6 @@ public class RealmRole extends RoleRepresentation implements ExtendedResourcesDe
         super();
         if (builder == null) throw new IllegalArgumentException("builder cannot be null");
         // Set the common values provided by the builder
-        // TODO Add each values read from builder to this representation
     }
 
     /**

@@ -49,24 +49,9 @@ public enum AdminConfigurationVariable implements IReadableConfiguration {
     REALM_MASTER_NAME("REALM_MASTER_NAME"),
 
     /**
-     * Security defense headers parameters regarding a realm.
-     * See <a href="https://datatracker.ietf.org/doc/html/rfc7034#section-2.2.1">X-Frame-Options </a> for more details
-     * See <a href="https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/threat/clickjacking.html">mitigation of Clickjacking</a> for help
+     * Path to file including default configuration properties reusable during dynamic creation of keycloak data.
      */
-    REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS("REALM_DEFAULT_SECURITY_HEADER_XFRAME_OPTIONS"),
-
-    /**
-     * Frontend page url regarding a new realm.
-     */
-    REALM_DEFAULT_FRONTEND_URL("REALM_DEFAULT_FRONTEND_URL"),
-
-    /**
-     * See <a href="https://www.w3.org/TR/CSP/#directive-frame-src">frame-src</a> to restrict the URLS which may be loaded into nested browsing contexts.
-     * See <a href="https://www.w3.org/TR/CSP/#directive-frame-ancestors">frame-ancestors</a> to define the URLs which can embed the resource using frame of iframe.
-     * See <a href="https://www.w3.org/TR/CSP/#directive-object-src">object-src</a> to restrict URLS from which plugin context may be loaded.
-     */
-    REALM_DEFAULT_SECURITY_HEADER_CONTENT_SECURITY_POLICY("REALM_DEFAULT_SECURITY_HEADER_CONTENT_SECURITY_POLICY")
-    ;
+    KEYCLOAK_DEFAULT_CONFIGURATION_FILE_PATH("KEYCLOAK_DEFAULT_CONFIGURATION_FILE_PATH");
 
     /**
      * Name of this environment variable currently hosted by the system environment.

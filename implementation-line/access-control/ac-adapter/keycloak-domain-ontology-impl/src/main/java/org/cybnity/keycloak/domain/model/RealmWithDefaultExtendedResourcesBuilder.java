@@ -1,7 +1,8 @@
 package org.cybnity.keycloak.domain.model;
 
+import org.cybnity.framework.ConfigurationSource;
+import org.cybnity.framework.UnoperationalStateException;
 import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,27 +20,37 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
     /**
      * Keycloak API JSON specification (Keycloak API project defined/controled) attribute name.
      */
-    public static String X_FRAME_OPTIONS = "xFrameOptions";
+    public static String ATTR_X_FRAME_OPTIONS = "xFrameOptions";
 
     /**
      * Keycloak API JSON specification (Keycloak API project defined/controled) attribute name.
      */
-    public static String FRONTEND_URL = "frontendUrl";
+    public static String ATTR_FRONTEND_URL = "frontendUrl";
 
     /**
      * Keycloak API JSON specification (Keycloak API project defined/controled) attribute name.
      */
-    public static String CONTENT_SECURITY_POLICY = "contentSecurityPolicy";
+    public static String ATTR_CONTENT_SECURITY_POLICY = "contentSecurityPolicy";
 
     String xFrameOptions;
     String frontEndURL;
     String contentSecurityPolicy;
+    private final Map<String, String> defaultConf;
 
     /**
-     * Default constructor
+     * Default constructor.
+     *
+     * @param defaultConfigurationSource Mandatory provider of default configuration data.
+     * @throws IllegalArgumentException    When mandatory parameter is missing.
+     * @throws UnoperationalStateException When found configuration file does not include default properties (e.g; empty file).
      */
-    public RealmWithDefaultExtendedResourcesBuilder() {
+    public RealmWithDefaultExtendedResourcesBuilder(ConfigurationSource defaultConfigurationSource) throws IllegalArgumentException, UnoperationalStateException {
         super();
+        if (defaultConfigurationSource == null)
+            throw new IllegalArgumentException("defaultConfigurationSource is required!");
+        defaultConf = defaultConfigurationSource.getProperties();
+        if (defaultConf == null)
+            throw new UnoperationalStateException("No default values found from file that are required for realm preparation!");
     }
 
     /**
@@ -82,7 +93,7 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
 
         // Add general settings into realm container
         if (frontEndURL != null && !frontEndURL.isBlank())
-            attributes.put(RealmWithDefaultExtendedResourcesBuilder.FRONTEND_URL, frontEndURL);
+            attributes.put(RealmWithDefaultExtendedResourcesBuilder.ATTR_FRONTEND_URL, frontEndURL);
 
         if (!attributes.isEmpty()) return attributes;
         return null; // default null attributes
@@ -126,9 +137,9 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
 
         // Add security defense settings into realm container
         if (xFrameOptions != null && !xFrameOptions.isBlank())
-            attributes.put(RealmWithDefaultExtendedResourcesBuilder.X_FRAME_OPTIONS, xFrameOptions);
+            attributes.put(RealmWithDefaultExtendedResourcesBuilder.ATTR_X_FRAME_OPTIONS, xFrameOptions);
         if (contentSecurityPolicy != null && !contentSecurityPolicy.isBlank())
-            attributes.put(RealmWithDefaultExtendedResourcesBuilder.CONTENT_SECURITY_POLICY, contentSecurityPolicy);
+            attributes.put(RealmWithDefaultExtendedResourcesBuilder.ATTR_CONTENT_SECURITY_POLICY, contentSecurityPolicy);
 
         if (!attributes.isEmpty()) return attributes;
         return null; // default null attributes
@@ -173,7 +184,7 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
         // Clients usable by UI layer components
         clients.add(webReactiveFrontEndSystemClient());
 
-        // TODO Clients usable by application layer components
+        // Add other default clients required by systems (e.g; reactive backend, AI endpoint) usable from UI layer or Application layer
 
         return clients;
     }
@@ -193,35 +204,34 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
 
         // Prepare singleton instance
         List<String> redirectUris = new ArrayList<>();
-        // TODO Change static value by read of envt variables
-        redirectUris.add("http://dev-deploy.cybnity.tech/*");
-        redirectUris.add("/*");
-        redirectUris.add("http://dev-deploy.cybnity.tech:3000/*");
+        redirectUris.add(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_REDIRECT_URIS_1", null));
+        redirectUris.add(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_REDIRECT_URIS_2", null));
+        redirectUris.add(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_REDIRECT_URIS_3", null));
 
         List<String> postLogoutRedirectUris = new ArrayList<>();
-        postLogoutRedirectUris.add("+");
-        postLogoutRedirectUris.add("http://dev-deploy.cybnity.tech:3000/*");
+        postLogoutRedirectUris.add(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_POSTLOGOUT_REDIRECT_URIS_1", null));
+        postLogoutRedirectUris.add(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_POSTLOGOUT_REDIRECT_URIS_2", null));
 
         List<String> webOrigins = new ArrayList<>();
-        webOrigins.add("+");
-        webOrigins.add("http://dev-deploy.cybnity.tech:3000/*");
+        webOrigins.add(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_WEBORIGINS_1", null));
+        webOrigins.add(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_WEBORIGINS_2", null));
 
         webReactiveFrontEndSystemClient = new ClientBuilder()
-                .clientId("web-reactive-frontend-system")
-                .name("Web Reactive Frontend Client")
-                .protocol(ClientBuilder.PROTOCOL_OPENID_CONNECT)
-                .description("OpenID client supporting the user interface frontend systems")
-                .alwaysDisplayInConsole(true)
-                .authorizationServicesEnabled(false)
-                .clientAuthenticationEnabled(false)
-                .isStandardAuthenticationFlow(true)
-                .directAccessGrantsEnabled(true)
-                .rootUrl("${authBaseUrl}")
-                .baseUrl("http://dev-deploy.cybnity.tech:3000/")
-                .adminUrl("${authBaseUrl}")
-                .loginTheme(ClientBuilder.LOGIN_THEME_KEYCLOAKV2)
-                .frontChannelLogoutEnabled(true)
-                .frontChannelLogoutSessionRequired(true)
+                .clientId(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_CLIENTID", null))
+                .name(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_NAME", null))
+                .protocol(ClientBuilder.PROTOCOL_OPENID_CONNECT) /* Value under check rule */
+                .description(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_DESCRIPTION", null))
+                .alwaysDisplayInConsole(Boolean.parseBoolean(defaultConf.get("REALM_DEFAULT_CLIENT_1_IS_ALWAYS_DISPLAY_IN_CONSOLE")))
+                .authorizationServicesEnabled(Boolean.parseBoolean(defaultConf.get("REALM_DEFAULT_CLIENT_1_IS_AUTHORIZATION_SERVICES_ENABLED")))
+                .clientAuthenticationEnabled(Boolean.parseBoolean(defaultConf.get("REALM_DEFAULT_CLIENT_1_IS_CLIENT_AUTHENTICATION_ENABLED")))
+                .isStandardAuthenticationFlow(Boolean.parseBoolean(defaultConf.get("REALM_DEFAULT_CLIENT_1_IS_STANDARD_AUTHENTICATION_FLOW")))
+                .directAccessGrantsEnabled(Boolean.parseBoolean(defaultConf.get("REALM_DEFAULT_CLIENT_1_IS_DIRECT_ACCESS_GRANTS_ENABLED")))
+                .rootUrl(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_ROOT_URL", null))
+                .baseUrl(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_BASE_URL", null))
+                .adminUrl(defaultConf.getOrDefault("REALM_DEFAULT_CLIENT_1_ADMIN_URL", null))
+                .loginTheme(ClientBuilder.LOGIN_THEME_KEYCLOAKV2) /* Value under check rule */
+                .frontChannelLogoutEnabled(Boolean.parseBoolean(defaultConf.get("REALM_DEFAULT_CLIENT_1_IS_FRONT_CHANNEL_LOGOUT_ENABLED")))
+                .frontChannelLogoutSessionRequired(Boolean.parseBoolean(defaultConf.get("REALM_DEFAULT_CLIENT_1_IS_FRONT_CHANNEL_LOGOUT_SESSION_REQUIRED")))
                 .redirectURIs(redirectUris)
                 .postLogoutRedirectUris(postLogoutRedirectUris)
                 .webOrigins(webOrigins)

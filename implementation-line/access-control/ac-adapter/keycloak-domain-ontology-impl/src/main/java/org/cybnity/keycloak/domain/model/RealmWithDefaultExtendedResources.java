@@ -41,7 +41,7 @@ public class RealmWithDefaultExtendedResources extends Realm {
     }
 
     /**
-     * Create additional resources required like static default configuration for this realm (e.g; other systems clients and scopes, default application roles).
+     * Create additional resources required like static default configuration for this realm (e.g; other systems clients, default client scopes, default application roles).
      */
     @Override
     public void decorate() {
@@ -55,6 +55,8 @@ public class RealmWithDefaultExtendedResources extends Realm {
 
         // --- REALM CLIENTS
         this.setClients(systemsClientConfigurationsSupported()); // only default roles defined by Keycloak are automatically assigned
+
+        // --- REALM CLIENTS SCOPES
     }
 
 }

@@ -21,12 +21,12 @@ public class ClientBuilder {
     /**
      * Keycloak API JSON specification (Keycloak API project defined/controled) attribute name.
      */
-    public static String POST_LOGOUT_REDIRECT_URIS = "post.logout.redirect.uris";
+    public static String ATTR_POST_LOGOUT_REDIRECT_URIS = "post.logout.redirect.uris";
 
     /**
      * Keycloak API JSON specification (Keycloak API project defined/controled) attribute name.
      */
-    public static String LOGIN_THEME = "login_theme";
+    public static String ATTR_LOGIN_THEME = "login_theme";
 
     /**
      * Supported theme for login, OTP, grant, registration and forgot password pages.
@@ -36,7 +36,7 @@ public class ClientBuilder {
     /**
      * Keycloak API JSON specification (Keycloak API project defined/controled) attribute name.
      */
-    public static String FRONT_CHANNEL_LOGIN_SESSION_REQUIRED = "frontchannel.logout.session.required";
+    public static String ATTR_FRONT_CHANNEL_LOGIN_SESSION_REQUIRED = "frontchannel.logout.session.required";
 
     String clientId;
     String name;
@@ -366,13 +366,13 @@ public class ClientBuilder {
 
         String postLogoutRedirectUrisString = postLogoutRedirectUrisInCombinedVersion();
         if (postLogoutRedirectUrisString != null) {
-            attributes.put(POST_LOGOUT_REDIRECT_URIS, postLogoutRedirectUrisString);
+            attributes.put(ATTR_POST_LOGOUT_REDIRECT_URIS, postLogoutRedirectUrisString);
         }
         if (this.loginTheme != null && !loginTheme.isEmpty()) {
-            attributes.put(LOGIN_THEME, loginTheme);
+            attributes.put(ATTR_LOGIN_THEME, loginTheme);
         }
         if (this.frontChannelLogoutSessionRequired != null)
-            attributes.put(FRONT_CHANNEL_LOGIN_SESSION_REQUIRED, this.frontChannelLogoutSessionRequired.toString());
+            attributes.put(ATTR_FRONT_CHANNEL_LOGIN_SESSION_REQUIRED, this.frontChannelLogoutSessionRequired.toString());
 
         if (!attributes.isEmpty()) return attributes;
         return null;
