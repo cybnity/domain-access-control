@@ -14,7 +14,7 @@ The main technologies set is:
 - Java Library
 - [Keycloak client](https://github.com/keycloak/keycloak-client?tab=readme-ov-file)
 
-## Adaptation Components Dependencies
+# ADAPTATION COMPONENTS DEPENDENCIES
 ```mermaid
 %%{
   init: {
