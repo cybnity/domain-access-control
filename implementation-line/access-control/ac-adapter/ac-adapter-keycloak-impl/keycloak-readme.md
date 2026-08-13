@@ -181,7 +181,7 @@ Register a new Keycloak client dedicated to backend messaging gateway module (al
 From **Client Scopes > ui-layer-systems-roles**:
 - Mappers
   - Create a new mapper since the **Configure a new mapper** button:
-    - Choose `User Client Role` mapper type
+    - Choose `User Client Role` mapper type (that map a user client role to a token claim)
     - Name: `ui-clients-role`
     - Client ID: `web-reactive-frontend-system`
       (client ID for role mappings. Just client roles of this client will be added to the token. If this is unset, client roles of all clients will be added to the token)
@@ -194,7 +194,7 @@ From **Client Scopes > ui-layer-systems-roles**:
     - Add to userinfo: `ON`
 
   - Create a new mapper since the **Add mapper > By configuration** button:
-    - Choose `User Realm Role`
+    - Choose `User Realm Role` mapper type (that map a user realm role to a token claim)
     - Name: `ui-realm-role`
     - Multivalued: `ON`
     - Token Claim Name: `realm.role`
