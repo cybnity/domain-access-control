@@ -31,11 +31,14 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
      * Keycloak API JSON specification (Keycloak API project defined/controled) attribute name.
      */
     public static String ATTR_CONTENT_SECURITY_POLICY = "contentSecurityPolicy";
-
+    private final Map<String, String> defaultConf;
     String xFrameOptions;
     String frontEndURL;
     String contentSecurityPolicy;
-    private final Map<String, String> defaultConf;
+    /**
+     * Default prepared front end client (singleton instance)
+     */
+    Client webReactiveFrontEndSystemClient;
 
     /**
      * Default constructor.
@@ -71,7 +74,7 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
         // Build instance of current values expected as realm resource attributes
         Map<String, String> attributes = new HashMap<>();
 
-        /**
+        /*
          *   "attributes": {
          *     "cibaBackchannelTokenDeliveryMode": "poll",
          *     "cibaAuthRequestedUserHint": "login_hint",
@@ -122,7 +125,7 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
         // Build instance of current values expected as realm resource attributes
         Map<String, String> attributes = new HashMap<>();
 
-        /**
+        /*
          * "browserSecurityHeaders": {
          *     "contentSecurityPolicyReportOnly": "",
          *     "xContentTypeOptions": "nosniff",
@@ -188,11 +191,6 @@ public class RealmWithDefaultExtendedResourcesBuilder extends RealmBuilder {
 
         return clients;
     }
-
-    /**
-     * Default prepared front end client (singleton instance)
-     */
-    Client webReactiveFrontEndSystemClient;
 
     /**
      * Prepare a client dedicated to CYBNITY web reactive front end system allowing end-users SSO tokens control requests to Keycloak.

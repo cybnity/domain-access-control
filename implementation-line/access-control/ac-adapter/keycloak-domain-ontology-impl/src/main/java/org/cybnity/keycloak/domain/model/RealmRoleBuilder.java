@@ -2,7 +2,7 @@ package org.cybnity.keycloak.domain.model;
 
 /**
  * Builder pattern implementation class allowing to respect the build rules of Keycloak regarding a RoleRepresentation object.
- * This class check the authorized values eligible for RoleRepresantation build according to the format rules supported by Keycloak.
+ * This class check the authorized values eligible for RealmRoleRepresentation build according to the format rules supported by Keycloak.
  * See specification of value supported at <a href="https://www.keycloak.org/docs-api/latest/rest-api/index.html#RoleRepresentation">RoleRepresentation object via JSON</a>.
  *
  * @author olivier

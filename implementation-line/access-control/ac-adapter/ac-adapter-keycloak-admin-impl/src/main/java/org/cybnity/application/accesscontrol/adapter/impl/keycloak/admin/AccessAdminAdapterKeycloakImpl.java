@@ -243,7 +243,7 @@ public class AccessAdminAdapterKeycloakImpl implements IAccessAdminAdapter {
             // https://www.keycloak.org/securing-apps/authz-client documentation
 
             // Prepare of realm default configured version, included default extended resources to record into the created new Realm
-            RealmConfigurationStrategy configStrategy = new RealmConfigurationStrategy();
+            RealmConfigurationStrategy configStrategy = new RealmConfigurationStrategy(this.context);
             Map<String, String> conf;
             try {
                 conf = configStrategy.getConfigurationProperties(this.context);

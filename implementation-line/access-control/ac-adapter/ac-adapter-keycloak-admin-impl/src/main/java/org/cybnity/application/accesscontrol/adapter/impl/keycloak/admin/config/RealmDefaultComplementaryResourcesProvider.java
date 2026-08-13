@@ -1,22 +1,16 @@
 package org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.config;
 
+import jakarta.ws.rs.core.Response;
 import org.cybnity.application.accesscontrol.adapter.api.admin.OperationException;
-import org.cybnity.keycloak.domain.model.RealmRoleBuilder;
-import org.cybnity.keycloak.domain.model.RealmWithDefaultExtendedResources;
-import org.cybnity.keycloak.domain.model.RoleBuilder;
-import org.cybnity.keycloak.domain.model.Sanitizer;
+import org.cybnity.keycloak.api.KeycloakAPIResponseCode;
+import org.cybnity.keycloak.domain.model.*;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.ClientsResource;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RoleResource;
+import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Helper supporting the creation of complementary default resources required by a Tenant (Keycloak Realm) to operate in a CYBNITY context.
@@ -28,17 +22,19 @@ public class RealmDefaultComplementaryResourcesProvider {
     private final String tenantLabel;
     private final RealmWithDefaultExtendedResources defaultConfig;
     private final RealmRoleBuilder realmRoleBuilder;
+    private final Map<String, String> configurationProperties;
 
     /**
      * Default constructor.
      *
-     * @param keycloak        Mandatory operational client.
-     * @param tenantLabel     Mandatory tenant identifier to enhance.
-     * @param defaultConfig   Mandatory default configuration as provider of configuration elements.
-     * @param realmRoleConfig Mandatory role builder for realm.
+     * @param keycloak                Mandatory operational client.
+     * @param tenantLabel             Mandatory tenant identifier to enhance.
+     * @param defaultConfig           Mandatory default configuration as provider of configuration elements.
+     * @param realmRoleConfig         Mandatory role builder for realm.
+     * @param configurationProperties Mandatory configuration strategy allowing read of default data usable for resources creations.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public RealmDefaultComplementaryResourcesProvider(Keycloak keycloak, String tenantLabel, RealmWithDefaultExtendedResources defaultConfig, RealmRoleBuilder realmRoleConfig) throws IllegalArgumentException {
+    public RealmDefaultComplementaryResourcesProvider(Keycloak keycloak, String tenantLabel, RealmWithDefaultExtendedResources defaultConfig, RealmRoleBuilder realmRoleConfig, Map<String, String> configurationProperties) throws IllegalArgumentException {
         if (tenantLabel == null || tenantLabel.isEmpty()) {
             throw new IllegalArgumentException("Tenant label cannot be null or empty");
         }
@@ -51,10 +47,14 @@ public class RealmDefaultComplementaryResourcesProvider {
         if (realmRoleConfig == null) {
             throw new IllegalArgumentException("Realm role config is null");
         }
+        if (configurationProperties == null) {
+            throw new IllegalArgumentException("configurationProperties is null");
+        }
         this.keycloakClient = keycloak;
         this.tenantLabel = tenantLabel;
         this.defaultConfig = defaultConfig;
         this.realmRoleBuilder = realmRoleConfig;
+        this.configurationProperties = configurationProperties;
     }
 
 
@@ -62,7 +62,7 @@ public class RealmDefaultComplementaryResourcesProvider {
      * Create all complementary default resources required by th realm including:
      * - realm system clients custom roles (e.g; function roles)
      * - associated client roles with realm roles
-     * - shared common scope between UI layer clients
+     * - shared common client scopes between UI layer clients
      *
      * @throws OperationException When problem occurred during interactions with Keycloak server.
      */
@@ -84,7 +84,8 @@ public class RealmDefaultComplementaryResourcesProvider {
             associateClientRoles(realm, defaultClientComplementaryRoleRecords, realmRolesRecords);
 
             // --- REALM CLIENT SCOPES about shared configuration for UI layer systems (e.g; common shared roles for endpoint systems)
-            createDefaultClientsScopes(realm, defaultConfig, defaultClientComplementaryRoleRecords);
+            Set<ClientRepresentation> eligibleToScopeAssignment = defaultClientComplementaryRoleRecords.keySet();
+            List<ClientScopeRepresentation> clientScopes = createDefaultClientsScopes(realm, defaultConfig, eligibleToScopeAssignment);
             // ----- MAPPED DEFAULT CLIENTS TO COMMON SCOPES
 
             // --- REALM USERS
@@ -183,49 +184,98 @@ public class RealmDefaultComplementaryResourcesProvider {
      * Client scopes naming convention: the "type" based naming template is applied for definition of each client scope name.
      * This method create the default scopes usable into a realm.
      *
-     * @param realm                           Mandatory current existing realm resource client (including technical identifier).
-     * @param defaultConfig                   Mandatory default configuration including definition of default scope potentially requiring creation for common roles sharing with associated default clients.
-     * @param defaultClientComplementaryRoles Client roles (including technical identifiers) eligible to subject of mapping with default clients scopes. No scope created if null or empty.
+     * @param realm                     Mandatory current existing realm resource client (including technical identifier).
+     * @param defaultConfig             Mandatory default configuration including definition of default scope potentially requiring creation for common roles sharing with associated default clients.
+     * @param eligibleToScopeAssignment Clients (including technical identifiers) eligible to subject of mapping with default clients scopes. No scope created if null or empty.
      * @return Created clients scopes including recorded technical identifiers (instance created by Keycloak) or empty set.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      * @throws OperationException       When problem occurred during interactions with Keycloak server.
      */
-    private List<ClientScopeRepresentation> createDefaultClientsScopes(RealmResource realm, RealmWithDefaultExtendedResources defaultConfig, Map<ClientRepresentation, RoleRepresentation> defaultClientComplementaryRoles) throws IllegalArgumentException, OperationException {
+    private List<ClientScopeRepresentation> createDefaultClientsScopes(RealmResource realm, RealmWithDefaultExtendedResources defaultConfig, Set<ClientRepresentation> eligibleToScopeAssignment) throws IllegalArgumentException, OperationException {
         if (realm == null) throw new IllegalArgumentException("realm parameter is required!");
         if (defaultConfig == null) throw new IllegalArgumentException("defaultConfig parameter is required!");
-        List<ClientScopeRepresentation> scopes = new ArrayList<>();
-        if (defaultClientComplementaryRoles != null) {
+        List<ClientScopeRepresentation> addedScopes = new ArrayList<>();
+        if (eligibleToScopeAssignment != null) {
             try {
-
-
-                // TODO change static value for environment variable values relative to minimum set of client scopes to create for the clients (equals to name of a client)
-                // TODO The envt variables should define a common client scope assigning shared roles (over mappers) for backend and frontend clients (systems using clients from the UI layer)
+                ClientScopesResource scopes = realm.clientScopes(); // Current existing scope of the realm context
 
                 // --- DEFAULT CLIENT SCOPES PREPARATION AND RECORDING INTO KEYCLOAK
-                // Identify the default client scope to prepare and to add into Keycloak for the realm
-                // Todo use RealmWithDefaultExtendedResources defaultConfig for read of default scopes to prepare (apply same approach that createSystemClientsRoles() )
-
                 // Create each common scope required by default for the realm
+                ClientScopeBuilder builder = new ClientScopeBuilder();
+
+                String defaultClientTypeAssignment = ClientScopeBuilder.TYPE_DEFAULT; // None, Default or Optional. Client scope, which will be added as default addedScopes to each created client
+
+                // TODO replace all static values by values coming from profile and config file
 
                 // Define client scope unique name defined into a realm (according to naming convention based on shared "type" between multiple clients)
-                // Name should not contain space characters as it is used as value of scope parameter.
-                String clientScopeName = "ui-layer-systems-roles"; // <<system type>>-<<system label>>-<<custom logical name>> naming convention
-                String clientScopeDescription = "OpenID Connect build-in scope about the common roles of clients used by systems of UI layer";
-                String assignedType = "Default"; // None, Default or Optional. Client scopes, which will be added as default scopes to each created client
-                String protocol = "OpenID Connect"; // SSO protocol configuration supplied by the client scope
+                String scopeName = "ui-layer-systems-roles";
+                builder.name(scopeName); // <<system type>>-<<system label>>-<<custom logical name>> naming convention
+                builder.description("OpenID Connect build-in scope about the common roles of clients used by systems of UI layer");
+                builder.type(defaultClientTypeAssignment);
+                builder.protocol(ClientScopeBuilder.PROTOCOL_OPENIDCONNECT);// SSO protocol configuration supplied by the client scope
+                builder.displayOnConsentScreen(true);
+                builder.consentScreenText("bonjour consents"); // Text that will be shown on the consent screen when this client scope is added to some client with consent required. Defaults to name of client scope if it is not filled.
+                builder.includedInTokenScope(true);
+                builder.displayOrder(1);// Specify order of the provider in GUI (such as in Consent page)
 
-                // ---- CONSENT SCREEN CONFIGURATION ---
-                boolean isDisplayOnConsentScreen = true; // If on, and this client scope is added to some client with consent required, the text specified by 'Consent Screen Text' will be displayed on consent screen. If off, this client scope will not be displayed on the consent screen.
-                String consentScreenText = ""; // Text that will be shown on the consent screen when this client scope is added to some client with consent required. Defaults to name of client scope if it is not filled.
+                // --- DEFINE THE MAPPERS REQUIRED FOR SHARING OF SCOPE TO THE ELIGIBLE CLIENTS
+                // ----- web frontend system mapper
+                ProtocolMapperBuilder protocolMapperBuilder = new ProtocolMapperBuilder()
+                        .mapperName("ui-clients-role")
+                        .protocol(ClientScopeBuilder.PROTOCOL_OPENIDCONNECT)
+                        .clientId("web-reactive-frontend-system")
+                        .isMultivalued(true)
+                        .tokenClaimName("client.role")
+                        .claimJSONType("String")
+                        .isAddedToIDToken(true)
+                        .isAddedToAccessToken(true)
+                        .isAddedToUserinfo(true)
+                        .isAddedToLightweightAccessToken(false)
+                        .isAddedToTokenIntrospection(true)
+                        .mapperTypeReferenceName("oidc-usermodel-client-role-mapper"); // See <a href="https://www.keycloak.org/admin-api/protocol-mappers">protocol mappers available by default into Keycloak</a>.
+                builder.protocolMapper(protocolMapperBuilder);// Include into the build of client scope as auto-assigned
+                ClientScope aPreparedScope = builder.build(); // Build the client scope to add into Keycloak
 
-                boolean includedInTokenScope = true; // If on, the name of this client scope will be added to the access token property 'scope' as well as to the Token Introspection Endpoint response. If off, this client scope will be omitted from the token and from the Token Introspection Endpoint response.
-                Integer displayOrder = 1; // Specify order of the provider in GUI (such as in Consent page) as integer.
+                // ----- ADD OTHER SYSTEM MAPPER ACCORDING TO SAME OR DEDICATED CLIENTS AND SCOPE
+
+                // ----- user realm role mapper
+                // TODO create here additional common User Realm Role
+
+                try (Response resp = scopes.create(aPreparedScope)) {
+                    if (!KeycloakAPIResponseCode.CREATED.responseCode().equals(Integer.valueOf(resp.getStatus()).toString())) {
+                        // Rejection for cause of conflict (409) ar forbidden (403) creation
+                        throw new OperationException(resp.toString());
+                    }
+
+                    // --- UPDATE CLIENTS ELIGIBLE TO DEFAULT OR OPTIONAL SCOPE
+                    // Update all clients eligible to new scope as default or optional scope
+                    realm.clientScopes().findAll().stream()
+                            .filter(scope -> scopeName.equals(scope.getName()) /* select only the new scope eligible for add as default or optional on realm existing clients */)
+                            .forEach(clientScopeRepresentation -> {
+                                // Assign the client scope on each default client according to its type (default, or optional)
+                                for (ClientRepresentation client : eligibleToScopeAssignment) {
+                                    ClientResource clientRef = realm.clients().get(client.getId()); // Get the client eligible to be set on the new scope
+                                    if (ClientScopeBuilder.TYPE_DEFAULT.equals(defaultClientTypeAssignment)) {
+                                        // Add scope to the existing default scopes
+                                        clientRef.addDefaultClientScope(clientScopeRepresentation.getId());
+                                        addedScopes.add(clientScopeRepresentation);
+                                    } else if (ClientScopeBuilder.TYPE_OPTIONAL.equals(defaultClientTypeAssignment)) {
+                                        // Add scope to the existing optional scopes
+                                        clientRef.addOptionalClientScope(clientScopeRepresentation.getId());
+                                        addedScopes.add(clientScopeRepresentation);
+                                    }
+                                }
+                            });
+                }
 
 
-                // --- CREATION OF MAPPERS REQUIRED FOR SHARING OF SCOPE TO THE ELIGIBLE CLIENTS
+                // TODO change static value for environment variable values relative to minimum set of client addedScopes to create for the clients (equals to name of a client)
+                // TODO The envt variables should define a common client scope assigning shared roles (over mappers) for backend and frontend clients (systems using clients from the UI layer)
 
-                // TODO Client roles mapping: identify which mapper need to be created for each new created client scope, and what client shall be assigned by configuration
-                // or manage this association via mapper into createResource() method next step
+
+                // Identify the default client scope to prepare and to add into Keycloak for the realm
+                // Todo use RealmWithDefaultExtendedResources defaultConfig for read of default addedScopes to prepare (apply same approach that createSystemClientsRoles() )
+
 
                 // Mapper type: label
                 // Mapper name: unique mapper name
@@ -237,7 +287,7 @@ public class RealmDefaultComplementaryResourcesProvider {
                 throw new OperationException(e);
             }
         }
-        return scopes; // instance of created scope including technical identifiers
+        return addedScopes; // instance of created scope including technical identifiers
     }
 
     /**

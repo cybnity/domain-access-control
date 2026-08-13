@@ -4,6 +4,7 @@ import org.cybnity.accesscontrol.ConfigurationStrategy;
 import org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.AdminConfigurationVariable;
 import org.cybnity.framework.FileBasedConfigurationSource;
 import org.cybnity.framework.IContext;
+import org.cybnity.framework.IReadableConfiguration;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.keycloak.domain.model.RealmRoleBuilder;
 import org.cybnity.keycloak.domain.model.RealmWithDefaultExtendedResources;
@@ -19,13 +20,20 @@ import java.util.Map;
  */
 public class RealmConfigurationStrategy extends ConfigurationStrategy {
 
+    private final IContext ctx;
+
     /**
      * Default strategy constructor.
      *
+     * @param ctx Mandatory context eventually including elements required during the Realm object preparation runtime.
      * @throws IllegalArgumentException When missing parameter.
      */
-    public RealmConfigurationStrategy() throws IllegalArgumentException {
+    public RealmConfigurationStrategy(IContext ctx) throws IllegalArgumentException {
         super();
+        if (ctx == null) {
+            throw new IllegalArgumentException("ctx parameter cannot be null!");
+        }
+        this.ctx = ctx;
     }
 
     /**
@@ -202,8 +210,9 @@ public class RealmConfigurationStrategy extends ConfigurationStrategy {
      * @param defaultConfig Mandatory default configuration as provider of configuration elements.
      * @return A helper for creation of default complementary resources.
      * @throws IllegalArgumentException When mandatory parameter is missing.
+     * @throws UnoperationalStateException When found configuration file does not include default properties.
      */
-    public RealmDefaultComplementaryResourcesProvider realmComplementaryDefaultResourcesHelper(Keycloak keycloak, String tenantLabel, RealmWithDefaultExtendedResources defaultConfig) throws IllegalArgumentException {
-        return new RealmDefaultComplementaryResourcesProvider(keycloak, tenantLabel, defaultConfig, new RealmRoleBuilder());
+    public RealmDefaultComplementaryResourcesProvider realmComplementaryDefaultResourcesHelper(Keycloak keycloak, String tenantLabel, RealmWithDefaultExtendedResources defaultConfig) throws IllegalArgumentException, UnoperationalStateException {
+        return new RealmDefaultComplementaryResourcesProvider(keycloak, tenantLabel, defaultConfig, new RealmRoleBuilder(), getConfigurationProperties(ctx));
     }
 }

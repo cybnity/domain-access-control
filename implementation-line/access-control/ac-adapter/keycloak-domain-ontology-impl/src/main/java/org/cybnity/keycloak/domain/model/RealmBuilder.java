@@ -71,6 +71,7 @@ public class RealmBuilder {
 
     /**
      * The display name of page regarding the realm authentication page.
+     *
      * @param displayName A label.
      * @return This builder instance.
      */
