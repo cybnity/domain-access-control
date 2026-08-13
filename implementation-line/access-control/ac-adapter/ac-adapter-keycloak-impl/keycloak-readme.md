@@ -186,7 +186,7 @@ From **Client Scopes > ui-layer-systems-roles**:
     - Client ID: `web-reactive-frontend-system`
       (client ID for role mappings. Just client roles of this client will be added to the token. If this is unset, client roles of all clients will be added to the token)
     - Multivalued: `ON`
-    - Token Claim Name: `resource_access.role`
+    - Token Claim Name: `client.role`
       (name of the claim to insert into the token. This can be a fully qualified name like 'address.street'. In this case, a nested json object will be created)
     - Claim JSON Type: `String`
     - Add to ID token: `ON`
@@ -208,7 +208,7 @@ From **Client Scopes > ui-layer-systems-roles**:
 From **Clients > web-reactive-frontend-system > Client Scopes** panel, add the custom scope previously created via the **Add client scope** button:
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
 
-Now, we can get the client roles from the JWT token with **resource_access.role** key, allowing to enable/disable web-reactive-frontend-system's view (e.g UI component, functions visibility) to particular roles received from the token.
+Now, we can get the client roles from the JWT token with **client.role** key, allowing to enable/disable web-reactive-frontend-system's view (e.g UI component, functions visibility) to particular roles received from the token.
 
 From **Clients > reactive-backend-system > Client Scopes** panel, add the custom scope previously created via the **Add client scope** button:
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
