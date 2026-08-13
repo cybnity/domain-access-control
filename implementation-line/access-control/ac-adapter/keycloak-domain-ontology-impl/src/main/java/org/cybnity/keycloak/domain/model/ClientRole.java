@@ -17,11 +17,18 @@ import org.keycloak.representations.idm.RoleRepresentation;
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_IA_2")
 public class ClientRole extends RoleRepresentation implements ExtendedResourcesDecorator {
+
+    /**
+     * Default constructor.
+     */
+    public ClientRole() {
+        super();
+    }
+
     /**
      * Apply a decoration of this object with additional customization elements.
      */
     @Override
     public void decorate() {
-
     }
 }

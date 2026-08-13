@@ -36,6 +36,10 @@ import java.util.Map;
  *    | ID Token / Access Token / UserInfo      |
  *    +-----------------------------------------+
  */
+
+/**
+ * Builder pattern about ClientScope.
+ */
 public class ClientScopeBuilder {
 
     /**

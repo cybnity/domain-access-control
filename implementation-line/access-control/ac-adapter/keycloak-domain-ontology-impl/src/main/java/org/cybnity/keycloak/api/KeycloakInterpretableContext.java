@@ -14,6 +14,13 @@ public class KeycloakInterpretableContext {
     private EnumSet<KeycloakAPIResponseCode> responseCodesReferential;
 
     /**
+     * Default constructor.
+     */
+    public KeycloakInterpretableContext() {
+
+    }
+
+    /**
      * Define referential of response codes.
      *
      * @param responseCodesReferential Mandatory set of codes.

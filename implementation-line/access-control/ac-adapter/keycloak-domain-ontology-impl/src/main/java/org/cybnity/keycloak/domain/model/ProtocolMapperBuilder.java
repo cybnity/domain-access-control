@@ -34,6 +34,10 @@ import java.util.Map;
  *    | ID Token / Access Token / UserInfo      |
  *    +-----------------------------------------+
  */
+
+/**
+ * Builder pattern of ProtocolMatter.
+ */
 public class ProtocolMapperBuilder {
     /**
      * SSO protocol configuration supplied by this mapper.

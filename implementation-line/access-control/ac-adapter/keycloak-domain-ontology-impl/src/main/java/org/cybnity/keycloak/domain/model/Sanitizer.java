@@ -6,6 +6,12 @@ package org.cybnity.keycloak.domain.model;
 public class Sanitizer {
 
     /**
+     * Default constructor.
+     */
+    public Sanitizer() {
+    }
+
+    /**
      * Remove any blank character from string.
      *
      * @param label Mandatory label to clean.
