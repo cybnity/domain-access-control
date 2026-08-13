@@ -203,7 +203,7 @@ From **Client Scopes > ui-layer-systems-roles**:
     - Add to access token: `ON`
     - Add to userinfo: `ON`
 - Scope
-  - Make new assignment of `tenant-enduser` role to `ui-layer-systems-roles` account
+  - Make new assignment of `use-tenant` role to `ui-layer-systems-roles` client scope.
 
 From **Clients > web-reactive-frontend-system > Client Scopes** panel, add the custom scope previously created via the **Add client scope** button:
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
@@ -238,7 +238,7 @@ Create a test account (e.g dedicated to the frontend application test) declared 
     - Set a password for the user account and toggle `Temporary` to `OFF`
     - Validate password creation
   - **Role Mapping** section:
-      - Assign the `tenant-enduser` realm role to the user allowing him to have automatically assigned mapped role defined for each client
+      - Assign the `use-tenant` realm role to the user allowing him to have automatically assigned mapped role defined for each client
 
 #### User account authentication check
 When disconnected of any user account:
