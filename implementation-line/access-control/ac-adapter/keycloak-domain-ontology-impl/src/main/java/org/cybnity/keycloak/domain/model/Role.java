@@ -6,6 +6,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 
 /**
  * A role represents organization-wide permissions or specific scope permissions.
+ * For example, can represent a common IAuthorizationType of Access Control domain, based on a PermissionCode (e.g; PermissionCode.USE_TENANT).
  */
 @Requirement(reqType = RequirementCategory.Security, reqId = "REQ_SEC_COMMON_IA_2")
 public class Role extends RoleRepresentation implements ExtendedResourcesDecorator {

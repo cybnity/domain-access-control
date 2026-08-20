@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Represent a policy strategy type as policy of policies that depends of context.
+ * Represent a policy strategy type as policy of policies that depends of a context.
  *
  * @author olivier
  *

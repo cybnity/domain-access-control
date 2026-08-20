@@ -286,7 +286,7 @@ public class ClientScopeBuilder {
      * @param protocolMapper Mandatory mapper.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    private void addProtocolMapper(ProtocolMapperRepresentation protocolMapper) throws IllegalArgumentException {
+    public void addProtocolMapper(ProtocolMapperRepresentation protocolMapper) throws IllegalArgumentException {
         if (protocolMapper == null) {
             throw new IllegalArgumentException("protocolMapper parameter cannot be null!");
         }
@@ -303,7 +303,7 @@ public class ClientScopeBuilder {
      * @return This builder instance.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public ClientScopeBuilder protocolMapper(ProtocolMapperBuilder builder) throws IllegalArgumentException {
+    public ClientScopeBuilder addProtocolMapper(ProtocolMapperBuilder builder) throws IllegalArgumentException {
         if (builder == null) {
             throw new IllegalArgumentException("builder parameter cannot be null!");
         }

@@ -4,7 +4,7 @@ import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
- * Represents an OIDC authorization
+ * Represents an OIDC authorization also commonly called permission.
  *
  * @author olivier
  *
