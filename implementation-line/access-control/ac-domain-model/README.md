@@ -170,9 +170,9 @@ behaviours.
 | Class Type              | Motivation                                                                                                                  |
 |:------------------------|:----------------------------------------------------------------------------------------------------------------------------|
 | IAuthorization          | Represents an OIDC authorization, also commonly called permission |
-| IAuthorizationCode      | Common type of authorization or permission, based on a naming convention for naming, and reusable by applications and-or automated flow for default assigning to actors (e.g; security accessories, basic users) |
 | IAuthorizationType      | Type of authorized action (e.g; read, update, delete) also named privilege defined by a pair of action and resource specification (e.g; read:patients, or update:configuration, or delete:posts) |
 | IClaim                 | Piece of information about a user (e.g; a "manager" as claim type, from "finance" department, and having permissions "Approve Invoice"), represented as a key–value pair |
+| PermissionCode        | Common type of authorization, based on a naming convention for naming, and reusable by applications and-or automated flow for default assigning to actors (e.g; security accessories, basic users) |
 
 ### CIAM SUB-PACKAGE
 
