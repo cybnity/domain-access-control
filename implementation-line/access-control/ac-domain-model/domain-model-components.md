@@ -65,7 +65,7 @@ Generic and extensible implementation components are designed into the domain mo
 
 |Class|Description|
 |:----|:----------|
-|Role|Generic role managed into a context (e.g; that could be assigned to a service account about a system application layer). This is a representation of a IAuthorizationType manageable or referenced by the Access Control domain|
+|Role|A role represents organization-wide permissions or specific scope permissions.<br>For example, can represent a common IAuthorizationType of Access Control domain, based on a PermissionCode (e.g; PermissionCode.USE_TENANT)|
 
 #
 
