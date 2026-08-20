@@ -89,12 +89,12 @@ classDiagram
   IResource <|.. ControlledResource
   Unmodifiable <|.. ControlledResource
   AttributesBasedAccessControl o-- "1..*" SubjectAttribute :subjectDescriptions
-  AttributesBasedAccessControl o-- "1..*" ActionAttribute :actionDescriptions
-  AttributesBasedAccessControl o-- "1..*" EnvironmentAttribute :environmentDescriptions
+  AttributesBasedAccessControl o-- "1..*" IActionAttribute :actionDescriptions
+  AttributesBasedAccessControl o-- "1..*" IEnvironmentAttribute :environmentDescriptions
   note for SubjectAttribute "Attributes describing the subject who is demanding access<br>(e.g roles, group memberships, competencies, user ID, etc..)<br><br>"
-  note for ActionAttribute "Combination of attributes describing what user<br>want to perform (e.g read, write, action type)<br><br>"
+  note for IActionAttribute "Combination of attributes describing what user<br>want to perform (e.g read, write, action type)<br><br>"
   note for ControlledResource "Information asset or object impacted by the action"
-  note for EnvironmentAttribute "Common attribute related to the current time and location from<br>where access is requested, type of communication channel, or client type<br><br>"
+  note for IEnvironmentAttribute "Common attribute related to the current time and location from<br>where access is requested, type of communication channel, or client type<br><br>"
 
   class ControlledResource {
     <<abstract>>
@@ -106,21 +106,19 @@ classDiagram
   class AttributesBasedAccessControl {
     <<AuthorizationPolicy>>
     -subjectDescription : Collection~SubjectAttribute~
-    -actionableActions : Collection~ActionAttribute~
-    -environmentDescription : Collection~EnvironmentAttribute~
-    +AttributesBasedAccessControl(Collection~SubjectAttribute~ subjectDescription, Collection~ActionAttribute~ actionableActions, Collection~EnvironmentAttribute~ environmentDescription)
+    -actionableActions : Collection~IActionAttribute~
+    -environmentDescription : Collection~IEnvironmentAttribute~
+    +AttributesBasedAccessControl(Collection~SubjectAttribute~ subjectDescription, Collection~IActionAttribute~ actionableActions, Collection~IEnvironmentAttribute~ environmentDescription)
   }
-  class ActionAttribute {
+  class IActionAttribute {
     <<interface>>
+	+description() String
   }
-  class EnvironmentAttribute {
+  class IEnvironmentAttribute {
 	<<interface>>
   }
   class SubjectAttribute {
 	<<abstract>>
-  }
-  class ActionAttribute {
-	<<interface>>
   }
 
 ```
