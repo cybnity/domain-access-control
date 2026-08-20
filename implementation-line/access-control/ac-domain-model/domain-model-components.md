@@ -65,7 +65,7 @@ Generic and extensible implementation components are designed into the domain mo
 
 |Class|Description|
 |:----|:----------|
-|Role|Generic role managed into a context (e.g; that could be assigned to a service account about a system application layer). This is a representation of a IActionAttribute type manageable or referenced by the Access Control domain|
+|Role|Generic role managed into a context (e.g; that could be assigned to a service account about a system application layer). This is a representation of a IAuthorizationType manageable or referenced by the Access Control domain|
 
 #
 
