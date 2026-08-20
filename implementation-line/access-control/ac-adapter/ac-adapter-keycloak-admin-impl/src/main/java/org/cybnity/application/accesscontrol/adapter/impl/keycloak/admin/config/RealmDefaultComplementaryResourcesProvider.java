@@ -248,71 +248,104 @@ public class RealmDefaultComplementaryResourcesProvider {
                 // Create each common scope required by default for the realm
                 List<ClientScope> defaultPreparedClientScopes = new ArrayList<>();
 
-                // Define client scope unique name defined into a realm (according to naming convention based on shared "type" between multiple clients)
-                String defaultClientTypeAssignment = ClientScopeBuilder.TYPE_DEFAULT; // None, Default or Optional. Client scope, which will be added as default addedScopes to each created client
-                String scopeName = configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_NAME");
-                Collection<ProtocolMapperBuilder> mappers = new ArrayList<>();
-                // --- DEFINE THE MAPPERS REQUIRED FOR SHARING OF SCOPE TO THE ELIGIBLE CLIENTS
-                // ----- web frontend (User Client Role mapper)
-                ProtocolMapperBuilder protocolMapperBuilder = new ProtocolMapperBuilder()
-                        .mapperName(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_NAME"))
-                        .protocol(ClientScopeBuilder.PROTOCOL_OPENIDCONNECT)
-                        .clientId(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_CLIENTID"))
-                        .isMultivalued(Boolean.parseBoolean(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_IS_MULTIVALUED")))
-                        .tokenClaimName(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_TOKEN_CLAIM_NAME"))
-                        .claimJSONType(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_CLAIM_JSON_TYPE"))
-                        .isAddedToIDToken(Boolean.parseBoolean(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_IS_ADDED_TO_ID_TOKEN")))
-                        .isAddedToAccessToken(Boolean.parseBoolean(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_IS_ADDED_TO_ACCESS_TOKEN")))
-                        .isAddedToUserinfo(Boolean.parseBoolean(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_IS_ADDED_TO_USER_INFO")))
-                        .isAddedToLightweightAccessToken(Boolean.parseBoolean(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_IS_ADDED_TO_LIGHT_WEIGHT_ACCESS_TOKEN")))
-                        .isAddedToTokenIntrospection(Boolean.parseBoolean(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_IS_ADDED_TO_TOKEN_INTROSPECTION")))
-                        .mapperTypeReferenceName(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_MAPPER_1_MAPPER_TYPE_REFERENCE_NAME")); // See <a href="https://www.keycloak.org/admin-api/protocol-mappers">protocol mappers available by default into Keycloak</a>.
-                mappers.add(protocolMapperBuilder);
-                // ----- web frontend (User Realm Role mapper)
-                // TODO create new mapper about ui-realm-role
+                int clientScopeCount = 1;
+                boolean findNextClientScopeDefaultConfig = true;
+                while (findNextClientScopeDefaultConfig) {
+                    try {
+                        // Attempt to build next existing configuration about client scope  to add as default into Keycloak
+                        String clientScopeConfigPropertyName = "REALM_DEFAULT_CLIENTSCOPE_";
+                        // Define client scope unique name defined into a realm (according to naming convention based on shared "type" between multiple clients)
+                        String clientScopeDefaultPropertyID = clientScopeConfigPropertyName + clientScopeCount;
+                        String defaultClientTypeAssignment = ClientScopeBuilder.TYPE_DEFAULT; // None, Default or Optional. Client scope, which will be added as default addedScopes to each created client
+                        final String scopeName = configurationProperties.get(clientScopeDefaultPropertyID + "_NAME");
+                        Collection<ProtocolMapperBuilder> mappers = new ArrayList<>();
 
-                defaultPreparedClientScopes.add(prepareClientScope(defaultClientTypeAssignment,
-                        scopeName,
-                        configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_DESCRIPTION"),
-                        ClientScopeBuilder.PROTOCOL_OPENIDCONNECT,
-                        Boolean.parseBoolean(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_DISPLAY_ON_CONSENT_SCREEN")),
-                        configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_CONSENT_SCREEN_TEXT"),
-                        Boolean.parseBoolean(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_IS_INCLUDED_IN_TOKEN_SCOPE")),
-                        Integer.parseInt(configurationProperties.get("REALM_DEFAULT_CLIENTSCOPE_1_DISPLAY_ORDER")),
-                        mappers)); // Build the client scope to add into Keycloak
+                        // --- DEFINE THE MAPPERS REQUIRED FOR SHARING OF SCOPE TO THE ELIGIBLE CLIENTS
+                        // See <a href="https://www.keycloak.org/admin-api/protocol-mappers">protocol mappers available by default into Keycloak</a>.
+                        // ----- web frontend (User Client Role mapper)
 
+                        int clientMapperCount = 1;
+                        boolean findNextMapperConfig = true;
+                        String mapperName;
+                        while (findNextMapperConfig) {
+                            try {
+                                // Attempt to build next existing configuration about mapper to add for client scope
+                                mapperName = configurationProperties.getOrDefault(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_NAME", null);
 
-                // TODO create here additional common User Realm Role
-
-                // ----- ADD OTHER SYSTEM MAPPER ACCORDING TO SAME OR DEDICATED CLIENTS AND SCOPE
-
-                // Record prepared scopes into Keycloak as new client scope
-                for (ClientScope aPreparedScope : defaultPreparedClientScopes) {
-                    try (Response resp = scopes.create(aPreparedScope)) {
-                        if (!KeycloakAPIResponseCode.CREATED.responseCode().equals(Integer.valueOf(resp.getStatus()).toString())) {
-                            // Rejection for cause of conflict (409) ar forbidden (403) creation
-                            throw new OperationException(resp.toString());
+                                if (mapperName != null && !mapperName.isBlank()) {
+                                    mappers.add(new ProtocolMapperBuilder()
+                                            .mapperName(mapperName)
+                                            .protocol(ClientScopeBuilder.PROTOCOL_OPENIDCONNECT)
+                                            .clientId(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_CLIENTID"))
+                                            .isMultivalued(Boolean.parseBoolean(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_IS_MULTIVALUED")))
+                                            .tokenClaimName(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_TOKEN_CLAIM_NAME"))
+                                            .claimJSONType(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_CLAIM_JSON_TYPE"))
+                                            .isAddedToIDToken(Boolean.parseBoolean(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_IS_ADDED_TO_ID_TOKEN")))
+                                            .isAddedToAccessToken(Boolean.parseBoolean(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_IS_ADDED_TO_ACCESS_TOKEN")))
+                                            .isAddedToUserinfo(Boolean.parseBoolean(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_IS_ADDED_TO_USER_INFO")))
+                                            .isAddedToLightweightAccessToken(Boolean.parseBoolean(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_IS_ADDED_TO_LIGHT_WEIGHT_ACCESS_TOKEN")))
+                                            .isAddedToTokenIntrospection(Boolean.parseBoolean(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_IS_ADDED_TO_TOKEN_INTROSPECTION")))
+                                            .mapperTypeReferenceName(configurationProperties.get(clientScopeDefaultPropertyID + "_MAPPER_" + clientMapperCount + "_MAPPER_TYPE_REFERENCE_NAME")));
+                                } else {
+                                    findNextMapperConfig = false; // Stop configuration file read (cause none existing new indexed mapper definition
+                                }
+                            } catch (Exception e) {
+                                // Stop read of configuration because none additional mapper is defined
+                                findNextMapperConfig = false;
+                            } finally {
+                                clientMapperCount++;
+                            }
                         }
 
-                        // --- UPDATE CLIENTS ELIGIBLE TO DEFAULT OR OPTIONAL SCOPE
-                        // Update all clients eligible to new scope as default or optional scope
-                        realm.clientScopes().findAll().stream()
-                                .filter(scope -> scopeName.equals(scope.getName()) /* select only the new scope eligible for add as default or optional on realm existing clients */)
-                                .forEach(clientScopeRepresentation -> {
-                                    // Assign the client scope on each default client according to its type (default, or optional)
-                                    for (ClientRepresentation client : eligibleToScopeAssignment) {
-                                        ClientResource clientRef = realm.clients().get(client.getId()); // Get the client eligible to be set on the new scope
-                                        if (ClientScopeBuilder.TYPE_DEFAULT.equals(defaultClientTypeAssignment)) {
-                                            // Add scope to the existing default scopes
-                                            clientRef.addDefaultClientScope(clientScopeRepresentation.getId());
-                                            addedScopes.add(clientScopeRepresentation);
-                                        } else if (ClientScopeBuilder.TYPE_OPTIONAL.equals(defaultClientTypeAssignment)) {
-                                            // Add scope to the existing optional scopes
-                                            clientRef.addOptionalClientScope(clientScopeRepresentation.getId());
-                                            addedScopes.add(clientScopeRepresentation);
-                                        }
-                                    }
-                                });
+                        defaultPreparedClientScopes.add(prepareClientScope(defaultClientTypeAssignment,
+                                scopeName,
+                                configurationProperties.get(clientScopeDefaultPropertyID + "_DESCRIPTION"),
+                                ClientScopeBuilder.PROTOCOL_OPENIDCONNECT,
+                                Boolean.parseBoolean(configurationProperties.get(clientScopeDefaultPropertyID + "_DISPLAY_ON_CONSENT_SCREEN")),
+                                configurationProperties.get(clientScopeDefaultPropertyID + "_CONSENT_SCREEN_TEXT"),
+                                Boolean.parseBoolean(configurationProperties.get(clientScopeDefaultPropertyID + "_IS_INCLUDED_IN_TOKEN_SCOPE")),
+                                Integer.parseInt(configurationProperties.get(clientScopeDefaultPropertyID + "_DISPLAY_ORDER")),
+                                mappers)); // Build the client scope to add into Keycloak
+
+
+                        // TODO add new assigned scope "use-tenant" role to "ui-layer-system-roles" client scope
+
+                        // ----- ADD OTHER SYSTEM MAPPER ACCORDING TO SAME OR DEDICATED CLIENTS AND SCOPE
+
+                        // Record prepared scopes into Keycloak as new client scope
+                        for (ClientScope aPreparedScope : defaultPreparedClientScopes) {
+                            try (Response resp = scopes.create(aPreparedScope)) {
+                                if (!KeycloakAPIResponseCode.CREATED.responseCode().equals(Integer.valueOf(resp.getStatus()).toString())) {
+                                    // Rejection for cause of conflict (409) ar forbidden (403) creation
+                                    throw new OperationException(resp.toString());
+                                }
+
+                                // --- UPDATE CLIENTS ELIGIBLE TO DEFAULT OR OPTIONAL SCOPE
+                                // Update all clients eligible to new scope as default or optional scope
+                                realm.clientScopes().findAll().stream()
+                                        .filter(scope -> scopeName.equals(scope.getName()) /* select only the new scope eligible for add as default or optional on realm existing clients */)
+                                        .forEach(clientScopeRepresentation -> {
+                                            // Assign the client scope on each default client according to its type (default, or optional)
+                                            for (ClientRepresentation client : eligibleToScopeAssignment) {
+                                                ClientResource clientRef = realm.clients().get(client.getId()); // Get the client eligible to be set on the new scope
+                                                if (ClientScopeBuilder.TYPE_DEFAULT.equals(defaultClientTypeAssignment)) {
+                                                    // Add scope to the existing default scopes
+                                                    clientRef.addDefaultClientScope(clientScopeRepresentation.getId());
+                                                    addedScopes.add(clientScopeRepresentation);
+                                                } else if (ClientScopeBuilder.TYPE_OPTIONAL.equals(defaultClientTypeAssignment)) {
+                                                    // Add scope to the existing optional scopes
+                                                    clientRef.addOptionalClientScope(clientScopeRepresentation.getId());
+                                                    addedScopes.add(clientScopeRepresentation);
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+                    } catch (Exception e) {
+                        // Stop read of configuration because none additional mapper is defined
+                        findNextClientScopeDefaultConfig = false;
+                    } finally {
+                        clientScopeCount++;
                     }
                 }
 
