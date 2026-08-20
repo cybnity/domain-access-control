@@ -96,6 +96,7 @@ type, as Identity & Access Management (IAM) features and domain objects.
 | Class Type              | Motivation                                                                                                                  |
 |:------------------------|:----------------------------------------------------------------------------------------------------------------------------|
 | Account                 | Domain root aggregate object relative to a subject's usable account                                                         |
+| IActionAttribute         | Combination of attributes describing what actor want to perform (e.g; read, write, any action type regarding a resource)    |
 | OrganizationalStructure | Organizational structure (e.g company, association, group of companies, institution) who can have interactions with systems |
 | Person                  | Physical social entity (e.g human person)                                                                                   |
 | SmartSystem             | Represent a software and/or hardware system (e.g autonomous accessory representing a person or organization)                |
@@ -164,7 +165,12 @@ classDiagram
 ### AUTHORIZATION SUB-PACKAGE
 
 The package `org.cybnity.accesscontrol.authorization.domain.model` provide components required to the authorization
-behaviors.
+behaviours.
+
+| Class Type              | Motivation                                                                                                                  |
+|:------------------------|:----------------------------------------------------------------------------------------------------------------------------|
+| IAuthorizationType      | Type of authorized action (e.g; read, update, delete) also named privilege defined by a pair of action and resource specification (e.g; read:patients, or update:configuration, or delete:posts) |
+| IClaim                 | Piece of information about a user (e.g; a "manager" as claim type, from "finance" department, and having permissions "Approve Invoice"), represented as a key–value pair |
 
 ### CIAM SUB-PACKAGE
 
