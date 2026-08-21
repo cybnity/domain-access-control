@@ -86,7 +86,7 @@ public class RealmDefaultComplementaryResourcesProvider {
 
             // --- REALM CLIENT SCOPES about shared configuration for UI layer systems (e.g; common shared roles for endpoint systems)
             Set<ClientRepresentation> eligibleToScopeAssignment = defaultClientComplementaryRoleRecords.keySet();
-            List<ClientScopeRepresentation> clientScopes = createDefaultClientsScopes(realm, defaultConfig, eligibleToScopeAssignment);
+            List<ClientScopeRepresentation> clientScopes = createDefaultClientScopes(realm, defaultConfig, eligibleToScopeAssignment, realmRolesRecords);
             // ----- MAPPED DEFAULT CLIENTS TO COMMON SCOPES
 
             // --- REALM USERS
@@ -229,14 +229,16 @@ public class RealmDefaultComplementaryResourcesProvider {
      * Client scopes naming convention: the "type" based naming template is applied for definition of each client scope name.
      * This method create the default scopes usable into a realm.
      *
-     * @param realm                     Mandatory current existing realm resource client (including technical identifier).
-     * @param defaultConfig             Mandatory default configuration including definition of default scope potentially requiring creation for common roles sharing with associated default clients.
-     * @param eligibleToScopeAssignment Clients (including technical identifiers) eligible to subject of mapping with default clients scopes. No scope created if null or empty.
+     * @param realm                             Mandatory current existing realm resource client (including technical identifier).
+     * @param defaultConfig                     Mandatory default configuration including definition of default scope potentially requiring creation for common roles sharing with associated default clients.
+     * @param eligibleToScopeAssignment         Clients (including technical identifiers) eligible to subject of mapping with default clients scopes. No scope created if null or empty.
+     * @param eligibleToClientScopesAssociation Optional roles to associate to default clients scopes. If there is no role scope mapping defined per client scope, each user is permitted to use those client scopes.
+     *                                          If there are role scope mappings defined (based on the eligible roles for association), the user must be a member of at least one of the roles.
      * @return Created clients scopes including recorded technical identifiers (instance created by Keycloak) or empty set.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      * @throws OperationException       When problem occurred during interactions with Keycloak server.
      */
-    private List<ClientScopeRepresentation> createDefaultClientsScopes(RealmResource realm, RealmWithDefaultExtendedResources defaultConfig, Set<ClientRepresentation> eligibleToScopeAssignment) throws IllegalArgumentException, OperationException {
+    private List<ClientScopeRepresentation> createDefaultClientScopes(RealmResource realm, RealmWithDefaultExtendedResources defaultConfig, Set<ClientRepresentation> eligibleToScopeAssignment, List<RoleRepresentation> eligibleToClientScopesAssociation) throws IllegalArgumentException, OperationException {
         if (realm == null) throw new IllegalArgumentException("realm parameter is required!");
         if (defaultConfig == null) throw new IllegalArgumentException("defaultConfig parameter is required!");
         List<ClientScopeRepresentation> addedScopes = new ArrayList<>();
@@ -307,9 +309,6 @@ public class RealmDefaultComplementaryResourcesProvider {
                                 Integer.parseInt(configurationProperties.get(clientScopeDefaultPropertyID + "_DISPLAY_ORDER")),
                                 mappers)); // Build the client scope to add into Keycloak
 
-
-                        // TODO add new assigned scope "use-tenant" role to "ui-layer-system-roles" client scope
-
                         // ----- ADD OTHER SYSTEM MAPPER ACCORDING TO SAME OR DEDICATED CLIENTS AND SCOPE
 
                         // Record prepared scopes into Keycloak as new client scope
@@ -322,21 +321,58 @@ public class RealmDefaultComplementaryResourcesProvider {
 
                                 // --- UPDATE CLIENTS ELIGIBLE TO DEFAULT OR OPTIONAL SCOPE
                                 // Update all clients eligible to new scope as default or optional scope
+                                String realmName = realm.toRepresentation().getRealm();
                                 realm.clientScopes().findAll().stream()
                                         .filter(scope -> scopeName.equals(scope.getName()) /* select only the new scope eligible for add as default or optional on realm existing clients */)
                                         .forEach(clientScopeRepresentation -> {
-                                            // Assign the client scope on each default client according to its type (default, or optional)
+                                            // Add complementary configuration elements to each client scope
+
+                                            // --- ADD CLIENT SCOPE TO CLIENT
                                             for (ClientRepresentation client : eligibleToScopeAssignment) {
+                                                // Assign the client scope on each default client according to its type (default, or optional)
                                                 ClientResource clientRef = realm.clients().get(client.getId()); // Get the client eligible to be set on the new scope
+                                                boolean isScopeAddedToClient = false;
                                                 if (ClientScopeBuilder.TYPE_DEFAULT.equals(defaultClientTypeAssignment)) {
                                                     // Add scope to the existing default scopes
                                                     clientRef.addDefaultClientScope(clientScopeRepresentation.getId());
-                                                    addedScopes.add(clientScopeRepresentation);
+                                                    isScopeAddedToClient = true;
                                                 } else if (ClientScopeBuilder.TYPE_OPTIONAL.equals(defaultClientTypeAssignment)) {
                                                     // Add scope to the existing optional scopes
                                                     clientRef.addOptionalClientScope(clientScopeRepresentation.getId());
-                                                    addedScopes.add(clientScopeRepresentation);
+                                                    isScopeAddedToClient = true;
                                                 }
+
+                                                if (eligibleToClientScopesAssociation != null) {
+                                                    // --- ADD LINK TO DEFAULT ROLE (AS SCOPE MAPPING) TO CLIENT SCOPE
+                                                    // Define client-level or realm roles to associate with the client-scope according their type
+                                                    List<RoleRepresentation> clientRolesToAssociate = new ArrayList<>();
+                                                    List<RoleRepresentation> realmRolesToAssociate = new ArrayList<>();
+
+                                                    for (RoleRepresentation roleToAssociate : eligibleToClientScopesAssociation) {
+                                                        if (roleToAssociate.getClientRole()) {
+                                                            // Identify the client roles to associate for permitting only users to use the client scope (relevant of this client role)
+                                                            clientRolesToAssociate.add(roleToAssociate);
+                                                        } else {
+                                                            // Identify the realm roles to associate for permitting only users to use the client scope (relevant of this realm role)
+                                                            realmRolesToAssociate.add(roleToAssociate);
+                                                        }
+                                                    }
+
+                                                    if (!clientRolesToAssociate.isEmpty() || !realmRolesToAssociate.isEmpty()) {
+                                                        RoleMappingResource roleMap = realm.clientScopes().get(clientScopeRepresentation.getId()).getScopeMappings();
+                                                        if (!clientRolesToAssociate.isEmpty()) {
+                                                            // Create scope mapping between client and role (entry into client scope mappings)
+                                                            roleMap.clientLevel(client.getId() /* UUID internal client identification id as consistent reference to the client managed by Keycloak */).add(clientRolesToAssociate);
+                                                        }
+                                                        if (!realmRolesToAssociate.isEmpty()) {
+                                                            // Create scope mapping between client scope and role (entry into scope mappings)
+                                                            roleMap.realmLevel().add(realmRolesToAssociate);
+                                                            // TODO add new assigned scope "use-tenant" role to "ui-layer-system-roles" client scope
+                                                        }
+                                                    }
+                                                }
+                                                if (isScopeAddedToClient)
+                                                    addedScopes.add(clientScopeRepresentation);
                                             }
                                         });
                             }

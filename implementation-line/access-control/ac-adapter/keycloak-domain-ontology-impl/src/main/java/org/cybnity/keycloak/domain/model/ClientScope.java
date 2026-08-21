@@ -54,6 +54,7 @@ public class ClientScope extends ClientScopeRepresentation implements ExtendedRe
         // Dynamic defined attributes as extended customization elements
         this.setAttributes(builder.complementaryAttributes()); // all contents represented as attributes
         this.setProtocolMappers(builder.protocolMappers); // defined protocol mappers
+
     }
 
 }
