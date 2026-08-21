@@ -82,7 +82,7 @@ Register a new Keycloak client dedicated to frontend module (allowing user authe
       - Frontchannel logout session required: `ON`
 
 #### Applicative role definition
-From **Realm Roles** menu, add a new realm role named `endpoint-web-reactive-server` via the **Create role** button:
+From **Realm Roles** menu, add a new realm role named `use-tenant` via the **Create role** button:
 - Role name: `use-tenant`
 - Description: `Function based role regarding authorized access and use of resources under realm ownership`
 
