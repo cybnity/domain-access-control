@@ -203,7 +203,7 @@ From **Client Scopes > ui-layer-systems-roles**:
     - Add to access token: `ON`
     - Add to userinfo: `ON`
 - Scope
-  - Make new assignment of `use-tenant` role to `ui-layer-systems-roles` client scope.
+  - Make new assignment of `use-tenant` role to `ui-layer-systems-roles` client scope as role scope mapping. (if there is no role scope mapping defined, each user is permitted to use this client scope; if there are role scope mappings defined, the user must be a member of at least one of the roles)
 
 From **Clients > web-reactive-frontend-system > Client Scopes** panel, add the custom scope previously created via the **Add client scope** button:
 - Select `ui-layer-systems-roles` from the items list, and assign it as `Default`
