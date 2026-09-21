@@ -10,7 +10,7 @@ It's an implementation project of library providing scope of features relative t
 |               | CYBNITY Technical Service System | Application Service | CYBNITY Domains Area | IT & Data Platform |
 
 # IMPLEMENTATION STACK
-The main technologies set is:
+The main technologies set involved is combination of:
 - Java Library
 - [Keycloak client](https://github.com/keycloak/keycloak-client?tab=readme-ov-file)
 
