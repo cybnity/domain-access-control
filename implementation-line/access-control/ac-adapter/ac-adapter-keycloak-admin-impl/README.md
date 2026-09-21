@@ -3,7 +3,7 @@ Presentation of the infrastructure adaptation module allowing to make interactio
 
 It's a specific client implementation module of CYBNITY infrastructure connector packaged as Java library which can be embedded by securized CYBNITY other module (e.g component of Access Control domain).
 
-It an implementation project of library providing scope of features relative to administration and supervision of UAM (e.g authentication and authorization settings management) and IAM (e.g realm management regarding multi-tenants).
+It's an implementation project of library providing scope of features relative to administration and supervision of UAM (e.g authentication and authorization settings management) and IAM (e.g realm management regarding multi-tenants).
 
 | Cloudified As | Component Category               | Component Type      | Deployment Area      | Platform Type      |
 |:--------------|:---------------------------------|:--------------------|:---------------------|:-------------------|
