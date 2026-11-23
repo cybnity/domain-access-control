@@ -3,7 +3,7 @@ version: "1.0"
 description: QA agent — verifies assigned user outcomes by effect
 
 defaults:
-  runtime: codex
+  runtime: claude-code
 
 imports:
   - ref: local:../../shared
