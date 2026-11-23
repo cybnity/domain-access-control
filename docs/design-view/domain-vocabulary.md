@@ -12,7 +12,7 @@ or synonyms. Paths are shortened as follows:
 
 - **What this is:** a vocabulary cross-reference maintained in the repository, checked against
   the code on `feature-237` at `df70a3a`. It is not a requirements document. Requirements live in
-  the specifications linked from [the implementation view](implementation-view/README.md).
+  the specifications linked from [the implementation view](../implementation-view/README.md).
 - **Three kinds of statement are kept apart:**
   - **Source:** behaviour or structure present in this repository's Java code.
   - **Framework:** a type from `org.cybnity.framework`, which lives outside this repository
@@ -101,7 +101,7 @@ and `Realm`: see [Keycloak Realm](#keycloak-realm).
 - **Boundary:** a Realm is not the domain Tenant. The code doesn't link the two: `TenantRegistration`
   stores the Tenant but doesn't create a realm (TODOs at `TenantRegistration.java:214`, `:221`).
   The "one realm per tenant" relationship is doc intent
-  ([dynamic account management](implementation-view/dynamic-account-management.md)).
+  ([dynamic account management](../implementation-view/dynamic-account-management.md)).
 - **Synonym caution:** the adapter method that creates a realm is called `createTenant`.
 
 ## Identities and accounts
@@ -260,7 +260,7 @@ and `Realm`: see [Keycloak Realm](#keycloak-realm).
 | ID token | `IDToken implements ISecurityToken` (an abstract class) | An OIDC token with claims, accreditations, and creation, authentication and expiry times. |
 | JWT token | `JWTToken`, which holds an `IDToken` | The JWT exchange format of a token. |
 | Accredited user token | `AccreditedUserToken` | An accredited JWT allowed to an authenticated subject (no fields yet). |
-| Authorization flow | `IAuthorizationFlow`, `IAuthorizationCodeFlow` | OIDC flow types. The implicit flow is described as not retained in [information flow enforcement](implementation-view/information-flow-enforcement.md). |
+| Authorization flow | `IAuthorizationFlow`, `IAuthorizationCodeFlow` | OIDC flow types. The implicit flow is described as not retained in [information flow enforcement](../implementation-view/information-flow-enforcement.md). |
 
 No class outside `ac-domain-model` references `IAccessToken`.
 

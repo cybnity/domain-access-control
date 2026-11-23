@@ -8,7 +8,7 @@ You can find informations relative to software maintenance like:
 - Support to software build process and packaging
 - Systems configuration and deployment procedures
 
-The domain terms (Tenant, Account, Role, Realm…) and how they map to the source are defined in the [domain vocabulary](docs/domain-vocabulary.md).
+The domain terms (Tenant, Account, Role, Realm…) and how they map to the source are defined in the [domain vocabulary](docs/design-view/domain-vocabulary.md).
 
 # FUNCTIONAL VIEW (Use Cases)
 ## PURPOSE
