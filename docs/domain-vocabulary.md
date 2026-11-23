@@ -157,8 +157,8 @@ and `Realm`: see [Keycloak Realm](#keycloak-realm).
 - **Definition:** a criterion describing an identity, such as an email address.
 - **Source:** `model/iam/domain/model/IdentityAttribute` and `IMailAddress extends IdentityAttribute`.
   The read and write contracts are `IdentitiesReadModel` and `IdentitiesWriteModel`.
-- **Boundary:** it describes an identity. `SubjectAttribute` describes a subject *requesting
-  access* and belongs to the authorization side (see [Owner / subject](#owner--subject)).
+- **Boundary:** it describes an identity. `SubjectAttribute` (same `iam` package) describes a
+  subject *requesting access* (see [Owner / subject](#owner--subject)).
 
 ## Authorization
 
