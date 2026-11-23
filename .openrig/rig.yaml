@@ -1,0 +1,102 @@
+version: "0.2"
+name: domain-access-control-squad
+culture_file: CULTURE.md
+permission_policy: builtin:auto
+managed_blocks:
+  claude-code: CLAUDE.local.md
+pods:
+  - id: orch
+    label: Orchestration
+    members:
+      - id: advisor
+        agent_ref: local:agents/product-management/pm
+        profile: advisor
+        runtime: claude-code
+        cwd: ..
+        model: claude-opus-5-5
+        restore_policy: resume_if_possible
+      - id: lead
+        agent_ref: local:agents/orchestration/orchestrator
+        profile: default
+        runtime: codex
+        cwd: ..
+        model: gpt-6-luna
+        restore_policy: resume_if_possible
+    edges:
+      - kind: collaborates_with
+        from: advisor
+        to: lead
+  - id: dev
+    label: Development
+    members:
+      - id: build
+        agent_ref: local:agents/development/implementer
+        profile: default
+        runtime: claude-code
+        cwd: ..
+        model: claude-opus-5-5
+        restore_policy: resume_if_possible
+      - id: design
+        agent_ref: local:agents/design/product-designer
+        profile: default
+        runtime: claude-code
+        cwd: ..
+        model: claude-opus-5-5
+        restore_policy: resume_if_possible
+      - id: qa
+        agent_ref: local:agents/development/qa
+        profile: default
+        runtime: claude-code
+        cwd: ..
+        model: claude-opus-5-5
+        restore_policy: resume_if_possible
+    edges:
+      - kind: delegates_to
+        from: build
+        to: qa
+  - id: review
+    label: Review
+    members:
+      - id: reviewer1
+        agent_ref: local:agents/review/independent-reviewer
+        profile: default
+        runtime: claude-code
+        cwd: ..
+        model: claude-opus-5-5
+        restore_policy: resume_if_possible
+      - id: reviewer2
+        agent_ref: local:agents/review/independent-reviewer
+        profile: default
+        runtime: codex
+        cwd: ..
+        model: gpt-6-luna
+        restore_policy: resume_if_possible
+    edges: []
+edges:
+  - kind: delegates_to
+    from: orch.lead
+    to: dev.build
+  - kind: delegates_to
+    from: orch.lead
+    to: dev.design
+  - kind: delegates_to
+    from: orch.lead
+    to: review.reviewer1
+  - kind: delegates_to
+    from: orch.lead
+    to: dev.qa
+  - kind: delegates_to
+    from: orch.lead
+    to: review.reviewer2
+  - kind: can_observe
+    from: review.reviewer1
+    to: dev.build
+  - kind: can_observe
+    from: review.reviewer1
+    to: dev.design
+  - kind: can_observe
+    from: review.reviewer2
+    to: dev.build
+  - kind: can_observe
+    from: review.reviewer2
+    to: dev.qa
