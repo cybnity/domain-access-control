@@ -1,0 +1,40 @@
+name: product-designer
+version: "1.0"
+description: Product designer — shapes UX, interaction flows, and design-system coherence
+
+defaults:
+  runtime: claude-code
+
+imports:
+  - ref: local:../../shared
+
+profiles:
+  default:
+    uses:
+      skills: [development-team, frontend-design, verification-before-completion]
+      guidance: []
+      subagents: []
+      plugins: [shared:openrig-core]
+      runtime_resources: [shared:claude-default-settings, shared:claude-default-mcp, shared:codex-default-config, shared:claude-activity-hooks]
+
+resources:
+  guidance:
+    - id: role
+      path: guidance/role.md
+
+startup:
+  files:
+    - path: guidance/role.md
+      orientation: role
+      delivery_hint: send_text
+      required: true
+  actions:
+    - type: send_text
+      value: >-
+        Resolve the assigned outcome and its selected procedure. Use frontend-design
+        when shaping an interface and verification-before-completion when validating
+        a result. Load relevant skills when their task arises; this startup action
+        adds no blanket preload or review gate.
+      phase: after_ready
+      applies_on: [fresh_start, restore]
+      idempotent: true
