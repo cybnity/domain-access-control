@@ -9,7 +9,7 @@ vendored here with its agent specs under `agents/` so the folder is self-contain
 | `orch.lead` | Codex | Runs the team, scopes and routes work |
 | `orch.advisor` | Claude Code | Product intent partner (PM) |
 | `dev.build` | Claude Code | Implements changes |
-| `dev.qa` | Codex | Verifies outcomes by effect |
+| `dev.qa` | Claude Code | Verifies outcomes by effect |
 | `dev.design` | Claude Code | API, configuration and operator experience |
 | `review.reviewer1` | Claude Code | Independent reviewer |
 | `review.reviewer2` | Codex | Independent reviewer |
