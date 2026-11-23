@@ -8,8 +8,8 @@
 The design rationale lives in the existing docs, which this map links rather than repeats:
 [README](/README.md) (views and module overview),
 [implementation view](/docs/implementation-view/README.md) (security controls),
-[system integration](ac-system/docs/README.md) (streams, channels and dynamic routing),
-[domain model](ac-domain-model/README.md) and [adapters](ac-adapter/README.md).
+[system integration](/implementation-line/access-control/ac-system/docs/README.md) (streams, channels and dynamic routing),
+[domain model](/implementation-line/access-control/ac-domain-model/README.md) and [adapters](/implementation-line/access-control/ac-adapter/README.md).
 
 ## Repository layout
 
@@ -168,11 +168,11 @@ imports them.
 
 **Docs vs code.**
 
-- [System integration](ac-system/docs/README.md) lists the supported command as
+- [System integration](/implementation-line/access-control/ac-system/docs/README.md) lists the supported command as
   `CommandName.REGISTER_ORGANIZATION`. The code uses `CommandName.REGISTER_TENANT`, and
   `REGISTER_ORGANIZATION` doesn't exist in the source.
 - The root README dependency diagram omits `keycloak-domain-ontology-impl`.
-- [Domain model README](ac-domain-model/README.md) links `../ac-translator/README.md`, which
+- [Domain model README](/implementation-line/access-control/ac-domain-model/README.md) links `../ac-translator/README.md`, which
   doesn't exist. The translator README is under `ac-translator/keycloak-translator/`.
 - The [implementation view](/docs/implementation-view/README.md) describes six security
   controls (AC-2(8) to IA-2(10)). Their requirements live in Notion. This map didn't assess how
