@@ -102,14 +102,15 @@ Step by step, with the class that does each step:
    `access_control_pu_presence_announcing`, with change requests on
    `access_control_io_gateway_dynamic_routing_plan_evolution`.
 5. **Processing unit.** `TenantRegistrationFeaturePipeline` reads
-   `access_control_tenant_registration` and announces its routes. `TenantRegistrationActivator`
-   builds the `TenantRegistration` service with `TenantsStore` (Redis, with
-   `SnapshotRepositoryRedisImpl`), `TenantTransactionCollectionsRepository` (JanusGraph) and an
-   `SSOAdminAdapterKeycloakImpl`.
+   `access_control_tenant_registration` and announces its routes. It creates an
+   `SSOAdminAdapterKeycloakImpl` and passes it to `TenantRegistrationActivator`. The activator
+   builds the `TenantRegistration` service with that adapter, `TenantsStore` (Redis, with
+   `SnapshotRepositoryRedisImpl`) and `TenantTransactionCollectionsRepository` (JanusGraph).
 6. **Service.** `TenantRegistration.handle(...)` checks the tenant name and queries the read
    model by label.
    - If an *active* tenant already has that name, it emits `TENANT_REGISTRATION_REJECTED`.
-   - If an inactive tenant has that name, it returns it as `TENANT_REGISTERED`.
+   - If a tenant that is inactive, or has no activity status, has that name, it returns it as
+     `TENANT_REGISTERED`.
    - Otherwise it builds a new `Tenant`, adds it to the write model, and emits
      `TENANT_REGISTERED`.
 
