@@ -1,100 +1,122 @@
 version: "0.2"
 name: domain-access-control-squad
-summary: >
-  Workshop team dedicated to cybnity/domain-access-control (CYBNITY's Access
-  Control domain), from OpenRig's registry workshop at commit f4579db: a lead who
-  scopes the work, a builder, a QA seat and a code reviewer. cyfab's laws apply:
-  the repository is a read-only target and only Olivier merges.
-
 culture_file: CULTURE.md
+summary: >
+  Software factory dedicated to cybnity/domain-access-control (CYBNITY's Access
+  Control domain), from OpenRig's built-in factory team: a lead and a PM
+  advisor, build, QA and design, plus two independent reviewers. The team may
+  push its own branches and open pull requests; only Olivier merges.
 
 docs:
   - path: README.md
 
-# Start steps shared by every seat; each seat's role file comes from its profile.
-startup:
-  files:
-    - path: startup/context.md
-      delivery_hint: send_text
-      required: true
-  # Each seat proves it received its start steps and can reach OpenRig.
-  # `rig ps --nodes` shows ORIENTED: verified, or missing until it does.
-  actions:
-    - type: startup_proof
-      value: authenticated
-      idempotent: true
-
-# OpenRig writes its instruction blocks into each seat's working directory.
-# Claude Code seats get them in CLAUDE.local.md, so they stay out of a
-# project's own CLAUDE.md. Codex seats always use AGENTS.md. The README says
-# how to keep both files out of your pull requests.
+# Claude Code seats get OpenRig's instruction blocks in CLAUDE.local.md, so
+# they stay out of the repository's own CLAUDE.md. Codex seats use AGENTS.md.
 managed_blocks:
   claude-code: CLAUDE.local.md
 
-# Changed from the registry's builtin:yolo + non_interruptive (Olivier's posture
-# for this fleet): Claude Code seats launch in auto mode; Codex seats at the floor.
+# Olivier's posture for this fleet: Claude Code seats launch in auto mode.
 permission_policy: builtin:auto
 
 pods:
   - id: orch
     label: Orchestration
-    summary: Starts from your goal, scopes the work and keeps the pull request description true.
     members:
       - id: lead
-        agent_ref: "local:agents/workshop"
-        profile: lead
+        agent_ref: "local:agents/orchestration/orchestrator"
         runtime: codex
         model: gpt-6-luna
+        profile: default
         cwd: "~/github_repo/domain-access-control"
-        # Default posture only: see "Codex seats and the sandbox" in README.md.
-        # codex_config_profile: workshop-net
         startup:
           files:
-            - path: startup/lead-first-move.md
+            - path: guidance/lead-first-move.md
               delivery_hint: send_text
               required: true
-    edges: []
+      - id: advisor
+        agent_ref: "local:agents/product-management/pm"
+        runtime: claude-code
+        model: claude-opus-5-5
+        profile: advisor
+        cwd: "~/github_repo/domain-access-control"
+        startup:
+          files:
+            - path: guidance/advisor-role.md
+              delivery_hint: send_text
+              required: true
+    edges:
+      - kind: collaborates_with
+        from: advisor
+        to: lead
 
   - id: dev
     label: Development
-    summary: Builds, tests and independently reviews the change.
     members:
       - id: build
-        agent_ref: "local:agents/workshop"
-        profile: builder
+        agent_ref: "local:agents/development/implementer"
         runtime: claude-code
         model: claude-opus-5-5
+        profile: default
         cwd: "~/github_repo/domain-access-control"
-      - id: review
-        agent_ref: "local:agents/workshop"
-        profile: code-reviewer
+      - id: qa
+        agent_ref: "local:agents/development/qa"
         runtime: codex
         model: gpt-6-luna
+        profile: default
         cwd: "~/github_repo/domain-access-control"
-        # Default posture only: opt-in network for this seat; see the README,
-        # "Codex seats and the sandbox".
-        # codex_config_profile: workshop-net
-      - id: qa
-        agent_ref: "local:agents/workshop"
-        profile: qa
+      - id: design
+        agent_ref: "local:agents/design/product-designer"
         runtime: claude-code
         model: claude-opus-5-5
+        profile: default
         cwd: "~/github_repo/domain-access-control"
     edges:
       - kind: delegates_to
         from: build
-        to: review
-      - kind: delegates_to
-        from: build
         to: qa
+
+  - id: review
+    label: Review
+    members:
+      - id: reviewer1
+        agent_ref: "local:agents/review/independent-reviewer"
+        runtime: claude-code
+        model: claude-opus-5-5
+        profile: default
+        cwd: "~/github_repo/domain-access-control"
+      - id: reviewer2
+        agent_ref: "local:agents/review/independent-reviewer"
+        runtime: codex
+        model: gpt-6-luna
+        profile: default
+        cwd: "~/github_repo/domain-access-control"
+    edges: []
 
 edges:
   - kind: delegates_to
     from: orch.lead
     to: dev.build
-  - kind: can_observe
+  - kind: delegates_to
     from: orch.lead
-    to: dev.review
-  - kind: can_observe
+    to: dev.design
+  - kind: delegates_to
     from: orch.lead
+    to: review.reviewer1
+  - kind: delegates_to
+    from: orch.lead
+    to: dev.qa
+  - kind: delegates_to
+    from: orch.lead
+    to: review.reviewer2
+  - kind: can_observe
+    from: review.reviewer1
+    to: dev.build
+  - kind: can_observe
+    from: review.reviewer1
+    to: dev.design
+  - kind: can_observe
+    from: review.reviewer2
+    to: dev.build
+  - kind: can_observe
+    from: review.reviewer2
     to: dev.qa
