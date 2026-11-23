@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Represent a policy strategy type according to a group of subjects and/or
  * sub-subjects.
- * 
+ *
  * @author olivier
  *
  */

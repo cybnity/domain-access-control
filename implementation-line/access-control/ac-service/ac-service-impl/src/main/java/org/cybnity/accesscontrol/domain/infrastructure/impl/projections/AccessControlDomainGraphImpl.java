@@ -1,6 +1,6 @@
 package org.cybnity.accesscontrol.domain.infrastructure.impl.projections;
 
-import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.infrastructure.technical.registry.repository.impl.janusgraph.AbstractDomainGraphImpl;
@@ -39,6 +39,7 @@ public class AccessControlDomainGraphImpl extends AbstractDomainGraphImpl {
 
     /**
      * Definition of each type of data view managed by this graph.
+     *
      * @param management Mandatory management instance to update with vertex labels definition.
      * @throws IllegalArgumentException When management parameter is not defined.
      */
@@ -47,7 +48,7 @@ public class AccessControlDomainGraphImpl extends AbstractDomainGraphImpl {
         if (management == null) throw new IllegalArgumentException("management parameter is required!");
         // Define specification of each data-view (e.g vertex) that is manipulable into this graph (e.g relative to domain perimeter)
         // Each domain object data-view type (type of vertex) is defined by unique label
-        management.makeVertexLabel(TenantDataView.class.getSimpleName()).make();
+        management.makeVertexLabel(TenantDTO.class.getSimpleName()).make();
     }
 
     @Override

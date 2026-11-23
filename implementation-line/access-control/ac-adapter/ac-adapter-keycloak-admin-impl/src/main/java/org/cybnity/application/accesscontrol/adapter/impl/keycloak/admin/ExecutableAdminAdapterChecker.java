@@ -7,6 +7,7 @@ import org.cybnity.framework.immutable.utility.ExecutableComponentChecker;
 import org.cybnity.framework.support.annotation.Requirement;
 import org.cybnity.framework.support.annotation.RequirementCategory;
 
+import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,16 +41,31 @@ public class ExecutableAdminAdapterChecker extends ExecutableComponentChecker {
         // Define the mandatory environment variable for adapter running
         Set<IReadableConfiguration> required = new HashSet<>();
 
-        // - required
-        //required.add(ConfigurationVariable.JANUSGRAPH_STORAGE_BACKEND);
+        // - required for Keycloak Admin REST API client instantiation
+        required.add(AdminConfigurationVariable.REALM_MASTER_NAME);
+        required.add(AdminConfigurationVariable.KEYCLOAK_SERVER_URL);
+        required.add(AdminConfigurationVariable.REALM_MASTER_USERNAME);
+        required.add(AdminConfigurationVariable.REALM_MASTER_PASSWORD);
+        required.add(AdminConfigurationVariable.REALM_MASTER_CLIENTID);
+        required.add(AdminConfigurationVariable.REALM_MASTER_GRANT_TYPE);
+
+        // - required common configuration data for any keycloak objects auto-generation
+        required.add(AdminConfigurationVariable.KEYCLOAK_DEFAULT_CONFIGURATION_FILE_PATH);
 
         return required;
     }
 
     @Override
     protected void checkOperatingFiles() throws UnoperationalStateException {
-        // None embedded files need to be check regarding the adapter to remote
-        // server
+        // Check that required configuration files are accessible
+
+        // Check accessibility to realm configuration file
+        try (FileInputStream f = new FileInputStream(getContext().get(AdminConfigurationVariable.KEYCLOAK_DEFAULT_CONFIGURATION_FILE_PATH))) {
+            if (f.available() < 1)
+                throw new UnoperationalStateException("Invalid empty dynamic realm default configuration file contents!");
+        } catch (Exception e) {
+            throw new UnoperationalStateException(e);
+        }
     }
 
     @Override

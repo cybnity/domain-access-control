@@ -40,6 +40,23 @@ public class UICapabilitiesHTTPRouterImpl extends RouterImpl {
     }
 
     /**
+     * Get the list of headers allowed regarding the requests treated by this backend server.
+     *
+     * @return A list of headers.
+     */
+    private static Set<String> getAllowedHeaders() {
+        Set<String> allowedHeaders = new HashSet<String>();
+        allowedHeaders.add("x-requested-with");
+        allowedHeaders.add("Access-Control-Allow-Origin");// All to consume the content
+        allowedHeaders.add("origin");
+        allowedHeaders.add("Content-Type");
+        allowedHeaders.add("accept");
+        allowedHeaders.add("Authorization");
+        allowedHeaders.add("X-Requested-With");
+        return allowedHeaders;
+    }
+
+    /**
      * Define input/outputs permitted resources.
      *
      * @param vertx Mandatory base vertx context.
@@ -103,23 +120,6 @@ public class UICapabilitiesHTTPRouterImpl extends RouterImpl {
         // Add BodyHandler before the SockJS handler which is required to process POST
         // requests by sub-router
         this.post().handler(BodyHandler.create());
-    }
-
-    /**
-     * Get the list of headers allowed regarding the requests treated by this backend server.
-     *
-     * @return A list of headers.
-     */
-    private static Set<String> getAllowedHeaders() {
-        Set<String> allowedHeaders = new HashSet<String>();
-        allowedHeaders.add("x-requested-with");
-        allowedHeaders.add("Access-Control-Allow-Origin");// All to consume the content
-        allowedHeaders.add("origin");
-        allowedHeaders.add("Content-Type");
-        allowedHeaders.add("accept");
-        allowedHeaders.add("Authorization");
-        allowedHeaders.add("X-Requested-With");
-        return allowedHeaders;
     }
 
     /**

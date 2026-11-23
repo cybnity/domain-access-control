@@ -5,6 +5,7 @@ import org.cybnity.accesscontrol.domain.infrastructure.impl.ACWriteModelConfigur
 import org.cybnity.accesscontrol.domain.infrastructure.impl.TenantsStore;
 import org.cybnity.accesscontrol.iam.domain.infrastructure.impl.IAMWriteModelConfigurationVariable;
 import org.cybnity.application.accesscontrol.translator.ui.api.AccessControlDomainModel;
+import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.model.IDomainModel;
 import org.cybnity.infastructure.technical.persistence.store.impl.redis.PersistentObjectNamingConvention;
@@ -34,12 +35,19 @@ public class CustomContextualizedTest extends InfrastructureContextualizedTest {
     static protected Long CIAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 60L;
 
     /**
+     * Default Keycloak MASTER real name.
+     */
+    static protected String KEYCLOAK_REALM_MASTER_NAME = "cybnnity";
+
+    /**
      * Default duration in seconds of each Access Control object snapshot version stored in Redis.
      */
     static protected Long AC_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 20L;
 
     public CustomContextualizedTest(boolean withRedis, boolean withJanusGraph, boolean withKeycloak, boolean stopKeycloakAfterEach, boolean supportedBySnapshotRepository) {
         super(withRedis, withJanusGraph, withKeycloak, stopKeycloakAfterEach, supportedBySnapshotRepository);
+        // Initialize environment variable required by server adapter clients
+        initServerClientsEnvironmentVariables();
     }
 
     @BeforeEach
@@ -47,6 +55,14 @@ public class CustomContextualizedTest extends InfrastructureContextualizedTest {
         // Initialize dedicated data and configurations
         persistentObjectNamingConvention = PersistentObjectNamingConvention.NamingConventionApplicability.TENANT;
         dataOwner = new AccessControlDomainModel();
+    }
+
+    /**
+     * Initialize environment variable required by server adapter clients
+     */
+    protected void initServerClientsEnvironmentVariables() {
+        initKeycloakEnvVariables(context());
+        initRedisEnvVariables();
     }
 
     /**
@@ -59,6 +75,23 @@ public class CustomContextualizedTest extends InfrastructureContextualizedTest {
             environmentVariables.set(CIAMWriteModelConfigurationVariable.CIAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS.getName(), CIAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS);
             environmentVariables.set(IAMWriteModelConfigurationVariable.IAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS.getName(), IAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS);
             environmentVariables.set(ACWriteModelConfigurationVariable.AC_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS.getName(), AC_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS);
+        }
+    }
+
+    /**
+     * Add complementary environment variables required by a unit test using a Keycloak instance.
+     *
+     * @param context Context to update.
+     */
+    protected void initKeycloakEnvVariables(IContext context) {
+        super.initKeycloakEnvVariables();
+        if (environmentVariables != null) {
+            // Define environment variables regarding adapter initialization
+            environmentVariables.set(org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.AdminConfigurationVariable.REALM_MASTER_NAME.getName(), KEYCLOAK_REALM_MASTER_NAME);
+        }
+        if (context != null) {
+            // Set configuration resources required by Keycloak adapter
+            context.addResource(KEYCLOAK_REALM_MASTER_NAME, org.cybnity.application.accesscontrol.adapter.impl.keycloak.admin.AdminConfigurationVariable.REALM_MASTER_NAME.getName(), false);
         }
     }
 

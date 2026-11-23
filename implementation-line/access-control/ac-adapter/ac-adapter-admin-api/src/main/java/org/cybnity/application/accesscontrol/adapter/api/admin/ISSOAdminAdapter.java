@@ -2,6 +2,7 @@ package org.cybnity.application.accesscontrol.adapter.api.admin;
 
 import org.cybnity.framework.domain.ICleanup;
 import org.cybnity.framework.domain.IHealthControl;
+import org.cybnity.framework.domain.model.Tenant;
 
 /**
  * Contract regarding administration of Single-Sign On (SSO) capabilities that support users or systems on the User Identity and Access Management (UIAM).
