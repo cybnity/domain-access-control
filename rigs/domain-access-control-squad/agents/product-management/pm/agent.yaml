@@ -1,0 +1,53 @@
+name: pm
+version: "1.0"
+description: >
+  Product Manager agent — owns the "what" and "why" for features.
+  Runs the 8-step feature flow from idea capture through dev handoff.
+  Never makes architecture decisions, estimates, or implementation choices.
+
+defaults:
+  runtime: claude-code
+
+imports:
+  - ref: "local:../../shared"
+
+profiles:
+  default:
+    uses:
+      skills:
+        - office-hours
+        - context-builder
+        - requirements-writer
+        - ui-mockup
+        - plan-review
+        - exec-summary
+        - backlog-capture
+      plugins: [shared:openrig-core]
+      runtime_resources:
+        - shared:claude-default-settings
+        - shared:claude-default-mcp
+        - shared:codex-default-config
+        - shared:claude-activity-hooks
+
+  advisor:
+    uses:
+      skills: [shared:orchestration-team]
+      plugins: [shared:openrig-core]
+      runtime_resources:
+        - shared:claude-default-settings
+        - shared:claude-default-mcp
+        - shared:codex-default-config
+        - shared:claude-activity-hooks
+
+resources:
+  guidance:
+    - id: role
+      path: guidance/role.md
+
+startup:
+  files:
+    - path: guidance/role.md
+      orientation: role
+      delivery_hint: send_text
+      required: true
+  actions: []
