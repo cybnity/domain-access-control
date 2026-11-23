@@ -1,7 +1,7 @@
 # Access Control domain: initial roadmap (draft)
 
-> **Status: draft proposal for Olivier Lemée to review.** Nothing here is an approved commitment.
-> The items and their order are inferred from the code as it stands on `main` (merged into
+> **Status: draft proposal for Olivier Lemée to review.** Neither the items nor their order are
+> approved commitments. Both are inferred from the code as it stands on `main` (merged into
 > `feature-237` at `df70a3a`). There are no dates on purpose.
 
 ## Where things stand
