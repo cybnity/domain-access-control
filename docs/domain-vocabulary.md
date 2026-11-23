@@ -109,17 +109,21 @@ and `Realm`: see [Keycloak Realm](#keycloak-realm).
 - **Framework:** `org.cybnity.framework.domain.model.SocialEntity`, an abstract class that
   extends `Aggregate`.
 - **Source:** the three subtypes below. None of them has a tenant field.
+- **Boundary:** an identity, not an [Account](#account). Accounts point to an identity as their owner.
 
 ### Person
 
 - **Definition:** a physical social entity, such as a human.
 - **Source:** `model/iam/domain/model/Person extends SocialEntity`.
+- **Boundary:** not an [Account](#account). It holds no credentials and no tenant reference.
 
 ### SmartSystem
 
 - **Definition:** a software and/or hardware system, such as an autonomous accessory acting for
   a person or organization.
 - **Source:** `model/iam/domain/model/SmartSystem extends SocialEntity`.
+- **Boundary:** a modelled identity with no tenant field. It is not a Keycloak `Client`, which is an
+  application registration (see [Keycloak terms](#keycloak-terms)).
 
 ### OrganizationalStructure
 
@@ -153,6 +157,8 @@ and `Realm`: see [Keycloak Realm](#keycloak-realm).
 - **Definition:** a criterion describing an identity, such as an email address.
 - **Source:** `model/iam/domain/model/IdentityAttribute` and `IMailAddress extends IdentityAttribute`.
   The read and write contracts are `IdentitiesReadModel` and `IdentitiesWriteModel`.
+- **Boundary:** it describes an identity. `SubjectAttribute` describes a subject *requesting
+  access* and belongs to the authorization side (see [Owner / subject](#owner--subject)).
 
 ## Authorization
 
@@ -203,12 +209,16 @@ and `Realm`: see [Keycloak Realm](#keycloak-realm).
 - **Definition:** an ability and role granted to a JWT token's owner.
 - **Source:** `model/authorization/domain/model/IAccreditation`, used by `IDToken`
   (`userHabilitations`).
+- **Synonym:** *habilitation*, the field name in `IDToken`.
+- **Boundary:** an accreditation is something *granted*. A [Claim](#claim) is information
+  *about* the user. `IDToken` keeps them in separate collections.
 
 ### Claim
 
 - **Definition:** a key-value piece of information about a user, such as a department or
   permission.
 - **Source:** `model/authorization/domain/model/IClaim`, used by `IDToken` (`userClaims`).
+- **Boundary:** information carried in a token, not a grant. See [Accreditation](#accreditation).
 
 ### Scope
 
@@ -234,6 +244,8 @@ and `Realm`: see [Keycloak Realm](#keycloak-realm).
 - **Source:** `IResource`; `ControlledResource implements IResource`, holding
   `Collection<AuthorizationPolicy> policies`; and `IResourceServer`, the host of protected
   resources.
+- **Boundary:** a domain-model type. No Keycloak class in `kc/` models protected resources, and it
+  is not a Keycloak `Client`.
 
 ## Tokens and flows
 
@@ -242,7 +254,7 @@ and `Realm`: see [Keycloak Realm](#keycloak-realm).
 | Security token | `ISecurityToken` | An OAuth2 token. |
 | Access token | `IAccessToken extends ISecurityToken` | An access token allowed to an account. |
 | Refresh token | `IRefreshToken extends ISecurityToken` | A token used to refresh an access token. |
-| ID token | `IDToken implements ISecurityToken` (a class) | An OIDC token with claims, accreditations, and creation, authentication and expiry times. |
+| ID token | `IDToken implements ISecurityToken` (an abstract class) | An OIDC token with claims, accreditations, and creation, authentication and expiry times. |
 | JWT token | `JWTToken`, which holds an `IDToken` | The JWT exchange format of a token. |
 | Accredited user token | `AccreditedUserToken` | An accredited JWT allowed to an authenticated subject (no fields yet). |
 | Authorization flow | `IAuthorizationFlow`, `IAuthorizationCodeFlow` | OIDC flow types. The implicit flow is described as not retained in [information flow enforcement](implementation-view/information-flow-enforcement.md). |
@@ -288,7 +300,7 @@ These are recorded as found and not corrected:
 
 | Where | Observation |
 |:---|:---|
-| `IDToken` | A concrete class whose name has the `I` interface prefix. |
+| `IDToken` | An abstract class whose name has the `I` interface prefix. |
 | `IAuthorizationType` | Its Javadoc gives two meanings: a lifecycle status (requested, accepted, …) and a privilege (action:resource). |
 | `Implicit`, `IClientCredentials` | Grant or flow styles modelled as subtypes of `IAuthorizationType`, while the flows themselves are `IAuthorizationFlow`. |
 | `Account` Javadoc | Constructor parameters describe "this tenant root aggregate" and "identifier of this tenant", although the class is an account. |
