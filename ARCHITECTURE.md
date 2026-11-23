@@ -44,7 +44,7 @@ direct, non-test `<dependencies>` of each POM. Framework and infrastructure arti
 | `ac-system/ac-domain-gateway-server` | `ac.system:domain-gateway-server` | **Runnable.** Domain I/O gateway. | `translator:ui` |
 | `ac-system/ac-rts-computation-unit` | `ac.system:process-module` | **Runnable.** Processing unit hosting the tenant-registration pipeline. | `service-impl`, `adapters:keycloak-admin-impl` |
 | `ac-ui/ac-ui-system/ac-backend-server` | `ac.ui.system:backend-server` | **Runnable.** UI-facing backend (Vert.x HTTP and event bus). | `ui:api`, `translator:ui` |
-| `ac-ui/ac-ui-system/ac-frontend-server` | `ac.ui.system:frontend-server` | Declared module only: it contains a `pom.xml`, `src/LICENSE` and `src/NOTICE`, and no source. | none |
+| `ac-ui/ac-ui-system/ac-frontend-server` | `ac.ui.system:frontend-server` | **Not built.** Its `<module>` entry is commented out in `ac-ui/ac-ui-system/pom.xml` (lines 16-17), so it is outside the Maven reactor and CI. The folder holds a `pom.xml`, `src/LICENSE` and `src/NOTICE`, and no source. | none |
 
 **Runnable vs library:** the three runnable systems each declare a `main.verticle` property and
 the `docker-maven-plugin` in their POM, and they ship `src/main/resources/static/health.html`.
@@ -54,8 +54,8 @@ Their entry verticles are:
 - `AccessControlDomainProcessModule`
 - `AccessControlReactiveMessagingGateway`
 
-Every other module is a jar library. The root README also lists `frontend-server` as a
-deployable module, but it has no code yet.
+Every other built module is a jar library. The root README also lists `frontend-server` as a
+deployable module, but it has no code and is excluded from the build.
 
 ## Tenant registration: request and response path
 
@@ -165,7 +165,8 @@ imports them.
 - The four use-case tests in `ac-rts-computation-unit/.../TenantRegistrationUseCaseTest` flag
   their checkpoints without assertions. That class runs in the commit stage, because its name
   doesn't contain "Integration".
-- `ac-frontend-server` and the domain-model `ciam` and `pam` packages are placeholders.
+- `ac-frontend-server` is a placeholder excluded from the Maven reactor (commented out in
+  `ac-ui/ac-ui-system/pom.xml`). The domain-model `ciam` and `pam` packages are placeholders.
 
 **Docs vs code.**
 
