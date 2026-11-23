@@ -5,8 +5,8 @@ The space presents the implementation view of the developed components.
 The [architecture map](ARCHITECTURE.md) describes the code as it is today, read from the Maven POMs and the Java sources, for maintainers and builders who need to find their way. It keeps observed behaviour separate from the intent described in this documentation, and it doesn't propose future work.
 
 In synthesis:
-- **Modules:** under `implementation-line/access-control/`, the modules are layered as domain model, translators, adapters, services, systems and UI. Each module's role and in-repo dependencies are listed in the map.
-- **Runnable systems:** three Vert.x systems are built as Docker images:
+- **Modules:** under `implementation-line/access-control/`, the modules are grouped into domain model, translators, adapters, services, systems and UI. Each module's role and in-repo dependencies are listed in the map.
+- **Runnable systems:** three Vert.x systems, each with a main verticle and Docker packaging declared in its POM:
   - Domain gateway (`AccessControlDomainIOGateway`)
   - Process module (`AccessControlDomainProcessModule`)
   - UI backend (`AccessControlReactiveMessagingGateway`)
