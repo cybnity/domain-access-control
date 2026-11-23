@@ -31,8 +31,12 @@ Specific OpenID connect libraries are encapsulated/reused by CYBNITY application
 
 ### Java Connectors
 These implementation sub-projects build client adapters which can be reuse by any other CYBNITY applicative or technical component that require interaction with the UIAM module deployed into a CYBNITY software suite environment:
+- [ac-adapter-admin-api](ac-adapter-admin-api): IAM and SSO administration adapter API (connector specification component).
+- [ac-adapter-api](ac-adapter-api): Access Control adapter API (connector specification component).
 - [ac-adapter-keycloak-impl](ac-adapter-keycloak-impl): implementation components that are compatible to Keycloak endpoints and API, and support realization of the capabilities (e.g communication protocol, data transformation) with contribution/delegation of Keycloak server system. This __implementation library__ is supporting the scope of `ac-adapter-api` as __common features__ usable from any CYBNITY architecture layer. For example, the authentication features are realized by this library in a SSO protocol implemented for authentication and authorization of a user or system.
 - [ac-adapter-keycloak-admin-impl](ac-adapter-keycloak-admin-impl): implementation components that are managing the integration and support with Keycloak Admin REST API. This __implementation library__ is supporting the scope of `ac-adapter-admin-api` as __IAM administration features__ usable only from CYBNITY Access Control domain that is deployed into secure layers (e.g server-side system executed and deployed into protected area). For example, this library is usefull for TenantRegistrationService ensuring the creation of independant Realm scopes dedicated per organization.
+- [keycloak-domain-ontology-impl](keycloak-domain-ontology-impl): supported ontology specific to Keycloak solution as external object able to be translated.
+- [keycloak-translator](../ac-translator/keycloak-translator): objects translation rules and mappers between Keycloak and Access Control ontologies.
 
 ### Javascript Connectors
 

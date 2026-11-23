@@ -19,24 +19,20 @@ import org.junit.jupiter.api.TestInstance;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class CustomContextualizedTest extends InfrastructureContextualizedTest {
 
-    private PersistentObjectNamingConvention.NamingConventionApplicability persistentObjectNamingConvention;
-
-    private IDomainModel dataOwner;
-
     /**
      * Default duration in seconds of each IAM object snapshot version stored in Redis.
      */
     static protected Long IAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 60L;
-
     /**
      * Default duration in seconds of each CIAM object snapshot version stored in Redis.
      */
     static protected Long CIAM_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 60L;
-
     /**
      * Default duration in seconds of each Access Control object snapshot version stored in Redis.
      */
     static protected Long AC_WRITEMODEL_SNAPSHOT_ITEM_DEFAULT_EXPIRATION_DURATION_IN_SECONDS = 20L;
+    private PersistentObjectNamingConvention.NamingConventionApplicability persistentObjectNamingConvention;
+    private IDomainModel dataOwner;
 
     public CustomContextualizedTest(boolean withRedis, boolean withJanusGraph, boolean withKeycloak, boolean stopKeycloakAfterEach, boolean supportedBySnapshotRepository) {
         super(withRedis, withJanusGraph, withKeycloak, stopKeycloakAfterEach, supportedBySnapshotRepository);

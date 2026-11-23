@@ -12,4 +12,12 @@
     <version>${revision}</version>
     <packaging>jar</packaging>
     <name>-- IAM &amp; SSO administration adapter api (spec)</name>
+
+	<dependencies>
+		<dependency>
+			<!-- Exposed access domain ontology data models -->
+			<groupId>org.cybnity.application.access-control.adapters</groupId>
+            <artifactId>api</artifactId>
+		</dependency>
+	</dependencies>
 </project>

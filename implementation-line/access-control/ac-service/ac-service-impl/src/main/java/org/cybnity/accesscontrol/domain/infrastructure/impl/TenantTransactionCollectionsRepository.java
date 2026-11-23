@@ -3,8 +3,8 @@ package org.cybnity.accesscontrol.domain.infrastructure.impl;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.AccessControlDomainGraphImpl;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.AccessControlDomainReadModelImpl;
 import org.cybnity.accesscontrol.domain.service.api.event.ACApplicationQueryName;
-import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
 import org.cybnity.accesscontrol.domain.service.api.model.TenantTransactionsCollection;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.application.accesscontrol.translator.ui.api.AccessControlDomainModel;
 import org.cybnity.framework.IContext;
 import org.cybnity.framework.UnoperationalStateException;
@@ -120,12 +120,12 @@ public class TenantTransactionCollectionsRepository extends AbstractReadModelRep
                             // Build domain data view results to return
                             List<TenantTransactionsCollection> results;
                             DataTransferObject resultProvider = dto.get();
-                            if (TenantDataView.class.isAssignableFrom(resultProvider.getClass())) {
+                            if (TenantDTO.class.isAssignableFrom(resultProvider.getClass())) {
                                 // Valid type of collected data view object managed by this repository
                                 // that can be returned as unique result
                                 results = new LinkedList<>();
-                                TenantDataView record = (TenantDataView) resultProvider;
-                                TenantTransactionsCollection col = new TenantTransactionsCollection(record.valueOfProperty(TenantDataView.PropertyAttributeKey.IDENTIFIED_BY));
+                                TenantDTO record = (TenantDTO) resultProvider;
+                                TenantTransactionsCollection col = new TenantTransactionsCollection(record.valueOfProperty(TenantDTO.PropertyAttributeKey.IDENTIFIED_BY));
                                 col.add(record);
                                 results.add(col);
                                 return results;

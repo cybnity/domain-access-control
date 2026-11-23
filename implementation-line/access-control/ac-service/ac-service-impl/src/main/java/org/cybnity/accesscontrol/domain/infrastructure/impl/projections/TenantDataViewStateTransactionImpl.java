@@ -2,7 +2,7 @@ package org.cybnity.accesscontrol.domain.infrastructure.impl.projections;
 
 import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.change.ChangedTenantDataViewVersion;
 import org.cybnity.accesscontrol.domain.infrastructure.impl.projections.read.FindTenantDataViewVersionByEqualsLabel;
-import org.cybnity.accesscontrol.domain.service.api.model.TenantDataView;
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.framework.UnoperationalStateException;
 import org.cybnity.framework.domain.*;
 import org.cybnity.framework.domain.event.ConcreteDomainChangeEvent;
@@ -27,7 +27,7 @@ public class TenantDataViewStateTransactionImpl extends AbstractGraphDataViewTra
      * Label designing this type of data view lifecycle manager.
      * It's a logical definition (e.g query name, projection finality unique name) of this projection that can be used for projections equals validation.
      */
-    public static final String LABEL = TenantDataView.class.getSimpleName();
+    public static final String LABEL = TenantDTO.class.getSimpleName();
 
     /**
      * Default constructor regarding a graph read model projection.

@@ -16,9 +16,33 @@ buildNumber.properties
 **/.settings
 # IntelliJ Idea
 **/.idea
+
+# Maven pom generated intermediate files
 **/.flattened-pom.xml
 .flattened-pom.xml
 implementation-line/.flattened-pom.xml
-implementation-line/.flattened-pom.xml
+implementation-line/access-control/ac-adapter/ac-adapter-admin-api/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-adapter/ac-adapter-api/mpp-official-version-pom-tree.txt
 implementation-line/access-control/ac-adapter/ac-adapter-api/api.iml
+implementation-line/access-control/ac-adapter/ac-adapter-keycloak-admin-impl/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-adapter/ac-adapter-keycloak-impl/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-adapter/keycloak-domain-ontology-impl/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-adapter/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-domain-model/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-service/ac-service-api/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-service/ac-service-impl/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-service/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-system/ac-domain-gateway-server/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-system/ac-rts-computation-unit/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-system/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-translator/ac-ui-translator/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-translator/keycloak-translator/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-translator/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-ui/ac-ui-api/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-ui/ac-ui-system/ac-backend-server/mpp-official-version-pom-tree.txt
 implementation-line/access-control/ac-ui/ac-ui-system/ac-backend-server/backend-server.iml
+implementation-line/access-control/ac-ui/ac-ui-system/mpp-official-version-pom-tree.txt
+implementation-line/access-control/ac-ui/mpp-official-version-pom-tree.txt
+implementation-line/access-control/mpp-official-version-pom-tree.txt
+implementation-line/mpp-official-version-pom-tree.txt
+mpp-official-version-pom-tree.txt

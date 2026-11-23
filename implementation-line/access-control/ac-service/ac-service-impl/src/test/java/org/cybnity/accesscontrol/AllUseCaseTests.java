@@ -1,8 +1,8 @@
 package org.cybnity.accesscontrol;
 
-import org.cybnity.accesscontrol.domain.infrastructure.impl.ACTransactionsRepositoryUseCaseTest;
-import org.cybnity.accesscontrol.domain.service.impl.TenantRegistrationRejectionUseCaseTest;
-import org.cybnity.accesscontrol.domain.service.impl.TenantRegistrationUseCaseTest;
+import org.cybnity.accesscontrol.domain.infrastructure.impl.ACTransactionsRepositoryUseCaseIntegrationTest;
+import org.cybnity.accesscontrol.domain.service.impl.TenantRegistrationRejectionUseCaseIntegrationTest;
+import org.cybnity.accesscontrol.domain.service.impl.TenantRegistrationUseCaseIntegrationTest;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 
@@ -13,7 +13,7 @@ import org.junit.platform.suite.api.Suite;
  * @author olivier
  */
 @Suite
-@SelectClasses({TenantRegistrationUseCaseTest.class, TenantRegistrationRejectionUseCaseTest.class, ACTransactionsRepositoryUseCaseTest.class})
+@SelectClasses({TenantRegistrationUseCaseIntegrationTest.class, TenantRegistrationRejectionUseCaseIntegrationTest.class, ACTransactionsRepositoryUseCaseIntegrationTest.class})
 public class AllUseCaseTests {
 
 }

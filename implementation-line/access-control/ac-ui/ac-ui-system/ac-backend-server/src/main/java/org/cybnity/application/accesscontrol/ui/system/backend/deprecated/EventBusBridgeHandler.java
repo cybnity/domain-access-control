@@ -15,13 +15,12 @@ import java.util.logging.Logger;
  * layer.
  */
 public abstract class EventBusBridgeHandler implements Handler<BridgeEvent> {
-    private final EventBus bus;
-    private final SharedData sessionStore;
-
     /**
      * Technical logging
      */
     private static final Logger logger = Logger.getLogger(EventBusBridgeHandler.class.getName());
+    private final EventBus bus;
+    private final SharedData sessionStore;
 
     public EventBusBridgeHandler(EventBus eventBus, SharedData sessionStore) {
         this.bus = eventBus;
