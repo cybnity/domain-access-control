@@ -5,7 +5,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 
 /**
  * Represent a policy strategy type according to a user type.
- * 
+ *
  * @author olivier
  *
  */

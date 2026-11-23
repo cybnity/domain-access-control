@@ -8,7 +8,7 @@ import java.util.Collection;
 
 /**
  * Ability and role allowed to a JWT token owner.
- * 
+ *
  * @author olivier
  *
  */
@@ -17,7 +17,7 @@ public interface IAccreditation {
 
     /**
      * Get description of the owner of this accreditation.
-     * 
+     *
      * @return An owner identity.
      */
     Collection<SubjectAttribute> userIdentity();

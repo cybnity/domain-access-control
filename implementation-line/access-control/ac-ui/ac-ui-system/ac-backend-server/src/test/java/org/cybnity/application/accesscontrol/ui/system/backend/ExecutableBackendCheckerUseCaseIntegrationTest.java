@@ -21,12 +21,12 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @ExtendWith({VertxExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class ExecutableBackendCheckerUseCaseTest extends BackendCustomContextualizedTest {
+public class ExecutableBackendCheckerUseCaseIntegrationTest extends BackendCustomContextualizedTest {
 
     /**
      * Default constructor.
      */
-    public ExecutableBackendCheckerUseCaseTest() {
+    public ExecutableBackendCheckerUseCaseIntegrationTest() {
         super(false, false, false, false, /* With snapshots management capability activated */ false);
     }
 

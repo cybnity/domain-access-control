@@ -22,8 +22,14 @@
 			<!-- Common Keycloak usage implementation components -->
 			<groupId>org.cybnity.application.access-control.adapters</groupId>
 			<artifactId>keycloak-impl</artifactId>
+			<scope>compile</scope>
 		</dependency>
-
+		<dependency>
+			<!-- Keycloak Admin REST client -->
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-admin-client</artifactId>
+			<scope>compile</scope>
+		</dependency>
 		<!-- Test cycle dependencies -->
 		<dependency>
 			<!-- io.netty.resolver.dns.DnsServerAddressStreamProviders ignored about 'io.netty:netty-resolver-dns-native-macos" NOTIFICATION on Mac -->

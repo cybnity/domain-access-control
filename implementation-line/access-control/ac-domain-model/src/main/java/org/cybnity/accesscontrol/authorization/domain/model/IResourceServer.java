@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Represent a host of protected resources which accept requests (e.g resource
  * read, change) performed by confidential clients.
- * 
+ *
  * @author olivier
  *
  */

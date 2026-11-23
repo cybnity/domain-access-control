@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * Behavior unit test regarding the registration rejection cases. This test scope is not considering the integration concerns with repositories or event sourcing collaboration actions (based on mocked services).
  */
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class TenantRegistrationRejectionUseCaseTest extends CustomContextualizedTest {
+public class TenantRegistrationRejectionUseCaseIntegrationTest extends CustomContextualizedTest {
 
     private TenantsStore tenantsStore;
     private TenantRegistration tenantRegistrationService;
@@ -47,12 +47,13 @@ public class TenantRegistrationRejectionUseCaseTest extends CustomContextualized
     /**
      * Default constructor.
      */
-    public TenantRegistrationRejectionUseCaseTest() {
+    public TenantRegistrationRejectionUseCaseIntegrationTest() {
         super(true, true, /* not need by registration service use case impl */ false, false,/* With snapshots management capability activated */true);
     }
 
     @BeforeEach
     public void initHelpers() throws UnoperationalStateException {
+        initServerClientsEnvironmentVariables();
         // Create a store managing streamed messages
         tenantsStore = getTenantPersistenceOrientedStore();
 

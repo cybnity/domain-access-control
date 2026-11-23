@@ -17,6 +17,10 @@
 			<artifactId>domain</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.cybnity.application.access-control.adapters</groupId>
+			<artifactId>api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.cybnity.application.access-control.translator</groupId>
 			<artifactId>ui</artifactId>
 		</dependency>

@@ -8,7 +8,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Represents an object (e.g file, service, data) being protected, and that is
  * identifiable.
- * 
+ *
  * @author olivier
  *
  */

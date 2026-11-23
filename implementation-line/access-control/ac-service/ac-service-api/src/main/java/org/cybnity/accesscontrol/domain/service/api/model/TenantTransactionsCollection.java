@@ -1,5 +1,6 @@
 package org.cybnity.accesscontrol.domain.service.api.model;
 
+import org.cybnity.application.accesscontrol.adapter.api.model.TenantDTO;
 import org.cybnity.framework.domain.DataTransferObject;
 import org.cybnity.framework.domain.SerializationFormat;
 
@@ -21,7 +22,7 @@ public class TenantTransactionsCollection extends DataTransferObject {
      * ArrayList is the best choice for frequent operation that is retrieval operation.
      * LinkedList is the best choice for frequent operation as insertion and deletion in the middle; but is a worst choice is the frequent operation is retrieval operation.
      */
-    private final List<TenantDataView> versionsHistory = Collections.synchronizedList(new ArrayList<>());
+    private final List<TenantDTO> versionsHistory = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Identifier of the Tenant which is owner of transactions container.
@@ -73,18 +74,18 @@ public class TenantTransactionsCollection extends DataTransferObject {
      * @param versionedAt    Optional date of version search criteria.
      * @return Found transaction or null.
      */
-    public Collection<TenantDataView> findExistingEquals(String label, Boolean activityStatus, Date versionedAt) {
-        Collection<TenantDataView> found = new LinkedList<>();
+    public Collection<TenantDTO> findExistingEquals(String label, Boolean activityStatus, Date versionedAt) {
+        Collection<TenantDTO> found = new LinkedList<>();
         // Read history and compare search criteria to identify an equals version
-        for (TenantDataView t : versionsHistory) {
+        for (TenantDTO t : versionsHistory) {
             boolean equalsLabel = (label == null), equalsStatus = (activityStatus == null), equalsVersionDate = (versionedAt == null);
             if (label != null) {
                 // Compare search criteria
-                equalsLabel = label.equals(t.valueOfProperty(TenantDataView.PropertyAttributeKey.LABEL));
+                equalsLabel = label.equals(t.valueOfProperty(TenantDTO.PropertyAttributeKey.LABEL));
             }
             if (activityStatus != null) {
                 // Compare search criteria
-                String currentStatus = t.valueOfProperty(TenantDataView.PropertyAttributeKey.ACTIVITY_STATUS);
+                String currentStatus = t.valueOfProperty(TenantDTO.PropertyAttributeKey.ACTIVITY_STATUS);
                 if (currentStatus != null) {
                     equalsStatus = Boolean.valueOf(currentStatus).equals(activityStatus);
                 }
@@ -93,7 +94,7 @@ public class TenantTransactionsCollection extends DataTransferObject {
                 DateFormat formatter = new SimpleDateFormat(SerializationFormat.DATE_FORMAT_PATTERN);
                 try {
                     // Compare search criteria
-                    equalsVersionDate = versionedAt.equals(formatter.parse(t.valueOfProperty(TenantDataView.PropertyAttributeKey.LAST_UPDATED_AT)));
+                    equalsVersionDate = versionedAt.equals(formatter.parse(t.valueOfProperty(TenantDTO.PropertyAttributeKey.LAST_UPDATED_AT)));
                 } catch (ParseException pe) {
                     logger.log(Level.SEVERE, "Invalid formatted value of LAST_UPDATED_AT property detected into data view!", pe);
                 }
@@ -119,7 +120,7 @@ public class TenantTransactionsCollection extends DataTransferObject {
      */
     public void add(String label, Boolean activityStatus, Date versionedAt, Date createdAt, String commitVersion) throws IllegalArgumentException {
         // Create and add transaction item to transactions set
-        versionsHistory.add(new TenantDataView(activityStatus, label, versionedAt, this.tenantIdentifier, createdAt, commitVersion));
+        versionsHistory.add(new TenantDTO(activityStatus, label, versionedAt, this.tenantIdentifier, createdAt, commitVersion));
     }
 
     /**
@@ -128,7 +129,7 @@ public class TenantTransactionsCollection extends DataTransferObject {
      * @param view Mandatory view to add.
      * @throws IllegalArgumentException When mandatory parameter is missing.
      */
-    public void add(TenantDataView view) throws IllegalArgumentException {
+    public void add(TenantDTO view) throws IllegalArgumentException {
         if (view == null) throw new IllegalArgumentException("View parameter is required!");
         // Add transaction item to set
         versionsHistory.add(view);
@@ -139,7 +140,7 @@ public class TenantTransactionsCollection extends DataTransferObject {
      *
      * @return An immutable list of transactions or empty list.
      */
-    public List<TenantDataView> versions() {
+    public List<TenantDTO> versions() {
         return Collections.unmodifiableList(this.versionsHistory);
     }
 

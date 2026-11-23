@@ -6,7 +6,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
 /**
  * Represent an OIDC algorithm type of workflow managing an access
  * authorization.
- * 
+ *
  * @author olivier
  *
  */

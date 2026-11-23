@@ -7,7 +7,7 @@ import org.cybnity.framework.support.annotation.RequirementCategory;
  * Represent type of authorization usable by client-side (e.g web browser
  * javascript module). This type of authorization (e.g access token based) can
  * be intercepted if none security measure is implemented.
- * 
+ *
  * @author olivier
  *
  */
