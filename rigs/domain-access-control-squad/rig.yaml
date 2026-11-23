@@ -61,7 +61,7 @@ pods:
       - id: qa
         agent_ref: "local:agents/development/qa"
         runtime: claude-code
-        model: claude-opus-5-5
+        model: claude-sonnet-5-5
         profile: default
         cwd: "~/github_repo/domain-access-control"
       - id: design
