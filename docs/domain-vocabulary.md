@@ -33,8 +33,11 @@ flowchart LR
   Realm["Keycloak Realm"] -- "RealmRepresentationMapper" --> TenantDTO
   Account["Account"] -- "owner (EntityReference)" --> Subject["Person / SmartSystem /<br/>OrganizationalStructure<br/>(SocialEntity)"]
   Account -- "tenant (EntityReference, optional)" --> Tenant
-  PermissionCode["PermissionCode<br/>(IAuthorizationType)"] -- "label becomes role name" --> KcRole["Keycloak RealmRole /<br/>client role"]
-  KcRole -- "defined in" --> Realm
+  PermissionCode["PermissionCode<br/>(IAuthorizationType)"] -- "USE_TENANT label" --> RealmRole["Keycloak realm role"]
+  PermissionCode -- "ACCESS_APPLICATIONS label" --> ClientRole["Keycloak client role"]
+  RealmRole -- "created in" --> Realm
+  ClientRole -- "created in" --> Client["Keycloak Client"]
+  Client -- "belongs to" --> Realm
 ```
 
 Arrows show references or mappings that exist in code. There is no code link between `Tenant`
@@ -285,8 +288,9 @@ DTOs.
 - **Events:** three different enums are named `DomainEventType`.
   - `org.cybnity.application.accesscontrol.translator.ui.api.event.DomainEventType`
     (`ac-ui-translator`): `TENANT_REGISTRATION_SUBMITTED`, `TENANT_REGISTERED`, `TENANT_CHANGED`,
-    `TENANT_REMOVED`, `TENANT_REGISTRATION_REJECTED`. These are the results `TenantRegistration`
-    publishes.
+    `TENANT_REMOVED`, `TENANT_REGISTRATION_REJECTED`. Of these, `TenantRegistration` emits only
+    `TENANT_REGISTERED` and `TENANT_REGISTRATION_REJECTED`. The other three are declared but not
+    emitted by that service.
   - `org.cybnity.framework.domain.event.DomainEventType` (framework): `TENANT_CREATED` and others.
     These are the write-model events consumed by the tenant read-model projections
     (`ChangedTenantDataViewVersion`).
