@@ -8,8 +8,6 @@ You can find informations relative to software maintenance like:
 - Support to software build process and packaging
 - Systems configuration and deployment procedures
 
-The domain terms (Tenant, Account, Role, Realm…) and how they map to the source are defined in the [domain vocabulary](docs/design-view/domain-vocabulary.md).
-
 # FUNCTIONAL VIEW (Use Cases)
 ## PURPOSE
 - Show the functionalities of the system(s) as perceived by the external actors
@@ -38,8 +36,9 @@ Formalizes the specification of the software and sub-components produced during 
 Feature implementations versions are designed and delivered as implementation software which extends the Foundation Core project.
 
 ### Artifacts
-The managed source files are stored in the design-view sub-folder like:
+The managed documentation files are stored in the [design-view](docs/design-view) sub-folder like:
 - Static aspects (structural diagrams): classes, objects
+  - The domain terms (Tenant, Account, Role, Realm…) and how they map to the source are defined in the [domain vocabulary](docs/design-view/domain-vocabulary.md) 
 - Dynamic aspects (behavioral diagrams): interactions, statecharts, activities, sequences
 
 # PROCESS VIEW (Executions)
@@ -67,7 +66,7 @@ The managed source files are stored in the process-view sub-folder like:
 Formalizes the maintenance documentation aligned with source codes developed, including specificities regarding technologies (e.g language requirements) and frameworks (e.g implementation templates, protocols) used for implementation of the software.
 
 ### Artifacts
-The managed source files are stored in the [implementation-view](docs/implementation-view) sub-folder like:
+The documentations are stored in the [implementation-view](docs/implementation-view) sub-folder like:
 - Static aspects (structural diagrams): components, packages
 - Dynamic aspects (behavioral diagrams): interactions, statecharts, activities
 - Model sub-packages:
