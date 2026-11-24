@@ -2,7 +2,7 @@ version: "0.2"
 name: domain-access-control-squad
 culture_file: CULTURE.md
 summary: >
-  Software factory dedicated to cybnity/domain-access-control (CYBNITY's Access
+  Software factory team of agents (named Rig) dedicated to cybnity/domain-access-control (CYBNITY's Access
   Control domain), from OpenRig's built-in factory team: a lead and a PM
   advisor, build, QA and design, plus two independent reviewers. The team may
   push its own branches and open pull requests; only Olivier merges.
